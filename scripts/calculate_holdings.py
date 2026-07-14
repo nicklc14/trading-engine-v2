@@ -9,13 +9,13 @@ HOLDINGS_PATH = DATA_DIR / "holdings.csv"
 
 def calculate_holdings():
     if not TRADES_PATH.exists():
-        pd.DataFrame().to_csv(HOLDINGS_PATH, index=FALSE)
+        pd.DataFrame().to_csv(HOLDINGS_PATH, index=False)
         return pd.DataFrame()
 
     trades = pd.read_csv(TRADES_PATH)
 
     if trades.empty:
-        pd.DataFrame().to_csv(HOLDINGS_PATH, index=FALSE)
+        pd.DataFrame().to_csv(HOLDINGS_PATH, index=False)
         return pd.DataFrame()
 
     market = pd.read_csv(MARKET_PATH) if MARKET_PATH.exists() else pd.DataFrame()
@@ -39,10 +39,15 @@ def calculate_holdings():
         current_price = price_map.get(ticker, np.nan)
         market_value = shares * current_price if pd.notna(current_price) else np.nan
 
-        rows.append({"ticker": ticker,"shares": shares,"current_price": current_price,"market_value": market_value})
+        rows.append({
+            "ticker": ticker,
+            "shares": shares,
+            "current_price": current_price,
+            "market_value": market_value
+        })
 
     out = pd.DataFrame(rows)
-    out.to_csv(HOLDINGS_PATH, index=FALSE)
+    out.to_csv(HOLDINGS_PATH, index=False)
     return out
 
 if __name__ == "__main__":
