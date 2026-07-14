@@ -2,10 +2,15 @@ setting,value,description
 max_positions,6,Aggressive max open positions
 cash_reserve_pct,0,Use all available cash if signals justify it
 risk_pct_per_trade,0.05,Aggressive risk budget per trade
-max_position_pct,0.35,Max one position as percent of cash
+max_position_pct,0.35,Max one position as percent of equity
 block_new_buys_on_high_sell,TRUE,Do not add risk while high priority exits exist
 weekly_loss_stop_pct,0.10,Stop new buys if weekly realized loss exceeds 10 percent equity
-momentum_priority_boost,5,Boost MOMENTUM tier scores for aggressive plan
-quality_position_size_factor,0.65,QUALITY buys smaller than MOMENTUM buys
+momentum_priority_boost,5,Boost MOMENTUM tier scores
+quality_position_size_factor,0.65,QUALITY buys smaller than MOMENTUM
 add_more_min_return,0.05,Only add to winners above 5 percent
 add_more_min_score,80,Only add if signal score remains strong
+max_moonshot_positions,2,Maximum open MOONSHOT positions
+moonshot_score_boost,8,Boost MOONSHOT candidates
+moonshot_position_size_factor,0.50,Initial MOONSHOT position size factor
+moonshot_min_volume_trend,1.2,Minimum volume trend for moonshot confirmation
+moonshot_min_atr_pct,0.08,Minimum ATR percent for moonshot volatility
