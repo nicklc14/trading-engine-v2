@@ -11,6 +11,7 @@ HOLDINGS_PATH = DATA_DIR / "holdings.csv"
 
 RISK_PCT_PER_TRADE = 0.02
 MAX_POSITION_PCT = 0.25
+MAX_POSITIONS = 10
 
 def clamp(x, lo=0, hi=100):
     return max(lo, min(hi, x))
@@ -37,22 +38,25 @@ def score_signals():
     holdings = pd.read_csv(HOLDINGS_PATH) if HOLDINGS_PATH.exists() else pd.DataFrame()
     if not holdings.empty:
         holdings["ticker"] = holdings["ticker"].astype(str).str.upper().str.strip()
+        for col in ["shares", "avg_cost", "holding_return_pct"]:
+            if col not in holdings.columns:
+                holdings[col] = np.nan
+    else:
+        holdings = pd.DataFrame(columns=["ticker", "shares", "avg_cost", "holding_return_pct"])
+
+    position_count = int((holdings["shares"].fillna(0) > 0).sum()) if "shares" in holdings.columns else 0
+    open_slots = max(MAX_POSITIONS - position_count, 0)
 
     cash_available = get_cash_available()
     risk_budget_usd = cash_available * RISK_PCT_PER_TRADE
     max_position_usd = cash_available * MAX_POSITION_PCT
 
     df = watch.merge(market, on="ticker", how="left")
-    if not holdings.empty:
-        df = df.merge(
-            holdings[["ticker", "shares", "avg_cost", "holding_return_pct"]],
-            on="ticker",
-            how="left"
-        )
-    else:
-        df["shares"] = 0
-        df["avg_cost"] = np.nan
-        df["holding_return_pct"] = np.nan
+    df = df.merge(
+        holdings[["ticker", "shares", "avg_cost", "holding_return_pct"]],
+        on="ticker",
+        how="left"
+    )
 
     rows = []
 
@@ -108,6 +112,18 @@ def score_signals():
         elif final_score >= 75:
             action = "BUY SMALL"
 
+        position_rule = ""
+        can_open_new_position = already_held or open_slots > 0
+
+        if already_held:
+            position_rule = "Already held"
+        elif open_slots <= 0:
+            position_rule = "Max 10 positions reached"
+            if action in ["BUY", "BUY SMALL"]:
+                action = "WATCH"
+        else:
+            position_rule = f"{open_slots} open slot(s)"
+
         sell_signal = ""
         exit_reason = ""
 
@@ -143,13 +159,21 @@ def score_signals():
             warnings.append("Missing price")
         if pd.isna(atr) or atr <= 0:
             warnings.append("Missing ATR")
+        if not can_open_new_position and not already_held:
+            warnings.append("Max positions reached")
         if sell_signal:
             warnings.append(exit_reason)
 
         buy_amount_usd = 0.0
         shares_to_buy = 0.0
 
-        if not already_held and action in ["BUY", "BUY SMALL"] and pd.notna(price) and price > 0:
+        if (
+            can_open_new_position
+            and not already_held
+            and action in ["BUY", "BUY SMALL"]
+            and pd.notna(price)
+            and price > 0
+        ):
             risk_per_share = max(price - stop_loss, 0) if pd.notna(stop_loss) else 0
             if risk_per_share > 0:
                 atr_sized_amount = (risk_budget_usd / risk_per_share) * price
@@ -185,6 +209,9 @@ def score_signals():
             "holding_return_pct": holding_return_pct,
             "sell_signal": sell_signal,
             "exit_reason": exit_reason,
+            "position_count": position_count,
+            "open_slots": open_slots,
+            "position_rule": position_rule,
             "decision_reasons": "; ".join(decision_reasons),
             "warnings": "; ".join(warnings)
         })
