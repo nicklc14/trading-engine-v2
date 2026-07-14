@@ -20,33 +20,33 @@ def normalize_trades():
 
     trades["ticker"] = trades["ticker"].astype(str).str.upper().str.strip()
     trades["type"] = trades["type"].astype(str).str.title().str.strip()
+    trades["holding_key"] = trades["holding_key"].astype("string")
 
     for col in ["price","usd_amount","transaction_fee","shares","value"]:
         trades[col] = pd.to_numeric(trades[col], errors="coerce")
 
-    # If shares missing but usd_amount + fee + price exist, calculate shares.
     missing_shares = trades["shares"].isna() & trades["price"].gt(0) & trades["usd_amount"].notna()
     trades.loc[missing_shares, "shares"] = (
         (trades.loc[missing_shares, "usd_amount"] - trades.loc[missing_shares, "transaction_fee"].fillna(0))
         / trades.loc[missing_shares, "price"]
     )
 
-    # Always calculate value from price * shares.
     trades["value"] = trades["price"] * trades["shares"]
 
-    # If usd_amount missing, calculate gross + fee for buy, gross - fee for sell.
     missing_usd = trades["usd_amount"].isna()
     fees = trades["transaction_fee"].fillna(0)
+
     trades.loc[missing_usd & (trades["type"] == "Buy"), "usd_amount"] = trades["value"] + fees
     trades.loc[missing_usd & (trades["type"] == "Sell"), "usd_amount"] = trades["value"] - fees
 
-    # Auto holding key if blank.
-    blank_key = trades["holding_key"].isna() | (trades["holding_key"].astype(str).str.strip() == "")
-    trades.loc[blank_key, "holding_key"] = (
-        trades.loc[blank_key, "ticker"].astype(str)
-        + "-"
-        + trades.loc[blank_key, "date"].astype(str).str.replace("-", "", regex=False)
-    )
+    blank_key = trades["holding_key"].isna() | (trades["holding_key"].str.strip() == "")
+
+    if blank_key.any():
+        trades.loc[blank_key, "holding_key"] = (
+            trades.loc[blank_key, "ticker"].astype(str)
+            + "-"
+            + trades.loc[blank_key, "date"].astype(str).str.replace("-", "", regex=False)
+        )
 
     trades.to_csv(TRADES_PATH, index=False)
     return trades
