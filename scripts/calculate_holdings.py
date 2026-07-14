@@ -29,21 +29,36 @@ def calculate_holdings():
         if ticker in ["CASH", "DEPOSIT"]:
             continue
 
-        buy_shares = g[g["type"].astype(str).str.upper() == "BUY"]["shares"].sum()
-        sell_shares = g[g["type"].astype(str).str.upper() == "SELL"]["shares"].sum()
+        g["type_upper"] = g["type"].astype(str).str.upper()
+
+        buys = g[g["type_upper"] == "BUY"]
+        sells = g[g["type_upper"] == "SELL"]
+
+        buy_shares = buys["shares"].sum()
+        sell_shares = sells["shares"].sum()
         shares = buy_shares - sell_shares
 
         if shares <= 0:
             continue
 
+        buy_cost = buys["value"].sum() + buys["transaction_fee"].fillna(0).sum()
+        avg_cost = buy_cost / buy_shares if buy_shares > 0 else np.nan
+
         current_price = price_map.get(ticker, np.nan)
         market_value = shares * current_price if pd.notna(current_price) else np.nan
+        cost_basis = shares * avg_cost if pd.notna(avg_cost) else np.nan
+        unrealized_pnl = market_value - cost_basis if pd.notna(market_value) and pd.notna(cost_basis) else np.nan
+        holding_return_pct = unrealized_pnl / cost_basis if pd.notna(unrealized_pnl) and cost_basis > 0 else np.nan
 
         rows.append({
             "ticker": ticker,
             "shares": shares,
+            "avg_cost": avg_cost,
             "current_price": current_price,
-            "market_value": market_value
+            "market_value": market_value,
+            "cost_basis": cost_basis,
+            "unrealized_pnl": unrealized_pnl,
+            "holding_return_pct": holding_return_pct
         })
 
     out = pd.DataFrame(rows)
