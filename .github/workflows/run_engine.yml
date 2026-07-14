@@ -36,6 +36,6 @@ jobs:
         run: |
           git config user.email "action@github.com"
           git config user.name "GitHub Action"
-          git add data/*.csv output/*.xlsx
+          git add data/*.csv output/*.csv output/*.xlsx
           git commit -m "Update trading signals" || echo "No changes to commit"
           git push
