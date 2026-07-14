@@ -1,13 +1,11 @@
 setting,value,description
-max_positions,5,Maximum concurrent positions
-strong_buy_usd,20,STRONG BUY position size
-buy_usd,12,BUY position size
-buy_small_usd,8,BUY SMALL position size
-premarket_min_gap_pct,0.03,Minimum gap to trigger premarket
-premarket_min_volume_spike,1.5,Minimum volume spike
-premarket_stop_loss_pct,0.20,Stop loss for premarket
-premarket_trim_1_pct,0.25,First trim target
-quality_stop_loss_pct,0.08,Stop loss for quality plays
-quality_trim_pct,0.15,Trim target for quality
-min_rsi_for_buy,35,RSI floor for buys
-max_rsi_for_buy,75,RSI ceiling for buys
+max_positions,6,Aggressive max open positions
+cash_reserve_pct,0,Use all available cash if signals justify it
+risk_pct_per_trade,0.05,Aggressive risk budget per trade
+max_position_pct,0.35,Max one position as percent of cash
+block_new_buys_on_high_sell,TRUE,Do not add risk while high priority exits exist
+weekly_loss_stop_pct,0.10,Stop new buys if weekly realized loss exceeds 10 percent equity
+momentum_priority_boost,5,Boost MOMENTUM tier scores for aggressive plan
+quality_position_size_factor,0.65,QUALITY buys smaller than MOMENTUM buys
+add_more_min_return,0.05,Only add to winners above 5 percent
+add_more_min_score,80,Only add if signal score remains strong
