@@ -142,25 +142,41 @@ def score_signals():
                 add_more_signal = "HOLD"
                 add_more_reason = "Held, but not strong enough to add"
 
-        sell_signal = ""
+        exit_action = ""
+        exit_priority = ""
         exit_reason = ""
 
         if already_held:
             if pd.notna(price) and pd.notna(stop_loss) and price <= stop_loss:
-                sell_signal = "SELL"
+                exit_action = "SELL"
+                exit_priority = "HIGH"
                 exit_reason = "Price at or below stop loss"
             elif pd.notna(holding_return_pct) and holding_return_pct <= -0.15:
-                sell_signal = "SELL"
+                exit_action = "SELL"
+                exit_priority = "HIGH"
                 exit_reason = "Holding down 15%+"
-            elif pd.notna(rsi) and rsi >= 75:
-                sell_signal = "TRIM"
-                exit_reason = "RSI overbought"
+            elif trend_score < 40 and final_score < 55:
+                exit_action = "SELL"
+                exit_priority = "MEDIUM"
+                exit_reason = "Trend and score weakened"
             elif pd.notna(price) and pd.notna(trim_price) and price >= trim_price:
-                sell_signal = "TRIM"
+                exit_action = "TRIM"
+                exit_priority = "MEDIUM"
                 exit_reason = "Price reached trim target"
+            elif pd.notna(rsi) and rsi >= 75 and pd.notna(holding_return_pct) and holding_return_pct > 0:
+                exit_action = "TRIM"
+                exit_priority = "MEDIUM"
+                exit_reason = "RSI overbought while profitable"
             elif final_score < 50:
-                sell_signal = "REVIEW"
+                exit_action = "REVIEW"
+                exit_priority = "LOW"
                 exit_reason = "Signal score weakened"
+            else:
+                exit_action = "HOLD"
+                exit_priority = "LOW"
+                exit_reason = "No exit trigger"
+
+        sell_signal = exit_action if exit_action in ["SELL", "TRIM", "REVIEW"] else ""
 
         decision_reasons = []
         warnings = []
@@ -181,14 +197,14 @@ def score_signals():
             warnings.append("Max positions reached")
         if add_more_signal == "NO":
             warnings.append(add_more_reason)
-        if sell_signal:
+        if exit_action in ["SELL", "TRIM", "REVIEW"]:
             warnings.append(exit_reason)
 
         buy_amount_usd = 0.0
         shares_to_buy = 0.0
 
         can_buy_new = not already_held and open_slots > 0 and action in ["BUY", "BUY SMALL"]
-        can_add_more = already_held and add_more_signal == "ADD SMALL"
+        can_add_more = already_held and add_more_signal == "ADD SMALL" and exit_action not in ["SELL", "TRIM"]
 
         if (can_buy_new or can_add_more) and pd.notna(price) and price > 0:
             risk_per_share = max(price - stop_loss, 0) if pd.notna(stop_loss) else 0
@@ -226,6 +242,8 @@ def score_signals():
             "max_position_usd": round(max_position_usd, 2),
             "holding_return_pct": holding_return_pct,
             "sell_signal": sell_signal,
+            "exit_action": exit_action,
+            "exit_priority": exit_priority,
             "exit_reason": exit_reason,
             "position_count": position_count,
             "open_slots": open_slots,
