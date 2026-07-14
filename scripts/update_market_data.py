@@ -105,8 +105,4 @@ def update_market_data():
     return market
 
 if __name__ == "__main__":
-    update_market_data()```
-
----
-
-## Step 10 — `scripts/score_signals.py`
+    update_market_data()
