@@ -20,7 +20,9 @@ def load_config():
         "risk_pct_per_trade": 0.05,
         "max_position_pct": 0.35,
         "momentum_priority_boost": 5,
+        "moonshot_score_boost": 8,
         "quality_position_size_factor": 0.65,
+        "moonshot_position_size_factor": 0.50,
         "add_more_min_return": 0.05,
         "add_more_min_score": 80,
     }
@@ -65,7 +67,9 @@ def score_signals():
     risk_pct_per_trade = cfg_float(cfg, "risk_pct_per_trade")
     max_position_pct = cfg_float(cfg, "max_position_pct")
     momentum_priority_boost = cfg_float(cfg, "momentum_priority_boost")
+    moonshot_score_boost = cfg_float(cfg, "moonshot_score_boost")
     quality_position_size_factor = cfg_float(cfg, "quality_position_size_factor")
+    moonshot_position_size_factor = cfg_float(cfg, "moonshot_position_size_factor")
     add_more_min_return = cfg_float(cfg, "add_more_min_return")
     add_more_min_score = cfg_float(cfg, "add_more_min_score")
 
@@ -149,11 +153,14 @@ def score_signals():
             final_score = clamp(final_score + momentum_priority_boost)
 
         if tier == "MOONSHOT":
-            final_score = clamp(final_score + cfg_float(cfg, "moonshot_score_boost"))
+            final_score = clamp(final_score + moonshot_score_boost)
 
         if tier == "MOMENTUM":
             stop_loss = price - (2 * atr) if pd.notna(price) and pd.notna(atr) and atr > 0 else price * 0.80
             trim_price = price + (3 * atr) if pd.notna(price) and pd.notna(atr) and atr > 0 else price * 1.25
+        elif tier == "MOONSHOT":
+            stop_loss = price - (2.5 * atr) if pd.notna(price) and pd.notna(atr) and atr > 0 else price * 0.75
+            trim_price = price + (4 * atr) if pd.notna(price) and pd.notna(atr) and atr > 0 else price * 1.40
         else:
             stop_loss = price - (1.5 * atr) if pd.notna(price) and pd.notna(atr) and atr > 0 else price * 0.92
             trim_price = price + (2 * atr) if pd.notna(price) and pd.notna(atr) and atr > 0 else price * 1.15
@@ -232,6 +239,8 @@ def score_signals():
             reasons.append("MACD/volume acceleration")
         if tier == "MOMENTUM":
             reasons.append("Momentum tier boost")
+        if tier == "MOONSHOT":
+            reasons.append("Moonshot tier boost")
 
         if pd.notna(rsi) and rsi > 70:
             warnings.append("RSI overbought")
@@ -243,6 +252,8 @@ def score_signals():
             warnings.append(add_more_reason)
         if exit_action in ["SELL", "TRIM", "REVIEW"]:
             warnings.append(exit_reason)
+        if tier == "MOONSHOT":
+            warnings.append("Moonshot: high risk / small size")
 
         buy_amount_usd = 0.0
         shares_to_buy = 0.0
@@ -261,6 +272,9 @@ def score_signals():
 
             if tier == "QUALITY":
                 buy_amount_usd *= quality_position_size_factor
+
+            if tier == "MOONSHOT":
+                buy_amount_usd *= moonshot_position_size_factor
 
             if action == "BUY SMALL" or can_add:
                 buy_amount_usd *= 0.5
