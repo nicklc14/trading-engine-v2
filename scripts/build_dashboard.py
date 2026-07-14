@@ -7,6 +7,23 @@ SIGNALS_PATH = DATA_DIR / "signals.csv"
 HOLDINGS_PATH = DATA_DIR / "holdings.csv"
 DASHBOARD_PATH = DATA_DIR / "dashboard.csv"
 
+VISIBLE_COLUMNS = [
+    "ticker",
+    "action_required",
+    "plan_why",
+    "buy_usd",
+    "sell_usd",
+    "shares_to_buy",
+    "shares_to_sell",
+    "price",
+    "score",
+    "holding_return_pct",
+    "stop_loss",
+    "trim_target",
+    "risk_note",
+    "position_rule",
+]
+
 def clean_text(x):
     return "" if pd.isna(x) else str(x).strip()
 
@@ -84,7 +101,6 @@ def build_dashboard():
         "shares_to_sell": signals["shares_to_sell"],
         "price": signals.get("price", np.nan),
         "score": signals.get("score", np.nan),
-        "tier": signals.get("tier", ""),
         "holding_return_pct": signals.get("holding_return_pct", np.nan),
         "stop_loss": signals.get("stop_loss", np.nan),
         "trim_target": signals.get("trim_price", np.nan),
@@ -97,6 +113,8 @@ def build_dashboard():
         ["sort_priority", "score", "ticker"],
         ascending=[True, False, True]
     )
+
+    out = out[VISIBLE_COLUMNS]
 
     out.to_csv(DASHBOARD_PATH, index=False)
     return out
