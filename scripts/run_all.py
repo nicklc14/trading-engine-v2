@@ -1,3 +1,4 @@
+from normalize_trades import normalize_trades
 from update_market_data import update_market_data
 from calculate_cash import calculate_cash
 from calculate_holdings import calculate_holdings
@@ -7,6 +8,9 @@ from score_premarket_signals import score_premarket_signals
 from build_excel_workbook import build_excel_workbook
 
 print("Starting Trading Engine V2...")
+
+print("Step 0: Normalizing trades...")
+normalize_trades()
 
 print("Step 1: Updating market data...")
 update_market_data()
