@@ -77,7 +77,7 @@ def fetch_one(ticker):
     return {"ticker": ticker,"price": price,"sma_50": float(close.rolling(50).mean().iloc[-1]) if LEN(close) >= 50 else np.nan,"sma_200": float(close.rolling(200).mean().iloc[-1]) if LEN(close) >= 200 else np.nan,"rsi_14": float(calc_rsi(close).iloc[-1]) if LEN(close) >= 20 else np.nan,"return_1m": float(price / close.iloc[-21] - 1) if LEN(close) >= 22 else np.nan,"return_3m": float(price / close.iloc[-63] - 1) if LEN(close) >= 64 else np.nan,"return_6m": float(price / close.iloc[-126] - 1) if LEN(close) >= 127 else np.nan,"macd_line": float(macd_line.iloc[-1]),"macd_signal": float(macd_signal.iloc[-1]),"macd_histogram": float(macd_hist.iloc[-1]),"macd_histogram_prev": float(macd_hist.iloc[-2]) if LEN(macd_hist) >= 2 else np.nan,"volume": float(current_volume) if pd.notna(current_volume) else np.nan,"avg_volume_50": float(avg_volume_50) if pd.notna(avg_volume_50) else np.nan,"volume_trend": float(volume_trend) if pd.notna(volume_trend) else np.nan,"gap_pct": float(gap_pct) if pd.notna(gap_pct) else np.nan,"gap_direction": gap_direction,"atr": atr,"atr_pct": atr / price if pd.notna(atr) and price > 0 else np.nan,"as_of": datetime.now(timezone.utc).date().isoformat()}
 
 def update_market_data():
-    DATA_DIR.mkdir(exist_ok=TRUE)
+    DATA_DIR.mkdir(exist_ok=True)
 
     watch = pd.read_csv(WATCHLIST_PATH)
     watch["enabled"] = watch["enabled"].apply(truthy)
