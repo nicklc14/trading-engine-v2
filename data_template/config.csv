@@ -1,1 +1,13 @@
-
+setting,value,description
+max_positions,5,Maximum concurrent positions
+strong_buy_usd,20,STRONG BUY position size
+buy_usd,12,BUY position size
+buy_small_usd,8,BUY SMALL position size
+premarket_min_gap_pct,0.03,Minimum gap to trigger premarket
+premarket_min_volume_spike,1.5,Minimum volume spike
+premarket_stop_loss_pct,0.20,Stop loss for premarket
+premarket_trim_1_pct,0.25,First trim target
+quality_stop_loss_pct,0.08,Stop loss for quality plays
+quality_trim_pct,0.15,Trim target for quality
+min_rsi_for_buy,35,RSI floor for buys
+max_rsi_for_buy,75,RSI ceiling for buys
