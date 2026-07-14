@@ -1,11 +1,40 @@
 ticker,sector,tier,enabled,notes
-ANET,Networking,MOMENTUM,TRUE,Premarket gapper
-BFLY,Medical Devices,MOMENTUM,TRUE,Small float high volatility
-BLZE,Gaming/Digital Media,MOMENTUM,TRUE,Moonshot candidate
-PUBM,AdTech,MOMENTUM,TRUE,Earnings momentum
-STTK,Industrials,MOMENTUM,TRUE,Low price high leverage
-AMD,Semiconductors,QUALITY,TRUE,Large cap
-NVDA,Semiconductors,QUALITY,TRUE,Large cap
-DDOG,Cloud Software,QUALITY,TRUE,SaaS leader
-TSLA,Electric Vehicles,QUALITY,TRUE,Trend leader
-LLY,Healthcare/Pharma,QUALITY,TRUE,Pharma momentum
+ALAB,Semiconductors,MOMENTUM,TRUE,Current workbook watchlist
+AMD,Semiconductors,QUALITY,TRUE,Current workbook watchlist
+AMZN,Internet/E-Commerce,QUALITY,TRUE,Current workbook watchlist
+ANET,Networking,MOMENTUM,TRUE,Current workbook watchlist
+ARM,Semiconductors,MOMENTUM,TRUE,Current workbook watchlist
+ASTS,Space/Telecom,MOMENTUM,TRUE,Current workbook watchlist
+AVGO,Semiconductors,QUALITY,TRUE,Current workbook watchlist
+BFLY,Medical Devices,MOMENTUM,TRUE,Current workbook watchlist
+BLZE,Gaming/Digital Media,MOMENTUM,TRUE,Current workbook watchlist
+CBOE,Financial Services,QUALITY,TRUE,Current workbook watchlist
+CELC,Biotech,MOMENTUM,TRUE,Current workbook watchlist
+CRDO,Semiconductors,MOMENTUM,TRUE,Current workbook watchlist
+GOOGL,Internet/Software,QUALITY,TRUE,Current workbook watchlist
+INTC,Semiconductors,QUALITY,TRUE,Current workbook watchlist
+IONQ,Quantum Computing,MOMENTUM,TRUE,Current workbook watchlist
+KYTX,Biotech,MOMENTUM,TRUE,Current workbook watchlist
+LLY,Healthcare/Pharma,QUALITY,TRUE,Current workbook watchlist
+LUNR,Space,MOMENTUM,TRUE,Current workbook watchlist
+MRVL,Semiconductors,QUALITY,TRUE,Current workbook watchlist
+MU,Semiconductors,MOMENTUM,TRUE,Current workbook watchlist
+NBIS,AI Infrastructure,MOMENTUM,TRUE,Current workbook watchlist
+NVDA,Semiconductors,QUALITY,TRUE,Current workbook watchlist
+CCJ,Uranium/Nuclear Energy,QUALITY,TRUE,Replaced OCGN
+PL,Space,MOMENTUM,TRUE,Current workbook watchlist
+PUBM,AdTech,MOMENTUM,TRUE,Current workbook watchlist
+RKLB,Space,MOMENTUM,TRUE,Current workbook watchlist
+SOFI,Fintech,MOMENTUM,TRUE,Current workbook watchlist
+STTK,Industrials,MOMENTUM,TRUE,Current workbook watchlist
+TSLA,Electric Vehicles,QUALITY,TRUE,Current workbook watchlist
+TSM,Semiconductors,QUALITY,TRUE,Current workbook watchlist
+VRT,Data Centers,QUALITY,TRUE,Current workbook watchlist
+STX,Data Storage,QUALITY,TRUE,Added watchlist ticker
+SMCI,AI Infrastructure,MOMENTUM,TRUE,Added watchlist ticker
+DDOG,Cloud Software,QUALITY,TRUE,Added watchlist ticker
+SKHY,High Yield ETF,QUALITY,TRUE,Added watchlist ticker
+SMR,Nuclear Energy,MOMENTUM,TRUE,Adding ticker to watchlist
+OKLO,Nuclear Energy,MOMENTUM,TRUE,Adding ticker to watchlist
+JOBY,eVTOL/Aviation,MOMENTUM,TRUE,Adding ticker to watchlist
+SOUN,AI Software,MOMENTUM,TRUE,Adding ticker to watchlist
