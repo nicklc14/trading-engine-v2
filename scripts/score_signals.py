@@ -13,6 +13,9 @@ RISK_PCT_PER_TRADE = 0.02
 MAX_POSITION_PCT = 0.25
 MAX_POSITIONS = 10
 
+ADD_MORE_MIN_RETURN = 0.05
+ADD_MORE_MIN_SCORE = 80
+
 def clamp(x, lo=0, hi=100):
     return max(lo, min(hi, x))
 
@@ -44,7 +47,7 @@ def score_signals():
     else:
         holdings = pd.DataFrame(columns=["ticker", "shares", "avg_cost", "holding_return_pct"])
 
-    position_count = int((holdings["shares"].fillna(0) > 0).sum()) if "shares" in holdings.columns else 0
+    position_count = int((holdings["shares"].fillna(0) > 0).sum())
     open_slots = max(MAX_POSITIONS - position_count, 0)
 
     cash_available = get_cash_available()
@@ -113,8 +116,6 @@ def score_signals():
             action = "BUY SMALL"
 
         position_rule = ""
-        can_open_new_position = already_held or open_slots > 0
-
         if already_held:
             position_rule = "Already held"
         elif open_slots <= 0:
@@ -123,6 +124,23 @@ def score_signals():
                 action = "WATCH"
         else:
             position_rule = f"{open_slots} open slot(s)"
+
+        add_more_signal = ""
+        add_more_reason = ""
+
+        if already_held:
+            if pd.isna(holding_return_pct):
+                add_more_signal = "NO"
+                add_more_reason = "Missing holding return"
+            elif holding_return_pct < 0:
+                add_more_signal = "NO"
+                add_more_reason = "Do not average down"
+            elif holding_return_pct >= ADD_MORE_MIN_RETURN and final_score >= ADD_MORE_MIN_SCORE and trend_score >= 70:
+                add_more_signal = "ADD SMALL"
+                add_more_reason = "Winner with strong signal"
+            else:
+                add_more_signal = "HOLD"
+                add_more_reason = "Held, but not strong enough to add"
 
         sell_signal = ""
         exit_reason = ""
@@ -159,29 +177,29 @@ def score_signals():
             warnings.append("Missing price")
         if pd.isna(atr) or atr <= 0:
             warnings.append("Missing ATR")
-        if not can_open_new_position and not already_held:
+        if open_slots <= 0 and not already_held:
             warnings.append("Max positions reached")
+        if add_more_signal == "NO":
+            warnings.append(add_more_reason)
         if sell_signal:
             warnings.append(exit_reason)
 
         buy_amount_usd = 0.0
         shares_to_buy = 0.0
 
-        if (
-            can_open_new_position
-            and not already_held
-            and action in ["BUY", "BUY SMALL"]
-            and pd.notna(price)
-            and price > 0
-        ):
+        can_buy_new = not already_held and open_slots > 0 and action in ["BUY", "BUY SMALL"]
+        can_add_more = already_held and add_more_signal == "ADD SMALL"
+
+        if (can_buy_new or can_add_more) and pd.notna(price) and price > 0:
             risk_per_share = max(price - stop_loss, 0) if pd.notna(stop_loss) else 0
             if risk_per_share > 0:
                 atr_sized_amount = (risk_budget_usd / risk_per_share) * price
                 buy_amount_usd = min(atr_sized_amount, max_position_usd, cash_available)
-                if action == "BUY SMALL":
-                    buy_amount_usd *= 0.5
             else:
                 buy_amount_usd = min(max_position_usd, cash_available)
+
+            if action == "BUY SMALL" or can_add_more:
+                buy_amount_usd *= 0.5
 
             shares_to_buy = buy_amount_usd / price if buy_amount_usd > 0 else 0
 
@@ -212,6 +230,8 @@ def score_signals():
             "position_count": position_count,
             "open_slots": open_slots,
             "position_rule": position_rule,
+            "add_more_signal": add_more_signal,
+            "add_more_reason": add_more_reason,
             "decision_reasons": "; ".join(decision_reasons),
             "warnings": "; ".join(warnings)
         })
