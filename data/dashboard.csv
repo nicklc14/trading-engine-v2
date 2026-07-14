@@ -1,40 +1,40 @@
-ticker,action_required,plan_why,buy_usd,sell_usd,shares_to_buy,shares_to_sell,price,score,holding_return_pct,stop_loss,trim_target,risk_note,position_rule
-TSLA,SELL,Sell: Trend and score weakened,0.0,10.790223830073044,0.0,0.0272356606329269,396.1799926757813,43.0,-0.0417207966187322,368.3292813982283,433.31427437918535,Do not average down; Trend and score weakened | Stop 368.33,Already held
-ANET,BUY,BUY: MOMENTUM. Strong trend; Positive momentum; MACD/volume acceleration; Momentum tier boost,0.0,0.0,0.0,0.0,182.57000732421875,94.0,-0.0273823999246683,161.64559718540735,213.95662253243583,Do not average down | Stop 161.65,Already held
-BFLY,BUY,BUY: MOMENTUM. Strong trend; Positive momentum; Momentum tier boost,0.0,0.0,0.0,0.0,7.75,87.0,-0.0670394023961399,6.272785867963519,9.965821198054725,Do not average down | Stop 6.27,Already held
-BLZE,BUY,BUY: MOMENTUM. Strong trend; Positive momentum; MACD/volume acceleration; Momentum tier boost,0.0,0.0,0.0,0.0,16.549999237060547,84.0,0.0475067600157948,13.550999096461704,21.04849944795881,RSI overbought | Stop 13.55,Already held
-SOFI,HOLD,Hold. MACD/volume acceleration; Momentum tier boost,0.0,0.0,0.0,0.0,18.549999237060547,72.0,0.008241993405466,16.667142050606863,21.374285016741077, | Stop 16.67,Already held
-GOOGL,HOLD,Hold. Do not average down,0.0,0.0,0.0,0.0,359.510009765625,71.0,-0.0199286593032251,344.46607753208707,379.56858607700894,Do not average down | Stop 344.47,Already held
-NVDA,WATCH,Strong trend; Positive momentum; MACD/volume acceleration,0.0,0.0,0.0,0.0,211.8000030517578,89.0,,201.37714767456052,225.6971435546875, | Stop 201.38,Max 6 positions reached
-MU,WATCH,Strong trend; Positive momentum; Momentum tier boost,0.0,0.0,0.0,0.0,983.1199951171876,87.0,,803.5899658203126,1252.4150390625, | Stop 803.59,Max 6 positions reached
-PUBM,WATCH,RSI overbought,0.0,0.0,0.0,0.0,13.6899995803833,84.0,,12.48234258379255,15.501485075269429,RSI overbought | Stop 12.48,Max 6 positions reached
-STTK,WATCH,Strong trend; MACD/volume acceleration; Momentum tier boost,0.0,0.0,0.0,0.0,6.289999961853027,83.0,,5.003857272011893,8.219213996614728, | Stop 5.0,Max 6 positions reached
-AMD,WATCH,Strong trend; Positive momentum,0.0,0.0,0.0,0.0,548.1300048828125,82.0,,491.05285208565846,624.2328752790179, | Stop 491.05,Max 6 positions reached
-LLY,WATCH,Strong trend; Positive momentum,0.0,0.0,0.0,0.0,1152.5400390625,82.0,,1090.290562220982,1235.539341517857, | Stop 1090.29,Max 6 positions reached
-ALAB,WATCH,Strong trend; Positive momentum; Momentum tier boost,0.0,0.0,0.0,0.0,361.7799987792969,80.0,,268.7313014439174,501.35304478236606, | Stop 268.73,Max 6 positions reached
-CRDO,WATCH,Strong trend; Positive momentum; Momentum tier boost,0.0,0.0,0.0,0.0,236.17999267578125,80.0,,182.3964189801897,316.85535321916853, | Stop 182.4,Max 6 positions reached
-AVGO,WATCH,Positive momentum; MACD/volume acceleration,0.0,0.0,0.0,0.0,389.1099853515625,79.0,,366.6046360560826,419.1171177455357, | Stop 366.6,Max 6 positions reached
-DDOG,WATCH,RSI overbought,0.0,0.0,0.0,0.0,270.7300109863281,79.0,,249.83907972063335,298.5845860072545,RSI overbought | Stop 249.84,Max 6 positions reached
-CELC,WATCH,MACD/volume acceleration; Momentum tier boost,0.0,0.0,0.0,0.0,111.0500030517578,73.0,,97.80785914829798,130.91321890694752, | Stop 97.81,Max 6 positions reached
-AMZN,WATCH,MACD/volume acceleration,0.0,0.0,0.0,0.0,247.4900054931641,68.0,,236.13929585048132,262.6242850167411, | Stop 236.14,Max 6 positions reached
-STX,WATCH,Strong trend; Positive momentum,0.0,0.0,0.0,0.0,878.3099975585938,65.0,,751.8610687255859,1046.9085693359375, | Stop 751.86,Max 6 positions reached
-TSM,WATCH,Positive momentum,0.0,0.0,0.0,0.0,420.3900146484375,65.0,,390.43072945731024,460.3357282366072, | Stop 390.43,Max 6 positions reached
-VRT,WATCH,Watch only.,0.0,0.0,0.0,0.0,303.5799865722656,62.0,,271.6760559082031,346.1185607910156, | Stop 271.68,Max 6 positions reached
-ARM,WATCH,Positive momentum; Momentum tier boost,0.0,0.0,0.0,0.0,281.1700134277344,60.0,,222.40744018554688,369.3138732910156, | Stop 222.41,Max 6 positions reached
-NBIS,WATCH,Positive momentum; Momentum tier boost,0.0,0.0,0.0,0.0,194.08999633789065,60.0,,142.96970912388394,270.7704271589007, | Stop 142.97,Max 6 positions reached
-PL,WATCH,Momentum tier boost,0.0,0.0,0.0,0.0,25.559999465942383,59.0,,20.80728530883789,32.68907070159912, | Stop 20.81,Max 6 positions reached
-INTC,WATCH,Positive momentum,0.0,0.0,0.0,0.0,107.76000213623048,55.0,,93.41143008640836,126.89143153599332, | Stop 93.41,Max 6 positions reached
-MRVL,WATCH,Positive momentum,0.0,0.0,0.0,0.0,222.44000244140625,55.0,,190.0357131958008,265.6457214355469, | Stop 190.04,Max 6 positions reached
-CBOE,WATCH,MACD/volume acceleration,0.0,0.0,0.0,0.0,274.9800109863281,51.0,,257.1782308306013,298.7157178606306, | Stop 257.18,Max 6 positions reached
-RKLB,WATCH,Momentum tier boost,0.0,0.0,0.0,0.0,78.80999755859375,48.0,,63.34428405761719,102.0085678100586, | Stop 63.34,Max 6 positions reached
-SOUN,WATCH,MACD/volume acceleration; Momentum tier boost,0.0,0.0,0.0,0.0,6.690000057220459,44.0,,5.878714220864432,7.906928811754499, | Stop 5.88,Max 6 positions reached
-IONQ,WATCH,Momentum tier boost,0.0,0.0,0.0,0.0,39.290000915527344,38.0,,31.88785825456892,50.393214906964985, | Stop 31.89,Max 6 positions reached
-SMCI,WATCH,Momentum tier boost,0.0,0.0,0.0,0.0,27.64999961853028,38.0,,24.100000108991352,32.97499888283866, | Stop 24.1,Max 6 positions reached
-ASTS,WATCH,Momentum tier boost,0.0,0.0,0.0,0.0,68.81999969482422,37.0,,54.90942818777901,89.68585695539201, | Stop 54.91,Max 6 positions reached
-KYTX,WATCH,Momentum tier boost,0.0,0.0,0.0,0.0,7.940000057220459,37.0,,6.538857460021973,10.041713953018188, | Stop 6.54,Max 6 positions reached
-SKHY,WATCH,Missing ATR,0.0,0.0,0.0,0.0,193.9199981689453,29.0,,178.4063983154297,223.0079978942871,Missing ATR | Stop 178.41,Max 6 positions reached
-JOBY,WATCH,Momentum tier boost,0.0,0.0,0.0,0.0,7.889999866485596,27.0,,6.760285581861224,9.584571293422156, | Stop 6.76,Max 6 positions reached
-LUNR,WATCH,Momentum tier boost,0.0,0.0,0.0,0.0,14.90999984741211,27.0,,11.623856680733816,19.83921459742955, | Stop 11.62,Max 6 positions reached
-OKLO,WATCH,Momentum tier boost,0.0,0.0,0.0,0.0,46.2400016784668,27.0,,39.353258405412944,56.57011658804757, | Stop 39.35,Max 6 positions reached
-SMR,WATCH,Momentum tier boost,0.0,0.0,0.0,0.0,8.600000381469727,27.0,,7.252858161926269,10.620713710784912, | Stop 7.25,Max 6 positions reached
-CCJ,WATCH,Watch only.,0.0,0.0,0.0,0.0,91.56999969482422,22.0,,84.84464209420341,100.53714316231864, | Stop 84.84,Max 6 positions reached
+ticker,action_required,plan_why,buy_usd,sell_usd,shares_to_buy,shares_to_sell,price,score,tier,holding_return_pct,stop_loss,trim_target,risk_note,position_rule
+TSLA,SELL,Sell: Trend and score weakened,0.0,10.790223830073044,0.0,0.0272356606329269,396.1799926757813,43.0,QUALITY,-0.0417207966187322,368.3292813982283,433.31427437918535,Do not average down; Trend and score weakened | Stop 368.33,Already held
+ANET,BUY,BUY: MOMENTUM. Strong trend; Positive momentum; MACD/volume acceleration; Momentum tier boost,0.0,0.0,0.0,0.0,182.57000732421875,94.0,MOMENTUM,-0.0273823999246683,161.64559718540735,213.95662253243583,Do not average down | Stop 161.65,Already held
+BFLY,BUY,BUY: MOMENTUM. Strong trend; Positive momentum; Momentum tier boost,0.0,0.0,0.0,0.0,7.75,87.0,MOMENTUM,-0.0670394023961399,6.272785867963519,9.965821198054725,Do not average down | Stop 6.27,Already held
+BLZE,BUY,BUY: MOMENTUM. Strong trend; Positive momentum; MACD/volume acceleration; Momentum tier boost,0.0,0.0,0.0,0.0,16.549999237060547,84.0,MOMENTUM,0.0475067600157948,13.550999096461704,21.04849944795881,RSI overbought | Stop 13.55,Already held
+SOFI,HOLD,Hold. MACD/volume acceleration; Momentum tier boost,0.0,0.0,0.0,0.0,18.549999237060547,72.0,MOMENTUM,0.008241993405466,16.667142050606863,21.374285016741077, | Stop 16.67,Already held
+GOOGL,HOLD,Hold. Do not average down,0.0,0.0,0.0,0.0,359.510009765625,71.0,QUALITY,-0.0199286593032251,344.46607753208707,379.56858607700894,Do not average down | Stop 344.47,Already held
+NVDA,WATCH,Strong trend; Positive momentum; MACD/volume acceleration,0.0,0.0,0.0,0.0,211.8000030517578,89.0,QUALITY,,201.37714767456052,225.6971435546875, | Stop 201.38,Max 6 positions reached
+MU,WATCH,Strong trend; Positive momentum; Momentum tier boost,0.0,0.0,0.0,0.0,983.1199951171876,87.0,MOMENTUM,,803.5899658203126,1252.4150390625, | Stop 803.59,Max 6 positions reached
+PUBM,WATCH,RSI overbought,0.0,0.0,0.0,0.0,13.6899995803833,84.0,MOMENTUM,,12.48234258379255,15.501485075269429,RSI overbought | Stop 12.48,Max 6 positions reached
+STTK,WATCH,Strong trend; MACD/volume acceleration; Momentum tier boost,0.0,0.0,0.0,0.0,6.289999961853027,83.0,MOMENTUM,,5.003857272011893,8.219213996614728, | Stop 5.0,Max 6 positions reached
+AMD,WATCH,Strong trend; Positive momentum,0.0,0.0,0.0,0.0,548.1300048828125,82.0,QUALITY,,491.05285208565846,624.2328752790179, | Stop 491.05,Max 6 positions reached
+LLY,WATCH,Strong trend; Positive momentum,0.0,0.0,0.0,0.0,1152.5400390625,82.0,QUALITY,,1090.290562220982,1235.539341517857, | Stop 1090.29,Max 6 positions reached
+ALAB,WATCH,Strong trend; Positive momentum; Momentum tier boost,0.0,0.0,0.0,0.0,361.7799987792969,80.0,MOMENTUM,,268.7313014439174,501.35304478236606, | Stop 268.73,Max 6 positions reached
+CRDO,WATCH,Strong trend; Positive momentum; Momentum tier boost,0.0,0.0,0.0,0.0,236.17999267578125,80.0,MOMENTUM,,182.3964189801897,316.85535321916853, | Stop 182.4,Max 6 positions reached
+AVGO,WATCH,Positive momentum; MACD/volume acceleration,0.0,0.0,0.0,0.0,389.1099853515625,79.0,QUALITY,,366.6046360560826,419.1171177455357, | Stop 366.6,Max 6 positions reached
+DDOG,WATCH,RSI overbought,0.0,0.0,0.0,0.0,270.7300109863281,79.0,QUALITY,,249.83907972063335,298.5845860072545,RSI overbought | Stop 249.84,Max 6 positions reached
+CELC,WATCH,MACD/volume acceleration; Momentum tier boost,0.0,0.0,0.0,0.0,111.0500030517578,73.0,MOMENTUM,,97.80785914829798,130.91321890694752, | Stop 97.81,Max 6 positions reached
+AMZN,WATCH,MACD/volume acceleration,0.0,0.0,0.0,0.0,247.4900054931641,68.0,QUALITY,,236.13929585048132,262.6242850167411, | Stop 236.14,Max 6 positions reached
+STX,WATCH,Strong trend; Positive momentum,0.0,0.0,0.0,0.0,878.3099975585938,65.0,QUALITY,,751.8610687255859,1046.9085693359375, | Stop 751.86,Max 6 positions reached
+TSM,WATCH,Positive momentum,0.0,0.0,0.0,0.0,420.3900146484375,65.0,QUALITY,,390.43072945731024,460.3357282366072, | Stop 390.43,Max 6 positions reached
+VRT,WATCH,Watch only.,0.0,0.0,0.0,0.0,303.5799865722656,62.0,QUALITY,,271.6760559082031,346.1185607910156, | Stop 271.68,Max 6 positions reached
+ARM,WATCH,Positive momentum; Momentum tier boost,0.0,0.0,0.0,0.0,281.1700134277344,60.0,MOMENTUM,,222.40744018554688,369.3138732910156, | Stop 222.41,Max 6 positions reached
+NBIS,WATCH,Positive momentum; Momentum tier boost,0.0,0.0,0.0,0.0,194.08999633789065,60.0,MOMENTUM,,142.96970912388394,270.7704271589007, | Stop 142.97,Max 6 positions reached
+PL,WATCH,Momentum tier boost,0.0,0.0,0.0,0.0,25.559999465942383,59.0,MOMENTUM,,20.80728530883789,32.68907070159912, | Stop 20.81,Max 6 positions reached
+INTC,WATCH,Positive momentum,0.0,0.0,0.0,0.0,107.76000213623048,55.0,QUALITY,,93.41143008640836,126.89143153599332, | Stop 93.41,Max 6 positions reached
+MRVL,WATCH,Positive momentum,0.0,0.0,0.0,0.0,222.44000244140625,55.0,QUALITY,,190.0357131958008,265.6457214355469, | Stop 190.04,Max 6 positions reached
+CBOE,WATCH,MACD/volume acceleration,0.0,0.0,0.0,0.0,274.9800109863281,51.0,QUALITY,,257.1782308306013,298.7157178606306, | Stop 257.18,Max 6 positions reached
+RKLB,WATCH,Momentum tier boost,0.0,0.0,0.0,0.0,78.80999755859375,48.0,MOMENTUM,,63.34428405761719,102.0085678100586, | Stop 63.34,Max 6 positions reached
+SOUN,WATCH,MACD/volume acceleration; Momentum tier boost,0.0,0.0,0.0,0.0,6.690000057220459,44.0,MOMENTUM,,5.878714220864432,7.906928811754499, | Stop 5.88,Max 6 positions reached
+IONQ,WATCH,Momentum tier boost,0.0,0.0,0.0,0.0,39.290000915527344,38.0,MOMENTUM,,31.88785825456892,50.393214906964985, | Stop 31.89,Max 6 positions reached
+SMCI,WATCH,Momentum tier boost,0.0,0.0,0.0,0.0,27.64999961853028,38.0,MOMENTUM,,24.100000108991352,32.97499888283866, | Stop 24.1,Max 6 positions reached
+ASTS,WATCH,Momentum tier boost,0.0,0.0,0.0,0.0,68.81999969482422,37.0,MOMENTUM,,54.90942818777901,89.68585695539201, | Stop 54.91,Max 6 positions reached
+KYTX,WATCH,Momentum tier boost,0.0,0.0,0.0,0.0,7.940000057220459,37.0,MOMENTUM,,6.538857460021973,10.041713953018188, | Stop 6.54,Max 6 positions reached
+SKHY,WATCH,Missing ATR,0.0,0.0,0.0,0.0,193.9199981689453,29.0,QUALITY,,178.4063983154297,223.0079978942871,Missing ATR | Stop 178.41,Max 6 positions reached
+JOBY,WATCH,Momentum tier boost,0.0,0.0,0.0,0.0,7.889999866485596,27.0,MOMENTUM,,6.760285581861224,9.584571293422156, | Stop 6.76,Max 6 positions reached
+LUNR,WATCH,Momentum tier boost,0.0,0.0,0.0,0.0,14.90999984741211,27.0,MOMENTUM,,11.623856680733816,19.83921459742955, | Stop 11.62,Max 6 positions reached
+OKLO,WATCH,Momentum tier boost,0.0,0.0,0.0,0.0,46.2400016784668,27.0,MOMENTUM,,39.353258405412944,56.57011658804757, | Stop 39.35,Max 6 positions reached
+SMR,WATCH,Momentum tier boost,0.0,0.0,0.0,0.0,8.600000381469727,27.0,MOMENTUM,,7.252858161926269,10.620713710784912, | Stop 7.25,Max 6 positions reached
+CCJ,WATCH,Watch only.,0.0,0.0,0.0,0.0,91.56999969482422,22.0,QUALITY,,84.84464209420341,100.53714316231864, | Stop 84.84,Max 6 positions reached
