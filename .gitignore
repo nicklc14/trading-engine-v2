@@ -1,1 +1,15 @@
+__pycache__/
+*.py[cod]
+venv/
+env/
+.vscode/
+.idea/
+.DS_Store
 
+data/*
+!data/.gitkeep
+!data/*.csv
+
+output/*
+!output/.gitkeep
+!output/*.xlsx
