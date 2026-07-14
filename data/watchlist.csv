@@ -1,0 +1,11 @@
+ticker,sector,tier,enabled,notes
+ANET,Networking,MOMENTUM,TRUE,Premarket gapper
+BFLY,Medical Devices,MOMENTUM,TRUE,Small float high volatility
+BLZE,Gaming/Digital Media,MOMENTUM,TRUE,Moonshot candidate
+PUBM,AdTech,MOMENTUM,TRUE,Earnings momentum
+STTK,Industrials,MOMENTUM,TRUE,Low price high leverage
+AMD,Semiconductors,QUALITY,TRUE,Large cap
+NVDA,Semiconductors,QUALITY,TRUE,Large cap
+DDOG,Cloud Software,QUALITY,TRUE,SaaS leader
+TSLA,Electric Vehicles,QUALITY,TRUE,Trend leader
+LLY,Healthcare/Pharma,QUALITY,TRUE,Pharma momentum
