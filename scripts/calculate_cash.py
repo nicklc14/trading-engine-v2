@@ -23,8 +23,7 @@ def calculate_cash():
         buy_spend_usd = trades.loc[trades["type"] == "Buy", "usd_amount"].sum()
         sell_proceeds_usd = trades.loc[trades["type"] == "Sell", "usd_amount"].sum()
 
-        # Fees are included in usd_amount cash movements.
-        # Keep fee totals as diagnostics only; do not subtract again.
+        # Fees are already included in usd_amount.
         buy_fees_usd = trades.loc[trades["type"] == "Buy", "transaction_fee"].sum()
         sell_fees_usd = trades.loc[trades["type"] == "Sell", "transaction_fee"].sum()
     else:
@@ -46,6 +45,3 @@ def calculate_cash():
 
     out.to_csv(CASH_PATH, index=False)
     return out
-
-if __name__ == "__main__":
-    calculate_cash()
