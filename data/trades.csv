@@ -4,8 +4,8 @@ date,ticker,type,price,usd_amount,transaction_fee,shares,value,holding_key,notes
 2026-06-30,SOFI,Buy,18.07,11.26,0.20096,0.612011068068622,11.059040000000001,3,Imported current workbook buy
 2026-06-30,BLZE,Buy,14.8,11.26,0.20096,0.7472324324324323,11.05904,4,Imported current workbook buy
 2026-07-02,IONQ,Buy,53.489,11.28,0.21033,0.2069522705603021,11.069669999999999,5,Imported current workbook buy
-2026-07-08,IONQ,Sell,47.449,9.65,0.18329,ALL,,5,Imported current workbook sell
-2026-07-09,ASTS,Sell,73.868,9.74,0.18516,ALL,,2,Imported current workbook sell
+2026-07-08,IONQ,Sell,47.449,9.65,0.18329,0.2069522705603021,9.819678285815774,5,Imported current workbook sell
+2026-07-09,ASTS,Sell,73.868,9.74,0.18516,0.134428710462287,9.929979984428215,2,Imported current workbook sell
 2026-07-09,GOOGL,Buy,365.29,9.65,0.17994,0.0259247720988803,9.470059999999984,6,Imported current workbook buy
 2026-07-10,GOOGL,Buy,354.87,9.74,0.18161,0.0269349057401301,9.558389999999969,7,Imported current workbook buy
 2026-07-14,ANET,Buy,184.21,18.0,0.33562,0.0958926225503501,17.66437999999999,8,First trade logged in Github
