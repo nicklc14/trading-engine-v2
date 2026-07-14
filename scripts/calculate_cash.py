@@ -2,66 +2,52 @@ import pandas as pd
 from pathlib import Path
 
 DATA_DIR = Path("data")
-
-TRADES_PATH = DATA_DIR / "trades.csv"
 DEPOSITS_PATH = DATA_DIR / "deposits.csv"
+TRADES_PATH = DATA_DIR / "trades.csv"
 CASH_PATH = DATA_DIR / "cash.csv"
 
-
-def read_csv_safe(path):
-    if path.exists() and path.stat().st_size > 0:
-        return pd.read_csv(path)
-    return pd.DataFrame()
-
-
 def calculate_cash():
-    trades = read_csv_safe(TRADES_PATH)
-    deposits = read_csv_safe(DEPOSITS_PATH)
+    deposits = pd.read_csv(DEPOSITS_PATH) if DEPOSITS_PATH.exists() else pd.DataFrame()
+    trades = pd.read_csv(TRADES_PATH) if TRADES_PATH.exists() else pd.DataFrame()
 
-    if deposits.empty or "amount_usd" not in deposits.columns:
-        total_deposits_usd = 0.0
+    total_deposits_usd = pd.to_numeric(
+        deposits.get("amount_usd", pd.Series(dtype=float)),
+        errors="coerce"
+    ).fillna(0).sum()
+
+    if len(trades):
+        trades["type"] = trades["type"].astype(str).str.title().str.strip()
+        trades["usd_amount"] = pd.to_numeric(trades.get("usd_amount", 0), errors="coerce").fillna(0)
+        trades["transaction_fee"] = pd.to_numeric(trades.get("transaction_fee", 0), errors="coerce").fillna(0)
+
+        buy_spend_usd = trades.loc[trades["type"] == "Buy", "usd_amount"].sum()
+        sell_proceeds_usd = trades.loc[trades["type"] == "Sell", "usd_amount"].sum()
+
+        # Fees are included in usd_amount cash movements.
+        # Keep fee totals as diagnostics only; do not subtract again.
+        buy_fees_usd = trades.loc[trades["type"] == "Buy", "transaction_fee"].sum()
+        sell_fees_usd = trades.loc[trades["type"] == "Sell", "transaction_fee"].sum()
     else:
-        deposits["amount_usd"] = pd.to_numeric(deposits["amount_usd"], errors="coerce").fillna(0)
-        total_deposits_usd = deposits["amount_usd"].sum()
+        buy_spend_usd = 0
+        sell_proceeds_usd = 0
+        buy_fees_usd = 0
+        sell_fees_usd = 0
 
-    if trades.empty:
-        buy_spend_usd = 0.0
-        buy_fees_usd = 0.0
-        sell_proceeds_usd = 0.0
-        sell_fees_usd = 0.0
-    else:
-        trades["type"] = trades["type"].astype(str).str.upper()
-        trades["usd_amount"] = pd.to_numeric(trades["usd_amount"], errors="coerce").fillna(0)
-        trades["transaction_fee"] = pd.to_numeric(trades["transaction_fee"], errors="coerce").fillna(0)
+    cash_available_usd = total_deposits_usd - buy_spend_usd + sell_proceeds_usd
 
-        buys = trades[trades["type"] == "BUY"]
-        sells = trades[trades["type"] == "SELL"]
-
-        buy_spend_usd = buys["usd_amount"].sum()
-        buy_fees_usd = buys["transaction_fee"].sum()
-        sell_proceeds_usd = sells["usd_amount"].sum()
-        sell_fees_usd = sells["transaction_fee"].sum()
-
-    cash_available_usd = (
-        total_deposits_usd
-        - buy_spend_usd
-        - buy_fees_usd
-        + sell_proceeds_usd
-        - sell_fees_usd
-    )
-
-    cash = pd.DataFrame([{
-        "total_deposits_usd": round(total_deposits_usd, 5),
-        "buy_spend_usd": round(buy_spend_usd, 5),
-        "buy_fees_usd": round(buy_fees_usd, 5),
-        "sell_proceeds_usd": round(sell_proceeds_usd, 5),
-        "sell_fees_usd": round(sell_fees_usd, 5),
-        "cash_available_usd": round(cash_available_usd, 5),
+    out = pd.DataFrame([{
+        "total_deposits_usd": total_deposits_usd,
+        "buy_spend_usd": buy_spend_usd,
+        "buy_fees_usd": buy_fees_usd,
+        "sell_proceeds_usd": sell_proceeds_usd,
+        "sell_fees_usd": sell_fees_usd,
+        "cash_available_usd": cash_available_usd,
     }])
 
-    cash.to_csv(CASH_PATH, index=False)
-    return cash
-
+    out.to_csv(CASH_PATH, index=False)
+    return out
 
 if __name__ == "__main__":
     calculate_cash()
+Then run:
+python scripts/run_all.py
