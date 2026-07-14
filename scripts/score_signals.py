@@ -7,6 +7,7 @@ SIGNALS_PATH = DATA_DIR / "signals.csv"
 MARKET_PATH = DATA_DIR / "market_data.csv"
 WATCHLIST_PATH = DATA_DIR / "watchlist.csv"
 CASH_PATH = DATA_DIR / "cash.csv"
+HOLDINGS_PATH = DATA_DIR / "holdings.csv"
 
 RISK_PCT_PER_TRADE = 0.02
 MAX_POSITION_PCT = 0.25
@@ -33,17 +34,35 @@ def score_signals():
     market = pd.read_csv(MARKET_PATH)
     market["ticker"] = market["ticker"].astype(str).str.upper().str.strip()
 
+    holdings = pd.read_csv(HOLDINGS_PATH) if HOLDINGS_PATH.exists() else pd.DataFrame()
+    if not holdings.empty:
+        holdings["ticker"] = holdings["ticker"].astype(str).str.upper().str.strip()
+
     cash_available = get_cash_available()
     risk_budget_usd = cash_available * RISK_PCT_PER_TRADE
     max_position_usd = cash_available * MAX_POSITION_PCT
 
     df = watch.merge(market, on="ticker", how="left")
+    if not holdings.empty:
+        df = df.merge(
+            holdings[["ticker", "shares", "avg_cost", "holding_return_pct"]],
+            on="ticker",
+            how="left"
+        )
+    else:
+        df["shares"] = 0
+        df["avg_cost"] = np.nan
+        df["holding_return_pct"] = np.nan
+
     rows = []
 
     for _, row in df.iterrows():
         price = row.get("price", np.nan)
         tier = row.get("tier", "QUALITY")
         atr = row.get("atr", np.nan)
+        holding_return_pct = row.get("holding_return_pct", np.nan)
+        shares_held = row.get("shares", 0)
+        already_held = pd.notna(shares_held) and shares_held > 0
 
         trend_score = 0
         if pd.notna(price) and pd.notna(row.get("sma_50")) and price > row["sma_50"]:
@@ -89,6 +108,26 @@ def score_signals():
         elif final_score >= 75:
             action = "BUY SMALL"
 
+        sell_signal = ""
+        exit_reason = ""
+
+        if already_held:
+            if pd.notna(price) and pd.notna(stop_loss) and price <= stop_loss:
+                sell_signal = "SELL"
+                exit_reason = "Price at or below stop loss"
+            elif pd.notna(holding_return_pct) and holding_return_pct <= -0.15:
+                sell_signal = "SELL"
+                exit_reason = "Holding down 15%+"
+            elif pd.notna(rsi) and rsi >= 75:
+                sell_signal = "TRIM"
+                exit_reason = "RSI overbought"
+            elif pd.notna(price) and pd.notna(trim_price) and price >= trim_price:
+                sell_signal = "TRIM"
+                exit_reason = "Price reached trim target"
+            elif final_score < 50:
+                sell_signal = "REVIEW"
+                exit_reason = "Signal score weakened"
+
         decision_reasons = []
         warnings = []
 
@@ -104,11 +143,13 @@ def score_signals():
             warnings.append("Missing price")
         if pd.isna(atr) or atr <= 0:
             warnings.append("Missing ATR")
+        if sell_signal:
+            warnings.append(exit_reason)
 
         buy_amount_usd = 0.0
         shares_to_buy = 0.0
 
-        if action in ["BUY", "BUY SMALL"] and pd.notna(price) and price > 0:
+        if not already_held and action in ["BUY", "BUY SMALL"] and pd.notna(price) and price > 0:
             risk_per_share = max(price - stop_loss, 0) if pd.notna(stop_loss) else 0
             if risk_per_share > 0:
                 atr_sized_amount = (risk_budget_usd / risk_per_share) * price
@@ -141,6 +182,9 @@ def score_signals():
             "shares_to_buy": round(shares_to_buy, 6),
             "risk_budget_usd": round(risk_budget_usd, 2),
             "max_position_usd": round(max_position_usd, 2),
+            "holding_return_pct": holding_return_pct,
+            "sell_signal": sell_signal,
+            "exit_reason": exit_reason,
             "decision_reasons": "; ".join(decision_reasons),
             "warnings": "; ".join(warnings)
         })
