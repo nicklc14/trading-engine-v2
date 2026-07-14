@@ -5,6 +5,7 @@ from calculate_holdings import calculate_holdings
 from calculate_performance import calculate_performance
 from score_signals import score_signals
 from score_premarket_signals import score_premarket_signals
+from build_weekly_review import build_weekly_review
 from build_excel_workbook import build_excel_workbook
 
 print("Starting Trading Engine V2...")
@@ -30,7 +31,10 @@ score_signals()
 print("Step 6: Scoring premarket signals...")
 score_premarket_signals()
 
-print("Step 7: Building Excel workbook...")
+print("Step 7: Building weekly review...")
+build_weekly_review()
+
+print("Step 8: Building Excel workbook...")
 build_excel_workbook()
 
 print("Done.")
