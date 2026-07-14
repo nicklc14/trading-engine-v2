@@ -45,3 +45,6 @@ def calculate_cash():
 
     out.to_csv(CASH_PATH, index=False)
     return out
+    
+if __name__ == "__main__":
+    calculate_cash()
