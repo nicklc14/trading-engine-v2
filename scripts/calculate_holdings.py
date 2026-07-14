@@ -46,4 +46,4 @@ def calculate_holdings():
     return out
 
 if __name__ == "__main__":
-    calculate_holdings()```
+    calculate_holdings()
