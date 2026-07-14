@@ -21,7 +21,7 @@ def autosize(ws):
         for cell in col:
             value = "" if cell.value is None else str(cell.value)
             max_len = max(max_len, len(value))
-        ws.column_dimensions[col_letter].width = min(max_len + 2, 28)
+        ws.column_dimensions[col_letter].width = min(max_len + 2, 32)
 
 def style_sheet(ws):
     for cell in ws[1]:
@@ -30,14 +30,41 @@ def style_sheet(ws):
         cell.alignment = Alignment(horizontal="center")
     autosize(ws)
 
+def highlight_actions(ws, action_header):
+    headers = [cell.value for cell in ws[1]]
+    if action_header not in headers:
+        return
+
+    action_col = headers.index(action_header) + 1
+
+    for row in ws.iter_rows(min_row=2):
+        action = row[action_col - 1].value
+        if action in ["BUY", "PREMARKET BUY"]:
+            fill = PatternFill("solid", fgColor="C6EFCE")
+        elif action == "BUY SMALL":
+            fill = PatternFill("solid", fgColor="D9EAF7")
+        elif action in ["WATCH", "PREMARKET WATCH"]:
+            fill = PatternFill("solid", fgColor="FFF2CC")
+        elif action == "SELL":
+            fill = PatternFill("solid", fgColor="F4CCCC")
+        else:
+            fill = None
+
+        if fill:
+            for cell in row:
+                cell.fill = fill
+
 def build_excel_workbook():
     OUTPUT_DIR.mkdir(exist_ok=True)
 
     files = {
-        "PREMARKET_PLAYS": DATA_DIR / "premarket_signals.csv",
-        "BUY_NOW": DATA_DIR / "signals.csv",
+        "DASHBOARD": DATA_DIR / "dashboard.csv",
         "HOLDINGS": DATA_DIR / "holdings.csv",
+        "CASH": DATA_DIR / "cash.csv",
         "PERFORMANCE": DATA_DIR / "performance.csv",
+        "WEEKLY_REVIEW": DATA_DIR / "weekly_review.csv",
+        "SIGNALS_FULL": DATA_DIR / "signals.csv",
+        "PREMARKET_FULL": DATA_DIR / "premarket_signals.csv",
         "MARKET_DATA": DATA_DIR / "market_data.csv",
         "TRADE_LOG": DATA_DIR / "trades.csv",
         "MARKET_REGIME": DATA_DIR / "market_regime.csv",
@@ -49,25 +76,18 @@ def build_excel_workbook():
         for sheet, path in files.items():
             df = read_csv_safe(path)
 
-            if sheet == "PREMARKET_PLAYS" and not df.empty:
-                df = df[df["premarket_action"].isin(["PREMARKET BUY", "PREMARKET WATCH"])]
-
-            if sheet == "BUY_NOW" and not df.empty:
-                df = df[df["action"].isin(["BUY", "BUY SMALL", "WATCH"])]
-
             if df.empty:
                 df = pd.DataFrame([{"status": "No data available yet"}])
 
             df.to_excel(writer, sheet_name=sheet, index=False)
 
         instructions = pd.DataFrame([
-            {"Step": 1, "Action": "Open PERFORMANCE first to check account progress."},
-            {"Step": 2, "Action": "Open PREMARKET_PLAYS during NZ evening / US premarket window."},
-            {"Step": 3, "Action": "Focus only on PREMARKET BUY first."},
-            {"Step": 4, "Action": "Review BUY_NOW for standard BUY and BUY SMALL candidates."},
-            {"Step": 5, "Action": "Check stop_loss, trim_price, buy_amount_usd, shares_to_buy, exit_action, and warnings."},
-            {"Step": 6, "Action": "Do not exceed max position rules or add more unless add_more_signal allows it."},
-            {"Step": 7, "Action": "Log all buys/sells in data/trades.csv."},
+            {"Step": 1, "Action": "Open DASHBOARD first. It is the clean action view generated from GitHub."},
+            {"Step": 2, "Action": "Review SELL / exit warnings before any new buys."},
+            {"Step": 3, "Action": "Check HOLDINGS and CASH before trading."},
+            {"Step": 4, "Action": "Use BUY / BUY SMALL as candidates, not automatic trades."},
+            {"Step": 5, "Action": "For full sells in trades.csv, use shares=ALL."},
+            {"Step": 6, "Action": "Run GitHub workflow, then refresh Excel."},
         ])
         instructions.to_excel(writer, sheet_name="INSTRUCTIONS", index=False)
 
@@ -75,39 +95,18 @@ def build_excel_workbook():
         for ws in wb.worksheets:
             style_sheet(ws)
 
-            if ws.title == "PREMARKET_PLAYS":
-                headers = [cell.value for cell in ws[1]]
-                if "premarket_action" in headers:
-                    action_col = headers.index("premarket_action") + 1
-                    for row in ws.iter_rows(min_row=2):
-                        action = row[action_col - 1].value
-                        if action == "PREMARKET BUY":
-                            for cell in row:
-                                cell.fill = PatternFill("solid", fgColor="C6EFCE")
-                        elif action == "PREMARKET WATCH":
-                            for cell in row:
-                                cell.fill = PatternFill("solid", fgColor="FFF2CC")
+            if ws.title == "DASHBOARD":
+                highlight_actions(ws, "action")
 
-            if ws.title == "BUY_NOW":
-                headers = [cell.value for cell in ws[1]]
-                if "action" in headers:
-                    action_col = headers.index("action") + 1
-                    for row in ws.iter_rows(min_row=2):
-                        action = row[action_col - 1].value
-                        if action == "BUY":
-                            for cell in row:
-                                cell.fill = PatternFill("solid", fgColor="C6EFCE")
-                        elif action == "BUY SMALL":
-                            for cell in row:
-                                cell.fill = PatternFill("solid", fgColor="D9EAF7")
-                        elif action == "WATCH":
-                            for cell in row:
-                                cell.fill = PatternFill("solid", fgColor="FFF2CC")
+            if ws.title == "SIGNALS_FULL":
+                highlight_actions(ws, "action")
 
-            if ws.title == "PERFORMANCE":
-                for row in ws.iter_rows(min_row=2):
-                    for cell in row:
-                        cell.alignment = Alignment(horizontal="center")
+            if ws.title == "PREMARKET_FULL":
+                highlight_actions(ws, "premarket_action")
+
+            for row in ws.iter_rows():
+                for cell in row:
+                    cell.alignment = Alignment(vertical="top", wrap_text=True)
 
     print(f"Excel workbook created: {excel_file}")
     return excel_file
