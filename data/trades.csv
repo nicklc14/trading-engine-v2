@@ -9,5 +9,5 @@ date,ticker,type,price,usd_amount,transaction_fee,shares,value,holding_key,notes
 2026-07-09,GOOGL,Buy,365.29,9.65,0.17994,0.0259247720988803,9.470059999999984,6,Imported current workbook buy
 2026-07-10,GOOGL,Buy,354.87,9.74,0.18161,0.0269349057401301,9.558389999999969,7,Imported current workbook buy
 2026-07-14,ANET,Buy,184.21,18.0,0.33562,0.0958926225503501,17.66437999999999,8,First trade logged in Github
-2026-07-14,BFLY,Buy,8.152,12.0,0.22375,1.4445841511285575,11.77625,Second trade logged in Github,
-2026-07-14,BLZE,Buy,16.4,10.0,0.18646,0.5983865853658537,9.81354,Third trade logged in Github,
+2026-07-14,BFLY,Buy,8.152,12.0,0.22375,1.4445841511285575,11.77625,9,Second trade logged in Github,
+2026-07-14,BLZE,Buy,16.4,10.0,0.18646,0.5983865853658537,9.81354,9,Third trade logged in Github,
