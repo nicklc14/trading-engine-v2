@@ -148,6 +148,9 @@ def score_signals():
         if tier == "MOMENTUM":
             final_score = clamp(final_score + momentum_priority_boost)
 
+        if tier == "MOONSHOT":
+            final_score = clamp(final_score + cfg_float(cfg, "moonshot_score_boost"))
+
         if tier == "MOMENTUM":
             stop_loss = price - (2 * atr) if pd.notna(price) and pd.notna(atr) and atr > 0 else price * 0.80
             trim_price = price + (3 * atr) if pd.notna(price) and pd.notna(atr) and atr > 0 else price * 1.25
