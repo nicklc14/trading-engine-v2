@@ -19,6 +19,26 @@ ADD_MORE_MIN_SCORE = 80
 def clamp(x, lo=0, hi=100):
     return max(lo, min(hi, x))
 
+def review_priority(action, exit_action="", exit_priority="", position_rule=""):
+    action = str(action).upper()
+    exit_action = str(exit_action).upper()
+    exit_priority = str(exit_priority).upper()
+    position_rule = str(position_rule).upper()
+
+    if exit_action == "SELL" and exit_priority == "HIGH":
+        return 1
+    if exit_action == "SELL":
+        return 2
+    if "ALREADY HELD" in position_rule:
+        return 3
+    if action == "BUY":
+        return 5
+    if action == "BUY SMALL":
+        return 6
+    if action == "WATCH":
+        return 7
+    return 8
+
 def get_cash_available():
     if not CASH_PATH.exists():
         return 0.0
@@ -219,12 +239,20 @@ def score_signals():
 
             shares_to_buy = buy_amount_usd / price if buy_amount_usd > 0 else 0
 
+        sort_priority = review_priority(
+            action=action,
+            exit_action=exit_action,
+            exit_priority=exit_priority,
+            position_rule=position_rule,
+        )
+
         rows.append({
             "ticker": row["ticker"],
             "sector": row.get("sector", ""),
             "tier": tier,
             "price": price,
             "score": final_score,
+            "sort_priority": sort_priority,
             "action": action,
             "trend_score": trend_score,
             "momentum_score": momentum_score,
@@ -254,7 +282,11 @@ def score_signals():
             "warnings": "; ".join(warnings)
         })
 
-    out = pd.DataFrame(rows).sort_values("score", ascending=False)
+    out = pd.DataFrame(rows).sort_values(
+        ["sort_priority", "score", "ticker"],
+        ascending=[True, False, True]
+    )
+
     out.to_csv(SIGNALS_PATH, index=False)
     return out
 
