@@ -24,7 +24,7 @@ def action_required(row):
     return "WATCH"
 
 def plan_why(row):
-    action = clean_text(row.get("action"))
+    action = clean_text(row.get("action_required"))
     tier = clean_text(row.get("tier"))
     reasons = clean_text(row.get("decision_reasons"))
     warnings = clean_text(row.get("warnings"))
@@ -46,25 +46,26 @@ def build_dashboard():
 
     if not holdings.empty:
         holdings["ticker"] = holdings["ticker"].astype(str).str.upper().str.strip()
-        holdings = holdings[[c for c in ["ticker", "market_value", "shares"] if c in holdings.columns]]
+        keep = [c for c in ["ticker", "market_value", "shares"] if c in holdings.columns]
+        holdings = holdings[keep]
         signals = signals.merge(holdings, on="ticker", how="left")
     else:
         signals["market_value"] = np.nan
         signals["shares"] = np.nan
 
-    signals["action"] = signals.apply(action_required, axis=1)
+    signals["action_required"] = signals.apply(action_required, axis=1)
     signals["plan_why"] = signals.apply(plan_why, axis=1)
 
     signals["sell_usd"] = np.where(
-        signals["action"] == "SELL",
+        signals["action_required"] == "SELL",
         signals.get("market_value", 0),
-        np.where(signals["action"] == "TRIM", signals.get("market_value", 0) * 0.25, 0)
+        np.where(signals["action_required"] == "TRIM", signals.get("market_value", 0) * 0.25, 0)
     )
 
     signals["shares_to_sell"] = np.where(
-        signals["action"] == "SELL",
+        signals["action_required"] == "SELL",
         signals.get("shares", 0),
-        np.where(signals["action"] == "TRIM", signals.get("shares", 0) * 0.25, 0)
+        np.where(signals["action_required"] == "TRIM", signals.get("shares", 0) * 0.25, 0)
     )
 
     signals["risk_note"] = (
@@ -74,8 +75,8 @@ def build_dashboard():
     )
 
     out = pd.DataFrame({
-        "ticker": signals["ticker"],
-        "action": signals["action"],
+        "ticker": signals.get("ticker", ""),
+        "action_required": signals["action_required"],
         "plan_why": signals["plan_why"],
         "buy_usd": signals.get("buy_amount_usd", 0),
         "sell_usd": signals["sell_usd"],
@@ -92,7 +93,11 @@ def build_dashboard():
         "sort_priority": signals.get("sort_priority", 99),
     })
 
-    out = out.sort_values(["sort_priority", "score", "ticker"], ascending=[True, False, True])
+    out = out.sort_values(
+        ["sort_priority", "score", "ticker"],
+        ascending=[True, False, True]
+    )
+
     out.to_csv(DASHBOARD_PATH, index=False)
     return out
 
