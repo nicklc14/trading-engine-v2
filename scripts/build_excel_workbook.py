@@ -37,6 +37,8 @@ def build_excel_workbook():
         "PREMARKET_PLAYS": DATA_DIR / "premarket_signals.csv",
         "BUY_NOW": DATA_DIR / "signals.csv",
         "HOLDINGS": DATA_DIR / "holdings.csv",
+        "CASH": DATA_DIR / "cash.csv",
+        "DEPOSITS": DATA_DIR / "deposits.csv",
         "MARKET_DATA": DATA_DIR / "market_data.csv",
         "TRADE_LOG": DATA_DIR / "trades.csv",
         "MARKET_REGIME": DATA_DIR / "market_regime.csv",
@@ -60,13 +62,15 @@ def build_excel_workbook():
             df.to_excel(writer, sheet_name=sheet, index=False)
 
         instructions = pd.DataFrame([
-            {"Step": 1, "Action": "Open PREMARKET_PLAYS during NZ evening US premarket window."},
-            {"Step": 2, "Action": "Focus only on PREMARKET BUY first."},
-            {"Step": 3, "Action": "Check gap_pct, volume_trend, score, stop_loss and trim_price."},
-            {"Step": 4, "Action": "Position size is buy_amount_usd. Shares = shares_to_buy."},
-            {"Step": 5, "Action": "Set stop loss immediately."},
-            {"Step": 6, "Action": "Use trim_price as first profit-taking target."},
-            {"Step": 7, "Action": "Log all buys/sells in data/trades.csv."},
+            {"Step": 1, "Action": "Check CASH first to see available buying power."},
+            {"Step": 2, "Action": "Open PREMARKET_PLAYS during NZ evening US premarket window."},
+            {"Step": 3, "Action": "Focus only on PREMARKET BUY first."},
+            {"Step": 4, "Action": "Check gap_pct, volume_trend, score, stop_loss and trim_price."},
+            {"Step": 5, "Action": "Position size is buy_amount_usd. Shares = shares_to_buy."},
+            {"Step": 6, "Action": "Set stop loss immediately."},
+            {"Step": 7, "Action": "Use trim_price as first profit-taking target."},
+            {"Step": 8, "Action": "Log deposits in data/deposits.csv."},
+            {"Step": 9, "Action": "Log buys/sells only in data/trades.csv."},
         ])
         instructions.to_excel(writer, sheet_name="INSTRUCTIONS", index=False)
 
