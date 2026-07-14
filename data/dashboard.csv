@@ -1,0 +1,40 @@
+ticker,action,score,tier,price,buy_amount_usd,shares_to_buy,exit_action,exit_priority,exit_reason,position_rule,holding_return_pct,stop_loss,trim_price,warnings,decision_reasons
+TSLA,WATCH,43.0,QUALITY,396.1799926757813,0.0,0.0,SELL,MEDIUM,Trend and score weakened,Already held,-0.0417207966187322,368.3292813982283,433.31427437918535,Do not average down; Trend and score weakened,
+ANET,BUY,94.0,MOMENTUM,182.57000732421875,0.0,0.0,HOLD,LOW,No exit trigger,Already held,-0.0273823999246683,161.64559718540735,213.95662253243583,Do not average down,Strong trend; Positive momentum; MACD/volume acceleration; Momentum tier boost
+BFLY,BUY,87.0,MOMENTUM,7.75,0.0,0.0,HOLD,LOW,No exit trigger,Already held,-0.0670394023961399,6.272785867963519,9.965821198054725,Do not average down,Strong trend; Positive momentum; Momentum tier boost
+BLZE,BUY,84.0,MOMENTUM,16.549999237060547,0.0,0.0,HOLD,LOW,No exit trigger,Already held,0.0475067600157948,13.550999096461704,21.04849944795881,RSI overbought,Strong trend; Positive momentum; MACD/volume acceleration; Momentum tier boost
+SOFI,WATCH,72.0,MOMENTUM,18.549999237060547,0.0,0.0,HOLD,LOW,No exit trigger,Already held,0.008241993405466,16.667142050606863,21.374285016741077,,MACD/volume acceleration; Momentum tier boost
+GOOGL,WATCH,71.0,QUALITY,359.510009765625,0.0,0.0,HOLD,LOW,No exit trigger,Already held,-0.0199286593032251,344.46607753208707,379.56858607700894,Do not average down,Positive momentum; MACD/volume acceleration
+NVDA,WATCH,89.0,QUALITY,211.8000030517578,0.0,0.0,,,,Max 6 positions reached,,201.37714767456052,225.6971435546875,,Strong trend; Positive momentum; MACD/volume acceleration
+MU,WATCH,87.0,MOMENTUM,983.1199951171876,0.0,0.0,,,,Max 6 positions reached,,803.5899658203126,1252.4150390625,,Strong trend; Positive momentum; Momentum tier boost
+PUBM,WATCH,84.0,MOMENTUM,13.6899995803833,0.0,0.0,,,,Max 6 positions reached,,12.48234258379255,15.501485075269429,RSI overbought,Strong trend; Positive momentum; MACD/volume acceleration; Momentum tier boost
+STTK,WATCH,83.0,MOMENTUM,6.289999961853027,0.0,0.0,,,,Max 6 positions reached,,5.003857272011893,8.219213996614728,,Strong trend; MACD/volume acceleration; Momentum tier boost
+AMD,WATCH,82.0,QUALITY,548.1300048828125,0.0,0.0,,,,Max 6 positions reached,,491.05285208565846,624.2328752790179,,Strong trend; Positive momentum
+LLY,WATCH,82.0,QUALITY,1152.5400390625,0.0,0.0,,,,Max 6 positions reached,,1090.290562220982,1235.539341517857,,Strong trend; Positive momentum
+ALAB,WATCH,80.0,MOMENTUM,361.7799987792969,0.0,0.0,,,,Max 6 positions reached,,268.7313014439174,501.35304478236606,,Strong trend; Positive momentum; Momentum tier boost
+CRDO,WATCH,80.0,MOMENTUM,236.17999267578125,0.0,0.0,,,,Max 6 positions reached,,182.3964189801897,316.85535321916853,,Strong trend; Positive momentum; Momentum tier boost
+AVGO,WATCH,79.0,QUALITY,389.1099853515625,0.0,0.0,,,,Max 6 positions reached,,366.6046360560826,419.1171177455357,,Positive momentum; MACD/volume acceleration
+DDOG,WATCH,79.0,QUALITY,270.7300109863281,0.0,0.0,,,,Max 6 positions reached,,249.83907972063335,298.5845860072545,RSI overbought,Strong trend; Positive momentum; MACD/volume acceleration
+CELC,WATCH,73.0,MOMENTUM,111.0500030517578,0.0,0.0,,,,Max 6 positions reached,,97.80785914829798,130.91321890694752,,MACD/volume acceleration; Momentum tier boost
+AMZN,WATCH,68.0,QUALITY,247.4900054931641,0.0,0.0,,,,Max 6 positions reached,,236.13929585048132,262.6242850167411,,MACD/volume acceleration
+STX,WATCH,65.0,QUALITY,878.3099975585938,0.0,0.0,,,,Max 6 positions reached,,751.8610687255859,1046.9085693359375,,Strong trend; Positive momentum
+TSM,WATCH,65.0,QUALITY,420.3900146484375,0.0,0.0,,,,Max 6 positions reached,,390.43072945731024,460.3357282366072,,Positive momentum
+VRT,WATCH,62.0,QUALITY,303.5799865722656,0.0,0.0,,,,Max 6 positions reached,,271.6760559082031,346.1185607910156,,
+ARM,WATCH,60.0,MOMENTUM,281.1700134277344,0.0,0.0,,,,Max 6 positions reached,,222.40744018554688,369.3138732910156,,Positive momentum; Momentum tier boost
+NBIS,WATCH,60.0,MOMENTUM,194.08999633789065,0.0,0.0,,,,Max 6 positions reached,,142.96970912388394,270.7704271589007,,Positive momentum; Momentum tier boost
+PL,WATCH,59.0,MOMENTUM,25.559999465942383,0.0,0.0,,,,Max 6 positions reached,,20.80728530883789,32.68907070159912,,Momentum tier boost
+INTC,WATCH,55.0,QUALITY,107.76000213623048,0.0,0.0,,,,Max 6 positions reached,,93.41143008640836,126.89143153599332,,Positive momentum
+MRVL,WATCH,55.0,QUALITY,222.44000244140625,0.0,0.0,,,,Max 6 positions reached,,190.0357131958008,265.6457214355469,,Positive momentum
+CBOE,WATCH,51.0,QUALITY,274.9800109863281,0.0,0.0,,,,Max 6 positions reached,,257.1782308306013,298.7157178606306,,MACD/volume acceleration
+RKLB,WATCH,48.0,MOMENTUM,78.80999755859375,0.0,0.0,,,,Max 6 positions reached,,63.34428405761719,102.0085678100586,,Momentum tier boost
+SOUN,WATCH,44.0,MOMENTUM,6.690000057220459,0.0,0.0,,,,Max 6 positions reached,,5.878714220864432,7.906928811754499,,MACD/volume acceleration; Momentum tier boost
+IONQ,WATCH,38.0,MOMENTUM,39.290000915527344,0.0,0.0,,,,Max 6 positions reached,,31.88785825456892,50.393214906964985,,Momentum tier boost
+SMCI,WATCH,38.0,MOMENTUM,27.64999961853028,0.0,0.0,,,,Max 6 positions reached,,24.100000108991352,32.97499888283866,,Momentum tier boost
+ASTS,WATCH,37.0,MOMENTUM,68.81999969482422,0.0,0.0,,,,Max 6 positions reached,,54.90942818777901,89.68585695539201,,Momentum tier boost
+KYTX,WATCH,37.0,MOMENTUM,7.940000057220459,0.0,0.0,,,,Max 6 positions reached,,6.538857460021973,10.041713953018188,,Momentum tier boost
+SKHY,WATCH,29.0,QUALITY,193.9199981689453,0.0,0.0,,,,Max 6 positions reached,,178.4063983154297,223.0079978942871,Missing ATR,MACD/volume acceleration
+JOBY,WATCH,27.0,MOMENTUM,7.889999866485596,0.0,0.0,,,,Max 6 positions reached,,6.760285581861224,9.584571293422156,,Momentum tier boost
+LUNR,WATCH,27.0,MOMENTUM,14.90999984741211,0.0,0.0,,,,Max 6 positions reached,,11.623856680733816,19.83921459742955,,Momentum tier boost
+OKLO,WATCH,27.0,MOMENTUM,46.2400016784668,0.0,0.0,,,,Max 6 positions reached,,39.353258405412944,56.57011658804757,,Momentum tier boost
+SMR,WATCH,27.0,MOMENTUM,8.600000381469727,0.0,0.0,,,,Max 6 positions reached,,7.252858161926269,10.620713710784912,,Momentum tier boost
+CCJ,WATCH,22.0,QUALITY,91.56999969482422,0.0,0.0,,,,Max 6 positions reached,,84.84464209420341,100.53714316231864,,
