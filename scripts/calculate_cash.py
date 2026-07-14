@@ -49,5 +49,3 @@ def calculate_cash():
 
 if __name__ == "__main__":
     calculate_cash()
-Then run:
-python scripts/run_all.py
