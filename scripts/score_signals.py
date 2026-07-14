@@ -8,7 +8,7 @@ MARKET_PATH = DATA_DIR / "market_data.csv"
 WATCHLIST_PATH = DATA_DIR / "watchlist.csv"
 CASH_PATH = DATA_DIR / "cash.csv"
 
-RISK_PER_TRADE_PCT = 0.02
+RISK_PCT_PER_TRADE = 0.02
 MAX_POSITION_PCT = 0.25
 
 def clamp(x, lo=0, hi=100):
@@ -16,15 +16,16 @@ def clamp(x, lo=0, hi=100):
 
 def get_cash_available():
     if not CASH_PATH.exists():
-        return 0
-    cash = pd.read_csv(CASH_PATH)
-    if cash.empty or "cash_available_usd" not in cash.columns:
-        return 0
-    return float(cash["cash_available_usd"].iloc[0])
+        return 0.0
+    try:
+        cash = pd.read_csv(CASH_PATH)
+        if "cash_available_usd" in cash.columns and not cash.empty:
+            return float(cash["cash_available_usd"].iloc[0])
+    except Exception:
+        pass
+    return 0.0
 
 def score_signals():
-    cash_available = get_cash_available()
-
     watch = pd.read_csv(WATCHLIST_PATH)
     watch["enabled"] = watch["enabled"].astype(str).str.upper().isin(["TRUE", "YES", "1", "Y"])
     watch = watch[watch["enabled"]]
@@ -32,74 +33,41 @@ def score_signals():
     market = pd.read_csv(MARKET_PATH)
     market["ticker"] = market["ticker"].astype(str).str.upper().str.strip()
 
-    df = watch.merge(market, on="ticker", how="left")
+    cash_available = get_cash_available()
+    risk_budget_usd = cash_available * RISK_PCT_PER_TRADE
+    max_position_usd = cash_available * MAX_POSITION_PCT
 
+    df = watch.merge(market, on="ticker", how="left")
     rows = []
 
     for _, row in df.iterrows():
-        ticker = row["ticker"]
         price = row.get("price", np.nan)
         tier = row.get("tier", "QUALITY")
         atr = row.get("atr", np.nan)
-        volume_trend = row.get("volume_trend", np.nan)
-        rsi = row.get("rsi_14", np.nan)
-        gap_pct = row.get("gap_pct", np.nan)
-
-        reasons = []
-        warnings = []
-
-        if pd.isna(price) or price <= 0:
-            warnings.append("Missing price")
-        if pd.isna(volume_trend):
-            warnings.append("Missing volume trend")
-        if pd.isna(atr):
-            warnings.append("Missing ATR")
-        if pd.isna(rsi):
-            warnings.append("Missing RSI")
 
         trend_score = 0
         if pd.notna(price) and pd.notna(row.get("sma_50")) and price > row["sma_50"]:
             trend_score += 40
-            reasons.append("Above 50 SMA")
         if pd.notna(price) and pd.notna(row.get("sma_200")) and price > row["sma_200"]:
             trend_score += 40
-            reasons.append("Above 200 SMA")
 
         momentum_score = 0
         if pd.notna(row.get("return_1m")) and row["return_1m"] > 0:
             momentum_score += 25
-            reasons.append("Positive 1M return")
         if pd.notna(row.get("return_3m")) and row["return_3m"] > 0:
             momentum_score += 35
-            reasons.append("Positive 3M return")
         if pd.notna(row.get("return_6m")) and row["return_6m"] > 0:
             momentum_score += 40
-            reasons.append("Positive 6M return")
 
         accelerator_score = 50
         if pd.notna(row.get("macd_histogram")) and row["macd_histogram"] > 0:
             accelerator_score += 25
-            reasons.append("MACD improving")
-        if pd.notna(volume_trend) and volume_trend >= 1.5:
+        if pd.notna(row.get("volume_trend")) and row["volume_trend"] >= 1.5:
             accelerator_score += 25
-            reasons.append("Volume surge")
-
         accelerator_score = clamp(accelerator_score)
 
-        if pd.notna(rsi):
-            if 45 <= rsi <= 70:
-                rsi_score = 100
-                reasons.append("RSI in momentum zone")
-            elif rsi > 80:
-                rsi_score = 35
-                warnings.append("RSI very extended")
-            elif rsi < 35:
-                rsi_score = 40
-                warnings.append("RSI weak")
-            else:
-                rsi_score = 60
-        else:
-            rsi_score = 50
+        rsi = row.get("rsi_14", np.nan)
+        rsi_score = 100 if pd.notna(rsi) and 40 <= rsi <= 70 else 50
 
         final_score = round(
             trend_score * 0.25 +
@@ -108,39 +76,52 @@ def score_signals():
             rsi_score * 0.20
         )
 
-        if pd.notna(price) and pd.notna(atr) and atr > 0:
-            if tier == "MOMENTUM":
-                stop_loss = price - (2.0 * atr)
-            else:
-                stop_loss = price - (1.5 * atr)
+        if tier == "MOMENTUM":
+            stop_loss = price - (2 * atr) if pd.notna(price) and pd.notna(atr) and atr > 0 else price * 0.80
+            trim_price = price + (3 * atr) if pd.notna(price) and pd.notna(atr) and atr > 0 else price * 1.25
         else:
-            stop_loss = price * 0.80 if tier == "MOMENTUM" and pd.notna(price) else price * 0.92 if pd.notna(price) else np.nan
-
-        trim_price = price + (2 * (price - stop_loss)) if pd.notna(price) and pd.notna(stop_loss) else np.nan
+            stop_loss = price - (1.5 * atr) if pd.notna(price) and pd.notna(atr) and atr > 0 else price * 0.92
+            trim_price = price + (2 * atr) if pd.notna(price) and pd.notna(atr) and atr > 0 else price * 1.15
 
         action = "WATCH"
-        if final_score >= 80 and trend_score >= 70 and len(warnings) == 0:
+        if final_score >= 80 and trend_score >= 70:
             action = "BUY"
-        elif final_score >= 75 and "Missing price" not in warnings:
+        elif final_score >= 75:
             action = "BUY SMALL"
 
-        risk_per_trade = cash_available * RISK_PER_TRADE_PCT
-        max_position = cash_available * MAX_POSITION_PCT
+        decision_reasons = []
+        warnings = []
 
-        risk_per_share = price - stop_loss if pd.notna(price) and pd.notna(stop_loss) else np.nan
+        if trend_score >= 70:
+            decision_reasons.append("Strong trend")
+        if momentum_score >= 70:
+            decision_reasons.append("Positive momentum")
+        if accelerator_score >= 75:
+            decision_reasons.append("MACD/volume acceleration")
+        if pd.notna(rsi) and rsi > 70:
+            warnings.append("RSI overbought")
+        if pd.isna(price):
+            warnings.append("Missing price")
+        if pd.isna(atr) or atr <= 0:
+            warnings.append("Missing ATR")
 
-        if action in ["BUY", "BUY SMALL"] and pd.notna(risk_per_share) and risk_per_share > 0:
-            risk_based_amount = risk_per_trade / risk_per_share * price
-            buy_amount_usd = min(risk_based_amount, max_position, cash_available)
-            if action == "BUY SMALL":
-                buy_amount_usd *= 0.5
-        else:
-            buy_amount_usd = 0
+        buy_amount_usd = 0.0
+        shares_to_buy = 0.0
 
-        shares_to_buy = buy_amount_usd / price if pd.notna(price) and price > 0 else 0
+        if action in ["BUY", "BUY SMALL"] and pd.notna(price) and price > 0:
+            risk_per_share = max(price - stop_loss, 0) if pd.notna(stop_loss) else 0
+            if risk_per_share > 0:
+                atr_sized_amount = (risk_budget_usd / risk_per_share) * price
+                buy_amount_usd = min(atr_sized_amount, max_position_usd, cash_available)
+                if action == "BUY SMALL":
+                    buy_amount_usd *= 0.5
+            else:
+                buy_amount_usd = min(max_position_usd, cash_available)
+
+            shares_to_buy = buy_amount_usd / price if buy_amount_usd > 0 else 0
 
         rows.append({
-            "ticker": ticker,
+            "ticker": row["ticker"],
             "sector": row.get("sector", ""),
             "tier": tier,
             "price": price,
@@ -150,15 +131,17 @@ def score_signals():
             "momentum_score": momentum_score,
             "accelerator_score": accelerator_score,
             "rsi_14": rsi,
-            "gap_pct": gap_pct,
-            "volume_trend": volume_trend,
+            "gap_pct": row.get("gap_pct", np.nan),
+            "volume_trend": row.get("volume_trend", np.nan),
             "macd_histogram": row.get("macd_histogram", np.nan),
-            "atr": atr,
             "stop_loss": stop_loss,
             "trim_price": trim_price,
+            "atr": atr,
             "buy_amount_usd": round(buy_amount_usd, 2),
-            "shares_to_buy": shares_to_buy,
-            "decision_reasons": "; ".join(reasons),
+            "shares_to_buy": round(shares_to_buy, 6),
+            "risk_budget_usd": round(risk_budget_usd, 2),
+            "max_position_usd": round(max_position_usd, 2),
+            "decision_reasons": "; ".join(decision_reasons),
             "warnings": "; ".join(warnings)
         })
 
