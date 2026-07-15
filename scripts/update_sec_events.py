@@ -56,9 +56,23 @@ def update_sec_events():
     watch["enabled"] = watch["enabled"].astype(str).str.upper().isin(["TRUE", "YES", "1", "Y"])
     watch = watch[watch["enabled"]]
 
-    cik_map = get_cik_map()
-    cutoff = datetime.now(timezone.utc).date() - timedelta(days=LOOKBACK_DAYS)
+    try:
+        cik_map = get_cik_map()
+    except Exception as e:
+        out = pd.DataFrame([{
+            "ticker": "",
+            "sec_event_flag": "ERROR",
+            "sec_event_type": "",
+            "sec_event_date": "",
+            "sec_form": "",
+            "sec_severity": "LOW",
+            "sec_score_adjustment": 0,
+            "sec_event_note": f"SEC CIK map lookup failed: {e}",
+        }])
+        out.to_csv(SEC_EVENTS_PATH, index=False)
+        return out
 
+    cutoff = datetime.now(timezone.utc).date() - timedelta(days=LOOKBACK_DAYS)
     rows = []
 
     for ticker in watch["ticker"]:
