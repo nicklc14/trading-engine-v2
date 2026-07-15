@@ -6,7 +6,7 @@ from calculate_cash import calculate_cash
 from calculate_holdings import calculate_holdings
 from calculate_performance import calculate_performance
 from score_signals import score_signals
-from score_premarket_signals import score_premarket_signals
+from score_market_timing import score_market_timing
 from build_weekly_review import build_weekly_review
 from build_dashboard import build_dashboard
 from build_holdings_view import build_holdings_view
@@ -39,8 +39,8 @@ calculate_performance()
 print("Step 5: Scoring standard signals...")
 score_signals()
 
-print("Step 6: Scoring premarket signals...")
-score_premarket_signals()
+print("Step 6: Scoring market timing...")
+score_market_timing()
 
 print("Step 7: Building weekly review...")
 build_weekly_review()
