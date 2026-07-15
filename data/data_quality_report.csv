@@ -1,2 +1,5 @@
 as_of,ticker,issue_type,severity,issue,suggested_action
-2026-07-15T18:45:26.373214+00:00,,ok,OK,No major data quality issues found,Proceed with normal review
+2026-07-15T18:50:25.996627+00:00,SOUN,missing_avg_volume,MEDIUM,Missing 50-day average volume,Volume trend may be unreliable
+2026-07-15T18:50:25.996637+00:00,SOUN,missing_volume_trend,MEDIUM,Missing volume trend,Do not rely on volume confirmation
+2026-07-15T18:50:25.996640+00:00,SOUN,missing_rsi,LOW,Missing RSI,RSI quality score may be unreliable
+2026-07-15T18:50:25.996643+00:00,SOUN,missing_atr,HIGH,Missing or invalid ATR,Stop loss and sizing may be unreliable
