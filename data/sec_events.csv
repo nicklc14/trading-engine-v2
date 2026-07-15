@@ -1,0 +1,39 @@
+ticker,sec_event_flag,sec_event_type,sec_event_date,sec_form,sec_severity,sec_score_adjustment,sec_event_note
+ALAB,YES,INSIDER_OR_OWNERSHIP,2026-07-06,4,MEDIUM,2,Recent Form 4/ownership filing
+AMD,YES,INSIDER_OR_OWNERSHIP,2026-06-17,4,MEDIUM,2,Recent Form 4/ownership filing
+AMZN,YES,INSIDER_OR_OWNERSHIP,2026-07-02,4,MEDIUM,2,Recent Form 4/ownership filing
+ANET,YES,INSIDER_OR_OWNERSHIP,2026-07-14,4,MEDIUM,2,Recent Form 4/ownership filing
+ARM,NONE,,,,NONE,0,No major SEC events in lookback window
+ASTS,YES,INSIDER_OR_OWNERSHIP,2026-06-23,4,MEDIUM,2,Recent Form 4/ownership filing
+AVGO,YES,INSIDER_OR_OWNERSHIP,2026-07-14,4,MEDIUM,2,Recent Form 4/ownership filing
+BFLY,YES,INSIDER_OR_OWNERSHIP,2026-07-08,4,MEDIUM,2,Recent Form 4/ownership filing
+BLZE,YES,MATERIAL_EVENT,2026-07-02,8-K,MEDIUM,1,Recent 8-K material event filing
+CBOE,YES,INSIDER_OR_OWNERSHIP,2026-07-02,4,MEDIUM,2,Recent Form 4/ownership filing
+CELC,NONE,,,,NONE,0,No major SEC events in lookback window
+CRDO,YES,INSIDER_OR_OWNERSHIP,2026-07-13,4,MEDIUM,2,Recent Form 4/ownership filing
+GOOGL,YES,INSIDER_OR_OWNERSHIP,2026-07-06,4,MEDIUM,2,Recent Form 4/ownership filing
+INTC,NONE,,,,NONE,0,No major SEC events in lookback window
+IONQ,YES,INSIDER_OR_OWNERSHIP,2026-06-22,4,MEDIUM,2,Recent Form 4/ownership filing
+KYTX,YES,MATERIAL_EVENT,2026-07-09,8-K,MEDIUM,1,Recent 8-K material event filing
+LLY,YES,INSIDER_OR_OWNERSHIP,2026-06-16,4,MEDIUM,2,Recent Form 4/ownership filing
+LUNR,YES,INSIDER_OR_OWNERSHIP,2026-07-01,4,MEDIUM,2,Recent Form 4/ownership filing
+MRVL,YES,INSIDER_OR_OWNERSHIP,2026-07-01,4,MEDIUM,2,Recent Form 4/ownership filing
+MU,YES,INSIDER_OR_OWNERSHIP,2026-07-06,4,MEDIUM,2,Recent Form 4/ownership filing
+NBIS,YES,INSIDER_OR_OWNERSHIP,2026-07-06,4,MEDIUM,2,Recent Form 4/ownership filing
+NVDA,YES,INSIDER_OR_OWNERSHIP,2026-07-06,4,MEDIUM,2,Recent Form 4/ownership filing
+CCJ,NONE,,,,NONE,0,No major SEC events in lookback window
+PL,YES,INSIDER_OR_OWNERSHIP,2026-07-14,4,MEDIUM,2,Recent Form 4/ownership filing
+PUBM,YES,INSIDER_OR_OWNERSHIP,2026-07-06,4,MEDIUM,2,Recent Form 4/ownership filing
+RKLB,YES,INSIDER_OR_OWNERSHIP,2026-07-08,4,MEDIUM,2,Recent Form 4/ownership filing
+SOFI,YES,INSIDER_OR_OWNERSHIP,2026-06-29,4,MEDIUM,2,Recent Form 4/ownership filing
+STTK,YES,INSIDER_OR_OWNERSHIP,2026-07-07,4,MEDIUM,2,Recent Form 4/ownership filing
+TSLA,YES,INSIDER_OR_OWNERSHIP,2026-06-17,4,MEDIUM,2,Recent Form 4/ownership filing
+TSM,YES,INSIDER_OR_OWNERSHIP,2026-07-09,4,MEDIUM,2,Recent Form 4/ownership filing
+VRT,YES,INSIDER_OR_OWNERSHIP,2026-06-26,4,MEDIUM,2,Recent Form 4/ownership filing
+STX,YES,INSIDER_OR_OWNERSHIP,2026-07-02,4,MEDIUM,2,Recent Form 4/ownership filing
+SMCI,YES,INSIDER_OR_OWNERSHIP,2026-07-02,4,MEDIUM,2,Recent Form 4/ownership filing
+DDOG,YES,INSIDER_OR_OWNERSHIP,2026-07-13,4,MEDIUM,2,Recent Form 4/ownership filing
+SMR,YES,INSIDER_OR_OWNERSHIP,2026-07-01,4,MEDIUM,2,Recent Form 4/ownership filing
+OKLO,YES,INSIDER_OR_OWNERSHIP,2026-07-06,4,MEDIUM,2,Recent Form 4/ownership filing
+JOBY,YES,INSIDER_OR_OWNERSHIP,2026-07-14,4,MEDIUM,2,Recent Form 4/ownership filing
+SOUN,YES,INSIDER_OR_OWNERSHIP,2026-06-17,4,MEDIUM,2,Recent Form 4/ownership filing
