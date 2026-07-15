@@ -25,7 +25,7 @@ def score_market_timing():
 
         gap_reason = "No meaningful daily gap"
         if pd.notna(gap_pct):
-            if gap_pct > 0.1:
+            if gap_pct > 0.10:
                 timing_score += 35
                 gap_reason = "Huge daily gap up >10%"
                 tags.append("huge_gap_up")
@@ -44,7 +44,7 @@ def score_market_timing():
 
         volume_reason = "Volume not confirming"
         if pd.notna(volume_trend):
-            if volume_trend >= 2:
+            if volume_trend >= 2.0:
                 timing_score += 25
                 volume_reason = "Very strong volume >=2.0x"
                 tags.append("very_strong_volume")
@@ -90,7 +90,7 @@ def score_market_timing():
             timing_score -= 10
             tags.append("risk_off")
 
-        timing_score = MAX(0, MIN(100, ROUND(timing_score)))
+        timing_score = max(0, min(100, round(timing_score)))
 
         timing_action = "WAIT"
         buy_amount = 0
@@ -103,10 +103,30 @@ def score_market_timing():
             timing_action = "TIMING WATCH"
             position_rationale = "Timing is close but needs stronger confirmation"
 
-        rows.append({"ticker": ticker,"tier": tier,"market_regime": market_regime,"price": price,"gap_pct": gap_pct,"volume_trend": volume_trend,"timing_score": timing_score,"timing_action": timing_action,"buy_amount_usd": buy_amount,"shares_to_buy": 0,"stop_loss": row.get("stop_loss", np.nan),"trim_price": row.get("trim_price", np.nan),"reason_tags": "; ".join(tags),"position_rationale": position_rationale,"gap_reason": gap_reason,"volume_reason": volume_reason,"macd_reason": macd_reason,"rsi_reason": rsi_reason,"data_note": "Uses daily yfinance data, not true live premarket/after-hours data",})
+        rows.append({
+            "ticker": ticker,
+            "tier": tier,
+            "market_regime": market_regime,
+            "price": price,
+            "gap_pct": gap_pct,
+            "volume_trend": volume_trend,
+            "timing_score": timing_score,
+            "timing_action": timing_action,
+            "buy_amount_usd": buy_amount,
+            "shares_to_buy": 0,
+            "stop_loss": row.get("stop_loss", np.nan),
+            "trim_price": row.get("trim_price", np.nan),
+            "reason_tags": "; ".join(tags),
+            "position_rationale": position_rationale,
+            "gap_reason": gap_reason,
+            "volume_reason": volume_reason,
+            "macd_reason": macd_reason,
+            "rsi_reason": rsi_reason,
+            "data_note": "Uses daily yfinance data, not true live premarket/after-hours data",
+        })
 
-    out = pd.DataFrame(rows).sort_values("timing_score", ascending=FALSE)
-    out.to_csv(MARKET_TIMING_PATH, index=FALSE)
+    out = pd.DataFrame(rows).sort_values("timing_score", ascending=False)
+    out.to_csv(MARKET_TIMING_PATH, index=False)
     return out
 
 if __name__ == "__main__":
