@@ -15,3 +15,8 @@ moonshot_position_size_factor,0.50,Initial MOONSHOT position size factor
 moonshot_add_min_return,0.15,Only add to MOONSHOT winners above 15 percent
 moonshot_stop_atr_multiplier,2.5,Wider moonshot stop using ATR
 moonshot_trim_atr_multiplier,4.0,Wider moonshot trim target using ATR
+aggressive_mode,TRUE,Allow extra aggression only when market regime is Risk On
+aggressive_risk_on_score_boost,3,Extra score boost in Risk On
+aggressive_risk_on_position_size_factor,1.25,Larger sizing in Risk On
+aggressive_risk_on_buy_threshold,78,Lower BUY threshold in Risk On
+aggressive_risk_on_buy_small_threshold,73,Lower BUY SMALL threshold in Risk On
