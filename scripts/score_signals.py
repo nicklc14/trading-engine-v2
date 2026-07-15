@@ -329,10 +329,13 @@ def score_signals():
         sec_severity = str(row.get("sec_severity", "")).upper()
 
         if sec_event_flag == "YES":
-            if sec_event_type:
-                reasons.append(f"SEC: {sec_event_type}")
-            if sec_event_note:
-                warnings.append(sec_event_note)
+            if sec_event_type == "DILUTION_RISK":
+                warnings.append(sec_event_note or "SEC dilution/financing risk")
+            elif sec_event_type == "MATERIAL_EVENT":
+                reasons.append("SEC material event")
+                warnings.append(sec_event_note or "Recent 8-K material event")
+            elif sec_event_type == "OWNERSHIP_FILING":
+                warnings.append(sec_event_note or "Recent insider/ownership filing")
 
         if sec_severity == "HIGH":
             warnings.append("SEC high-risk filing")
