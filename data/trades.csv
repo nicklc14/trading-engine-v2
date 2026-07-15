@@ -11,4 +11,4 @@ date,ticker,type,price,usd_amount,transaction_fee,shares,value,holding_key,notes
 2026-07-14,ANET,Buy,184.21,18.0,0.33562,0.0958926225503501,17.66437999999999,8,First trade logged in Github
 2026-07-14,BFLY,Buy,8.152,12.0,0.22375,1.4445841511285575,11.77625,9,Second trade logged in Github
 2026-07-14,BLZE,Buy,16.4,10.0,0.18646,0.5983865853658537,9.81354,10,Third trade logged in Github
-2026-07-16,TSLA,Sell,399.434,10.67,0.29268,ALL,,1,First Sell on engine v2 advice
+2026-07-16,TSLA,Sell,399.434,10.67,0.29268,0.0272356606329269,10.878848869252524,1,First Sell on engine v2 advice
