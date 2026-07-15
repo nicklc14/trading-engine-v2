@@ -20,16 +20,22 @@ def load_config():
         "risk_pct_per_trade": 0.05,
         "max_position_pct": 0.35,
         "momentum_priority_boost": 5,
-        "moonshot_score_boost": 8,
         "quality_position_size_factor": 0.65,
-        "moonshot_position_size_factor": 0.50,
         "add_more_min_return": 0.05,
         "add_more_min_score": 80,
+        "max_moonshot_positions": 2,
+        "moonshot_score_boost": 8,
+        "moonshot_position_size_factor": 0.50,
+        "moonshot_add_min_return": 0.15,
+        "moonshot_stop_atr_multiplier": 2.5,
+        "moonshot_trim_atr_multiplier": 4.0,
     }
+
     if CONFIG_PATH.exists():
         cfg = pd.read_csv(CONFIG_PATH)
         for _, r in cfg.iterrows():
             defaults[str(r["setting"])] = r["value"]
+
     return defaults
 
 def cfg_float(cfg, key):
@@ -56,6 +62,7 @@ def review_priority(action, exit_action="", exit_priority="", position_rule=""):
 def get_cash_available():
     if not CASH_PATH.exists():
         return 0.0
+
     cash = pd.read_csv(CASH_PATH)
     return float(cash["cash_available_usd"].iloc[0]) if not cash.empty else 0.0
 
@@ -67,14 +74,19 @@ def score_signals():
     risk_pct_per_trade = cfg_float(cfg, "risk_pct_per_trade")
     max_position_pct = cfg_float(cfg, "max_position_pct")
     momentum_priority_boost = cfg_float(cfg, "momentum_priority_boost")
-    moonshot_score_boost = cfg_float(cfg, "moonshot_score_boost")
     quality_position_size_factor = cfg_float(cfg, "quality_position_size_factor")
-    moonshot_position_size_factor = cfg_float(cfg, "moonshot_position_size_factor")
     add_more_min_return = cfg_float(cfg, "add_more_min_return")
     add_more_min_score = cfg_float(cfg, "add_more_min_score")
+    max_moonshot_positions = cfg_int(cfg, "max_moonshot_positions")
+    moonshot_score_boost = cfg_float(cfg, "moonshot_score_boost")
+    moonshot_position_size_factor = cfg_float(cfg, "moonshot_position_size_factor")
+    moonshot_add_min_return = cfg_float(cfg, "moonshot_add_min_return")
+    moonshot_stop_atr_multiplier = cfg_float(cfg, "moonshot_stop_atr_multiplier")
+    moonshot_trim_atr_multiplier = cfg_float(cfg, "moonshot_trim_atr_multiplier")
 
     watch = pd.read_csv(WATCHLIST_PATH)
     watch["enabled"] = watch["enabled"].astype(str).str.upper().isin(["TRUE", "YES", "1", "Y"])
+    watch["ticker"] = watch["ticker"].astype(str).str.upper().str.strip()
     watch = watch[watch["enabled"]]
 
     market = pd.read_csv(MARKET_PATH)
@@ -83,6 +95,7 @@ def score_signals():
     holdings = pd.read_csv(HOLDINGS_PATH) if HOLDINGS_PATH.exists() else pd.DataFrame()
     if holdings.empty:
         holdings = pd.DataFrame(columns=["ticker", "shares", "holding_return_pct", "market_value"])
+
     holdings["ticker"] = holdings["ticker"].astype(str).str.upper().str.strip()
 
     for col in ["shares", "holding_return_pct", "market_value"]:
@@ -94,6 +107,7 @@ def score_signals():
 
     raw_cash = get_cash_available()
     cash_available = max(raw_cash * (1 - cash_reserve_pct), 0)
+
     holdings_value = pd.to_numeric(holdings["market_value"], errors="coerce").fillna(0).sum()
     equity = raw_cash + holdings_value
 
@@ -107,6 +121,15 @@ def score_signals():
         how="left"
     )
 
+    moonshot_position_count = int(
+        (
+            (df["tier"].astype(str).str.upper() == "MOONSHOT")
+            & (pd.to_numeric(df["shares"], errors="coerce").fillna(0) > 0)
+        ).sum()
+    )
+
+    moonshot_open_slots = max(max_moonshot_positions - moonshot_position_count, 0)
+
     rows = []
 
     for _, row in df.iterrows():
@@ -115,6 +138,7 @@ def score_signals():
         price = row.get("price", np.nan)
         atr = row.get("atr", np.nan)
         rsi = row.get("rsi_14", np.nan)
+        atr_pct = row.get("atr_pct", np.nan)
         shares_held = row.get("shares", 0)
         holding_return_pct = row.get("holding_return_pct", np.nan)
         already_held = pd.notna(shares_held) and shares_held > 0
@@ -155,12 +179,20 @@ def score_signals():
         if tier == "MOONSHOT":
             final_score = clamp(final_score + moonshot_score_boost)
 
-        if tier == "MOMENTUM":
+        if tier == "MOONSHOT":
+            stop_loss = (
+                price - (moonshot_stop_atr_multiplier * atr)
+                if pd.notna(price) and pd.notna(atr) and atr > 0
+                else price * 0.75
+            )
+            trim_price = (
+                price + (moonshot_trim_atr_multiplier * atr)
+                if pd.notna(price) and pd.notna(atr) and atr > 0
+                else price * 1.40
+            )
+        elif tier == "MOMENTUM":
             stop_loss = price - (2 * atr) if pd.notna(price) and pd.notna(atr) and atr > 0 else price * 0.80
             trim_price = price + (3 * atr) if pd.notna(price) and pd.notna(atr) and atr > 0 else price * 1.25
-        elif tier == "MOONSHOT":
-            stop_loss = price - (2.5 * atr) if pd.notna(price) and pd.notna(atr) and atr > 0 else price * 0.75
-            trim_price = price + (4 * atr) if pd.notna(price) and pd.notna(atr) and atr > 0 else price * 1.40
         else:
             stop_loss = price - (1.5 * atr) if pd.notna(price) and pd.notna(atr) and atr > 0 else price * 0.92
             trim_price = price + (2 * atr) if pd.notna(price) and pd.notna(atr) and atr > 0 else price * 1.15
@@ -171,17 +203,27 @@ def score_signals():
         elif final_score >= 75:
             action = "BUY SMALL"
 
+        position_rule = ""
+
         if already_held:
             position_rule = "Already held"
         elif open_slots <= 0:
             position_rule = f"Max {max_positions} positions reached"
             if action in ["BUY", "BUY SMALL"]:
                 action = "WATCH"
+        elif tier == "MOONSHOT" and moonshot_open_slots <= 0:
+            position_rule = f"Max {max_moonshot_positions} MOONSHOT positions reached"
+            if action in ["BUY", "BUY SMALL"]:
+                action = "WATCH"
         else:
-            position_rule = f"{open_slots} open slot(s)"
+            if tier == "MOONSHOT":
+                position_rule = f"{open_slots} open slot(s); {moonshot_open_slots} MOONSHOT slot(s)"
+            else:
+                position_rule = f"{open_slots} open slot(s)"
 
         add_more_signal = ""
         add_more_reason = ""
+
         if already_held:
             if pd.isna(holding_return_pct):
                 add_more_signal = "NO"
@@ -189,6 +231,9 @@ def score_signals():
             elif holding_return_pct < 0:
                 add_more_signal = "NO"
                 add_more_reason = "Do not average down"
+            elif tier == "MOONSHOT" and holding_return_pct < moonshot_add_min_return:
+                add_more_signal = "NO"
+                add_more_reason = f"MOONSHOT add blocked until return is above {moonshot_add_min_return:.0%}"
             elif holding_return_pct >= add_more_min_return and final_score >= add_more_min_score and trend_score >= 70:
                 add_more_signal = "ADD SMALL"
                 add_more_reason = "Winner with strong signal"
@@ -254,12 +299,17 @@ def score_signals():
             warnings.append(exit_reason)
         if tier == "MOONSHOT":
             warnings.append("Moonshot: high risk / small size")
+        if tier == "MOONSHOT" and pd.notna(atr_pct) and atr_pct < 0.08:
+            warnings.append("Moonshot volatility may be too low")
 
         buy_amount_usd = 0.0
         shares_to_buy = 0.0
 
         can_buy = not already_held and open_slots > 0 and action in ["BUY", "BUY SMALL"]
         can_add = already_held and add_more_signal == "ADD SMALL" and exit_action not in ["SELL", "TRIM"]
+
+        if tier == "MOONSHOT" and not already_held and moonshot_open_slots <= 0:
+            can_buy = False
 
         if (can_buy or can_add) and pd.notna(price) and price > 0:
             risk_per_share = max(price - stop_loss, 0) if pd.notna(stop_loss) else 0
