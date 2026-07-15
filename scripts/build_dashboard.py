@@ -92,32 +92,34 @@ def build_dashboard():
         + pd.to_numeric(signals.get("stop_loss", np.nan), errors="coerce").round(2).astype(str)
     )
 
-    out = pd.DataFrame({
-        "ticker": signals.get("ticker", ""),
-        "action_required": signals["action_required"],
-        "plan_why": signals["plan_why"],
-        "buy_usd": signals.get("buy_amount_usd", 0),
-        "sell_usd": signals["sell_usd"],
-        "shares_to_buy": signals.get("shares_to_buy", 0),
-        "shares_to_sell": signals["shares_to_sell"],
-        "price": signals.get("price", np.nan),
-        "score": signals.get("score", np.nan),
-        "tier": signals.get("tier", ""),
-        "holding_return_pct": signals.get("holding_return_pct", np.nan),
-        "stop_loss": signals.get("stop_loss", np.nan),
-        "trim_target": signals.get("trim_price", np.nan),
-        "risk_note": signals["risk_note"],
-        "position_rule": signals.get("position_rule", ""),
-        "sort_priority": signals.get("sort_priority", 99),
-    })
+    working = signals.copy()
+    if "sort_priority" not in working.columns:
+        working["sort_priority"] = 99
 
-    out = out.sort_values(
+    working = working.sort_values(
         ["sort_priority", "score", "ticker"],
         ascending=[True, False, True]
     )
 
-    out = out[VISIBLE_COLUMNS]
+    out = pd.DataFrame({
+        "ticker": working.get("ticker", ""),
+        "action_required": working["action_required"],
+        "plan_why": working["plan_why"],
+        "buy_usd": working.get("buy_amount_usd", 0),
+        "sell_usd": working["sell_usd"],
+        "shares_to_buy": working.get("shares_to_buy", 0),
+        "shares_to_sell": working["shares_to_sell"],
+        "price": working.get("price", np.nan),
+        "score": working.get("score", np.nan),
+        "tier": working.get("tier", ""),
+        "holding_return_pct": working.get("holding_return_pct", np.nan),
+        "stop_loss": working.get("stop_loss", np.nan),
+        "trim_target": working.get("trim_price", np.nan),
+        "risk_note": working["risk_note"],
+        "position_rule": working.get("position_rule", ""),
+    })
 
+    out = out[VISIBLE_COLUMNS]
     out.to_csv(DASHBOARD_PATH, index=False)
     return out
 
