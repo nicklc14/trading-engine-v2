@@ -7,6 +7,7 @@ from calculate_holdings import calculate_holdings
 from calculate_performance import calculate_performance
 from score_signals import score_signals
 from score_market_timing import score_market_timing
+from score_candidates import score_candidates
 from build_weekly_review import build_weekly_review
 from build_dashboard import build_dashboard
 from build_holdings_view import build_holdings_view
@@ -42,6 +43,9 @@ score_signals()
 
 print("Step 6: Scoring market timing...")
 score_market_timing()
+
+print("Step 6b: Scoring candidate watchlist...")
+score_candidates()
 
 print("Step 7: Building weekly review...")
 build_weekly_review()
