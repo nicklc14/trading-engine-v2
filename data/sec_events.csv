@@ -9,7 +9,7 @@ AVGO,YES,DILUTION_RISK,2026-06-17,424B3,HIGH,-5,Recent offering/registration fil
 BFLY,YES,MATERIAL_EVENT,2026-06-22,8-K,MEDIUM,0,Recent 8-K material event filing
 BLZE,YES,MATERIAL_EVENT,2026-07-02,8-K,MEDIUM,0,Recent 8-K material event filing
 CBOE,YES,MATERIAL_EVENT,2026-06-26,8-K,MEDIUM,0,Recent 8-K material event filing
-CELC,NONE,,,,NONE,0,No major SEC events in lookback window
+CELC,YES,MATERIAL_EVENT,2026-07-15,8-K,MEDIUM,0,Recent 8-K material event filing
 CRDO,YES,OWNERSHIP_FILING,2026-07-13,4,LOW,0,Recent insider/ownership filing
 GOOGL,YES,OWNERSHIP_FILING,2026-07-06,4,LOW,0,Recent insider/ownership filing
 INTC,NONE,,,,NONE,0,No major SEC events in lookback window
