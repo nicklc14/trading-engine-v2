@@ -10,9 +10,13 @@ CASH_PATH = DATA_DIR / "cash.csv"
 HOLDINGS_PATH = DATA_DIR / "holdings.csv"
 CONFIG_PATH = DATA_DIR / "config.csv"
 SEC_EVENTS_PATH = DATA_DIR / "sec_events.csv"
+REGIME_PATH = DATA_DIR / "market_regime.csv"
 
 def clamp(x, lo=0, hi=100):
     return max(lo, min(hi, x))
+
+def truthy(x):
+    return str(x).strip().upper() in ["TRUE", "YES", "1", "Y"]
 
 def load_config():
     defaults = {
@@ -30,6 +34,11 @@ def load_config():
         "moonshot_add_min_return": 0.15,
         "moonshot_stop_atr_multiplier": 2.5,
         "moonshot_trim_atr_multiplier": 4.0,
+        "risk_off_score_penalty": 8,
+        "risk_off_position_size_factor": 0.50,
+        "risk_off_buy_threshold": 85,
+        "risk_off_buy_small_threshold": 80,
+        "risk_off_block_new_moonshots": "TRUE",
     }
 
     if CONFIG_PATH.exists():
@@ -44,6 +53,17 @@ def cfg_float(cfg, key):
 
 def cfg_int(cfg, key):
     return int(float(cfg.get(key, 0)))
+
+def cfg_bool(cfg, key):
+    return truthy(cfg.get(key, False))
+
+def load_market_regime():
+    if not REGIME_PATH.exists():
+        return "UNKNOWN"
+    regime = pd.read_csv(REGIME_PATH)
+    if regime.empty or "market_regime" not in regime.columns:
+        return "UNKNOWN"
+    return str(regime["market_regime"].iloc[0]).strip()
 
 def review_priority(action, exit_action="", exit_priority="", position_rule=""):
     if exit_action == "SELL" and exit_priority == "HIGH":
@@ -68,6 +88,8 @@ def get_cash_available():
 
 def score_signals():
     cfg = load_config()
+    market_regime = load_market_regime()
+    is_risk_off = market_regime.upper() == "RISK OFF"
 
     max_positions = cfg_int(cfg, "max_positions")
     cash_reserve_pct = cfg_float(cfg, "cash_reserve_pct")
@@ -83,6 +105,15 @@ def score_signals():
     moonshot_add_min_return = cfg_float(cfg, "moonshot_add_min_return")
     moonshot_stop_atr_multiplier = cfg_float(cfg, "moonshot_stop_atr_multiplier")
     moonshot_trim_atr_multiplier = cfg_float(cfg, "moonshot_trim_atr_multiplier")
+
+    risk_off_score_penalty = cfg_float(cfg, "risk_off_score_penalty")
+    risk_off_position_size_factor = cfg_float(cfg, "risk_off_position_size_factor")
+    risk_off_buy_threshold = cfg_float(cfg, "risk_off_buy_threshold")
+    risk_off_buy_small_threshold = cfg_float(cfg, "risk_off_buy_small_threshold")
+    risk_off_block_new_moonshots = cfg_bool(cfg, "risk_off_block_new_moonshots")
+
+    buy_threshold = risk_off_buy_threshold if is_risk_off else 80
+    buy_small_threshold = risk_off_buy_small_threshold if is_risk_off else 75
 
     watch = pd.read_csv(WATCHLIST_PATH)
     watch["enabled"] = watch["enabled"].astype(str).str.upper().isin(["TRUE", "YES", "1", "Y"])
@@ -106,14 +137,8 @@ def score_signals():
         sec_events["ticker"] = sec_events["ticker"].astype(str).str.upper().str.strip()
     else:
         sec_events = pd.DataFrame(columns=[
-            "ticker",
-            "sec_event_flag",
-            "sec_event_type",
-            "sec_event_date",
-            "sec_form",
-            "sec_severity",
-            "sec_score_adjustment",
-            "sec_event_note",
+            "ticker", "sec_event_flag", "sec_event_type", "sec_event_date",
+            "sec_form", "sec_severity", "sec_score_adjustment", "sec_event_note",
         ])
 
     position_count = int((holdings["shares"].fillna(0) > 0).sum())
@@ -127,24 +152,15 @@ def score_signals():
     risk_budget_usd = equity * risk_pct_per_trade
     max_position_usd = equity * max_position_pct
 
-    df = watch.merge(market, on="ticker", how="left")
-    df = df.merge(
-        holdings[["ticker", "shares", "holding_return_pct"]],
-        on="ticker",
-        how="left"
-    )
-    df = df.merge(
-        sec_events,
-        on="ticker",
-        how="left"
-    )
+    if is_risk_off:
+        risk_budget_usd *= risk_off_position_size_factor
+        max_position_usd *= risk_off_position_size_factor
 
-    moonshot_position_count = int(
-        (
-            (df["tier"].astype(str).str.upper() == "MOONSHOT")
-            & (pd.to_numeric(df["shares"], errors="coerce").fillna(0) > 0)
-        ).sum()
-    )
+    df = watch.merge(market, on="ticker", how="left")
+    df = df.merge(holdings[["ticker", "shares", "holding_return_pct"]], on="ticker", how="left")
+    df = df.merge(sec_events, on="ticker", how="left")
+
+    moonshot_position_count = int(((df["tier"].astype(str).str.upper() == "MOONSHOT") & (pd.to_numeric(df["shares"], errors="coerce").fillna(0) > 0)).sum())
     moonshot_open_slots = max(max_moonshot_positions - moonshot_position_count, 0)
 
     rows = []
@@ -183,16 +199,10 @@ def score_signals():
 
         rsi_score = 100 if pd.notna(rsi) and 40 <= rsi <= 70 else 50
 
-        final_score = round(
-            trend_score * 0.25 +
-            momentum_score * 0.30 +
-            accelerator_score * 0.25 +
-            rsi_score * 0.20
-        )
+        final_score = round(trend_score * 0.25 + momentum_score * 0.30 + accelerator_score * 0.25 + rsi_score * 0.20)
 
         if tier == "MOMENTUM":
             final_score = clamp(final_score + momentum_priority_boost)
-
         if tier == "MOONSHOT":
             final_score = clamp(final_score + moonshot_score_boost)
 
@@ -202,17 +212,12 @@ def score_signals():
 
         final_score = clamp(final_score + sec_score_adjustment)
 
+        if is_risk_off and not already_held:
+            final_score = clamp(final_score - risk_off_score_penalty)
+
         if tier == "MOONSHOT":
-            stop_loss = (
-                price - (moonshot_stop_atr_multiplier * atr)
-                if pd.notna(price) and pd.notna(atr) and atr > 0
-                else price * 0.75
-            )
-            trim_price = (
-                price + (moonshot_trim_atr_multiplier * atr)
-                if pd.notna(price) and pd.notna(atr) and atr > 0
-                else price * 1.40
-            )
+            stop_loss = price - (moonshot_stop_atr_multiplier * atr) if pd.notna(price) and pd.notna(atr) and atr > 0 else price * 0.75
+            trim_price = price + (moonshot_trim_atr_multiplier * atr) if pd.notna(price) and pd.notna(atr) and atr > 0 else price * 1.40
         elif tier == "MOMENTUM":
             stop_loss = price - (2 * atr) if pd.notna(price) and pd.notna(atr) and atr > 0 else price * 0.80
             trim_price = price + (3 * atr) if pd.notna(price) and pd.notna(atr) and atr > 0 else price * 1.25
@@ -221,26 +226,24 @@ def score_signals():
             trim_price = price + (2 * atr) if pd.notna(price) and pd.notna(atr) and atr > 0 else price * 1.15
 
         action = "WATCH"
-        if final_score >= 80 and trend_score >= 70:
+        if final_score >= buy_threshold and trend_score >= 70:
             action = "BUY"
-        elif final_score >= 75:
+        elif final_score >= buy_small_threshold:
             action = "BUY SMALL"
+
+        if is_risk_off and tier == "MOONSHOT" and not already_held and risk_off_block_new_moonshots:
+            action = "WATCH"
 
         if already_held:
             position_rule = "Already held"
         elif open_slots <= 0:
             position_rule = f"Max {max_positions} positions reached"
-            if action in ["BUY", "BUY SMALL"]:
-                action = "WATCH"
+            action = "WATCH"
         elif tier == "MOONSHOT" and moonshot_open_slots <= 0:
             position_rule = f"Max {max_moonshot_positions} MOONSHOT positions reached"
-            if action in ["BUY", "BUY SMALL"]:
-                action = "WATCH"
+            action = "WATCH"
         else:
-            if tier == "MOONSHOT":
-                position_rule = f"{open_slots} open slot(s); {moonshot_open_slots} MOONSHOT slot(s)"
-            else:
-                position_rule = f"{open_slots} open slot(s)"
+            position_rule = f"{open_slots} open slot(s); {moonshot_open_slots} MOONSHOT slot(s)" if tier == "MOONSHOT" else f"{open_slots} open slot(s)"
 
         add_more_signal = ""
         add_more_reason = ""
@@ -268,34 +271,30 @@ def score_signals():
 
         if already_held:
             if pd.notna(price) and pd.notna(stop_loss) and price <= stop_loss:
-                exit_action = "SELL"
-                exit_priority = "HIGH"
-                exit_reason = "Price at or below stop loss"
+                exit_action = "SELL"; exit_priority = "HIGH"; exit_reason = "Price at or below stop loss"
             elif pd.notna(holding_return_pct) and holding_return_pct <= -0.15:
-                exit_action = "SELL"
-                exit_priority = "HIGH"
-                exit_reason = "Holding down 15%+"
+                exit_action = "SELL"; exit_priority = "HIGH"; exit_reason = "Holding down 15%+"
             elif trend_score < 40 and final_score < 55:
-                exit_action = "SELL"
-                exit_priority = "MEDIUM"
-                exit_reason = "Trend and score weakened"
+                exit_action = "SELL"; exit_priority = "MEDIUM"; exit_reason = "Trend and score weakened"
             elif pd.notna(price) and pd.notna(trim_price) and price >= trim_price:
-                exit_action = "TRIM"
-                exit_priority = "MEDIUM"
-                exit_reason = "Price reached trim target"
+                exit_action = "TRIM"; exit_priority = "MEDIUM"; exit_reason = "Price reached trim target"
             elif pd.notna(rsi) and rsi >= 75 and pd.notna(holding_return_pct) and holding_return_pct > 0:
-                exit_action = "TRIM"
-                exit_priority = "MEDIUM"
-                exit_reason = "RSI overbought while profitable"
+                exit_action = "TRIM"; exit_priority = "MEDIUM"; exit_reason = "RSI overbought while profitable"
             else:
-                exit_action = "HOLD"
-                exit_priority = "LOW"
-                exit_reason = "No exit trigger"
+                exit_action = "HOLD"; exit_priority = "LOW"; exit_reason = "No exit trigger"
 
         sell_signal = exit_action if exit_action in ["SELL", "TRIM", "REVIEW"] else ""
 
         warnings = []
         reasons = []
+
+        if market_regime != "UNKNOWN":
+            reasons.append(f"Market regime: {market_regime}")
+        else:
+            warnings.append("Market regime unknown")
+
+        if is_risk_off:
+            warnings.append("Risk Off: stricter buy rules and smaller sizing applied")
 
         if trend_score >= 70:
             reasons.append("Strong trend")
@@ -323,23 +322,6 @@ def score_signals():
         if tier == "MOONSHOT" and pd.notna(atr_pct) and atr_pct < 0.08:
             warnings.append("Moonshot volatility may be too low")
 
-        sec_event_flag = str(row.get("sec_event_flag", "NONE")).upper()
-        sec_event_type = str(row.get("sec_event_type", "")).strip()
-        sec_event_note = str(row.get("sec_event_note", "")).strip()
-        sec_severity = str(row.get("sec_severity", "")).upper()
-
-        if sec_event_flag == "YES":
-            if sec_event_type == "DILUTION_RISK":
-                warnings.append(sec_event_note or "SEC dilution/financing risk")
-            elif sec_event_type == "MATERIAL_EVENT":
-                reasons.append("SEC material event")
-                warnings.append(sec_event_note or "Recent 8-K material event")
-            elif sec_event_type == "OWNERSHIP_FILING":
-                warnings.append(sec_event_note or "Recent insider/ownership filing")
-
-        if sec_severity == "HIGH":
-            warnings.append("SEC high-risk filing")
-
         buy_amount_usd = 0.0
         shares_to_buy = 0.0
 
@@ -351,7 +333,6 @@ def score_signals():
 
         if (can_buy or can_add) and pd.notna(price) and price > 0:
             risk_per_share = max(price - stop_loss, 0) if pd.notna(stop_loss) else 0
-
             if risk_per_share > 0:
                 atr_sized_amount = (risk_budget_usd / risk_per_share) * price
                 buy_amount_usd = min(atr_sized_amount, max_position_usd, cash_available)
@@ -360,10 +341,8 @@ def score_signals():
 
             if tier == "QUALITY":
                 buy_amount_usd *= quality_position_size_factor
-
             if tier == "MOONSHOT":
                 buy_amount_usd *= moonshot_position_size_factor
-
             if action == "BUY SMALL" or can_add:
                 buy_amount_usd *= 0.5
 
@@ -376,6 +355,7 @@ def score_signals():
             "ticker": ticker,
             "sector": row.get("sector", ""),
             "tier": tier,
+            "market_regime": market_regime,
             "price": price,
             "score": final_score,
             "sort_priority": sort_priority,
