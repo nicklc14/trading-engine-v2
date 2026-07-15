@@ -12,5 +12,6 @@ add_more_min_score,80,Only add if signal score remains strong
 max_moonshot_positions,2,Maximum open MOONSHOT positions
 moonshot_score_boost,8,Boost MOONSHOT candidates
 moonshot_position_size_factor,0.50,Initial MOONSHOT position size factor
-moonshot_min_volume_trend,1.2,Minimum volume trend for moonshot confirmation
-moonshot_min_atr_pct,0.08,Minimum ATR percent for moonshot volatility
+moonshot_add_min_return,0.15,Only add to MOONSHOT winners above 15 percent
+moonshot_stop_atr_multiplier,2.5,Wider moonshot stop using ATR
+moonshot_trim_atr_multiplier,4.0,Wider moonshot trim target using ATR
