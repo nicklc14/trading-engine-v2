@@ -4,6 +4,7 @@ AMD,Semiconductors,QUALITY,True,Large-cap semiconductor
 AMZN,Internet/E-Commerce,QUALITY,True,Large-cap quality
 ANET,Networking,MOMENTUM,True,Strong trend momentum
 ARM,Semiconductors,MOMENTUM,True,High-growth semi momentum
+ASTS,Space/Telecom,MOONSHOT,True,Speculative space/telecom
 AVGO,Semiconductors,QUALITY,True,Large-cap semiconductor
 BFLY,Medical Devices,MOONSHOT,True,Speculative medical device
 BLZE,Gaming/Digital Media,MOONSHOT,True,High-risk momentum/moonshot
@@ -12,11 +13,16 @@ CELC,Biotech,MOONSHOT,True,Biotech catalyst risk
 CRDO,Semiconductors,MOMENTUM,True,High-growth semiconductor momentum
 GOOGL,Internet/Software,QUALITY,True,Large-cap quality
 INTC,Semiconductors,QUALITY,True,Large-cap turnaround
+IONQ,Quantum Computing,MOONSHOT,True,Speculative quantum computing
+KYTX,Biotech,MOONSHOT,True,Biotech catalyst risk
 LLY,Healthcare/Pharma,QUALITY,True,Large-cap pharma
+LUNR,Space,MOONSHOT,True,Speculative space
 MRVL,Semiconductors,QUALITY,True,Established semiconductor
 MU,Semiconductors,MOMENTUM,True,Cyclical semi momentum
 NBIS,AI Infrastructure,MOONSHOT,True,Speculative AI infrastructure
 NVDA,Semiconductors,QUALITY,True,Large-cap AI leader
+CCJ,Uranium/Nuclear Energy,QUALITY,True,Uranium quality/cyclical
+PL,Space,MOONSHOT,True,Speculative space
 PUBM,AdTech,MOMENTUM,True,Small/mid-cap adtech momentum
 RKLB,Space,MOONSHOT,True,Speculative space
 SOFI,Fintech,MOMENTUM,True,Fintech momentum
@@ -25,6 +31,10 @@ TSLA,Electric Vehicles,QUALITY,True,Large-cap volatile quality
 TSM,Semiconductors,QUALITY,True,Large-cap semiconductor
 VRT,Data Centers,QUALITY,True,Data center infrastructure
 STX,Data Storage,QUALITY,True,Established data storage
+SMCI,AI Infrastructure,MOONSHOT,True,High-risk AI infrastructure
 DDOG,Cloud Software,QUALITY,True,Established SaaS/cloud
 SKHY,High Yield ETF,QUALITY,False,Disabled due to missing yfinance indicator data
+SMR,Nuclear Energy,MOONSHOT,True,Speculative nuclear
+OKLO,Nuclear Energy,MOONSHOT,True,Speculative nuclear
+JOBY,eVTOL/Aviation,MOONSHOT,True,Speculative aviation
 SOUN,AI Software,MOONSHOT,True,Speculative AI software

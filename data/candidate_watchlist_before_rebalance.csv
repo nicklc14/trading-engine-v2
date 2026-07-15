@@ -1,0 +1,7 @@
+ticker,sector,tier,enabled,notes,date_added,candidate_reason
+PLTR,Technology,MOMENTUM,True,AI software platform,2026-07-16,Strong AI demand
+CLS,Technology,MOMENTUM,True,AI infrastructure supplier,2026-07-16,AI server demand
+POET,Technology,MOONSHOT,True,Optical interconnects,2026-07-16,AI networking bet
+HPE,Technology,MOMENTUM,True,Enterprise AI infrastructure,2026-07-16,AI server demand
+RXRX,Healthcare,MOONSHOT,True,AI drug discovery,2026-07-16,AI biotech upside
+SERV,Industrials,MOONSHOT,True,Autonomous robots,2026-07-16,Warehouse automation
