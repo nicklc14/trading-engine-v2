@@ -1,40 +1,40 @@
 ticker,sector,tier,enabled,notes
-ALAB,Semiconductors,MOMENTUM,TRUE,Current workbook watchlist
-AMD,Semiconductors,QUALITY,TRUE,Current workbook watchlist
-AMZN,Internet/E-Commerce,QUALITY,TRUE,Current workbook watchlist
-ANET,Networking,MOMENTUM,TRUE,Current workbook watchlist
-ARM,Semiconductors,MOMENTUM,TRUE,Current workbook watchlist
-ASTS,Space/Telecom,MOMENTUM,TRUE,Current workbook watchlist
-AVGO,Semiconductors,QUALITY,TRUE,Current workbook watchlist
-BFLY,Medical Devices,MOMENTUM,TRUE,Current workbook watchlist
-BLZE,Gaming/Digital Media,MOMENTUM,TRUE,Current workbook watchlist
-CBOE,Financial Services,QUALITY,TRUE,Current workbook watchlist
-CELC,Biotech,MOMENTUM,TRUE,Current workbook watchlist
-CRDO,Semiconductors,MOMENTUM,TRUE,Current workbook watchlist
-GOOGL,Internet/Software,QUALITY,TRUE,Current workbook watchlist
-INTC,Semiconductors,QUALITY,TRUE,Current workbook watchlist
-IONQ,Quantum Computing,MOMENTUM,TRUE,Current workbook watchlist
-KYTX,Biotech,MOMENTUM,TRUE,Current workbook watchlist
-LLY,Healthcare/Pharma,QUALITY,TRUE,Current workbook watchlist
-LUNR,Space,MOMENTUM,TRUE,Current workbook watchlist
-MRVL,Semiconductors,QUALITY,TRUE,Current workbook watchlist
-MU,Semiconductors,MOMENTUM,TRUE,Current workbook watchlist
-NBIS,AI Infrastructure,MOMENTUM,TRUE,Current workbook watchlist
-NVDA,Semiconductors,QUALITY,TRUE,Current workbook watchlist
-CCJ,Uranium/Nuclear Energy,QUALITY,TRUE,Replaced OCGN
-PL,Space,MOMENTUM,TRUE,Current workbook watchlist
-PUBM,AdTech,MOMENTUM,TRUE,Current workbook watchlist
-RKLB,Space,MOMENTUM,TRUE,Current workbook watchlist
-SOFI,Fintech,MOMENTUM,TRUE,Current workbook watchlist
-STTK,Industrials,MOMENTUM,TRUE,Current workbook watchlist
-TSLA,Electric Vehicles,QUALITY,TRUE,Current workbook watchlist
-TSM,Semiconductors,QUALITY,TRUE,Current workbook watchlist
-VRT,Data Centers,QUALITY,TRUE,Current workbook watchlist
-STX,Data Storage,QUALITY,TRUE,Added watchlist ticker
-SMCI,AI Infrastructure,MOMENTUM,TRUE,Added watchlist ticker
-DDOG,Cloud Software,QUALITY,TRUE,Added watchlist ticker
+ALAB,Semiconductors,MOMENTUM,TRUE,AI/semi momentum
+AMD,Semiconductors,QUALITY,TRUE,Large-cap semiconductor
+AMZN,Internet/E-Commerce,QUALITY,TRUE,Large-cap quality
+ANET,Networking,MOMENTUM,TRUE,Strong trend momentum
+ARM,Semiconductors,MOMENTUM,TRUE,High-growth semi momentum
+ASTS,Space/Telecom,MOONSHOT,TRUE,Speculative space/telecom
+AVGO,Semiconductors,QUALITY,TRUE,Large-cap semiconductor
+BFLY,Medical Devices,MOONSHOT,TRUE,Speculative medical device
+BLZE,Gaming/Digital Media,MOONSHOT,TRUE,High-risk momentum/moonshot
+CBOE,Financial Services,QUALITY,TRUE,Established financial services
+CELC,Biotech,MOONSHOT,TRUE,Biotech catalyst risk
+CRDO,Semiconductors,MOMENTUM,TRUE,High-growth semiconductor momentum
+GOOGL,Internet/Software,QUALITY,TRUE,Large-cap quality
+INTC,Semiconductors,QUALITY,TRUE,Large-cap turnaround
+IONQ,Quantum Computing,MOONSHOT,TRUE,Speculative quantum computing
+KYTX,Biotech,MOONSHOT,TRUE,Biotech catalyst risk
+LLY,Healthcare/Pharma,QUALITY,TRUE,Large-cap pharma
+LUNR,Space,MOONSHOT,TRUE,Speculative space
+MRVL,Semiconductors,QUALITY,TRUE,Established semiconductor
+MU,Semiconductors,MOMENTUM,TRUE,Cyclical semi momentum
+NBIS,AI Infrastructure,MOONSHOT,TRUE,Speculative AI infrastructure
+NVDA,Semiconductors,QUALITY,TRUE,Large-cap AI leader
+CCJ,Uranium/Nuclear Energy,QUALITY,TRUE,Uranium quality/cyclical
+PL,Space,MOONSHOT,TRUE,Speculative space
+PUBM,AdTech,MOMENTUM,TRUE,Small/mid-cap adtech momentum
+RKLB,Space,MOONSHOT,TRUE,Speculative space
+SOFI,Fintech,MOMENTUM,TRUE,Fintech momentum
+STTK,Industrials,MOONSHOT,TRUE,Speculative small-cap
+TSLA,Electric Vehicles,QUALITY,TRUE,Large-cap volatile quality
+TSM,Semiconductors,QUALITY,TRUE,Large-cap semiconductor
+VRT,Data Centers,QUALITY,TRUE,Data center infrastructure
+STX,Data Storage,QUALITY,TRUE,Established data storage
+SMCI,AI Infrastructure,MOONSHOT,TRUE,High-risk AI infrastructure
+DDOG,Cloud Software,QUALITY,TRUE,Established SaaS/cloud
 SKHY,High Yield ETF,QUALITY,FALSE,Disabled due to missing yfinance indicator data
-SMR,Nuclear Energy,MOMENTUM,TRUE,Adding ticker to watchlist
-OKLO,Nuclear Energy,MOMENTUM,TRUE,Adding ticker to watchlist
-JOBY,eVTOL/Aviation,MOMENTUM,TRUE,Adding ticker to watchlist
-SOUN,AI Software,MOMENTUM,TRUE,Adding ticker to watchlist
+SMR,Nuclear Energy,MOONSHOT,TRUE,Speculative nuclear
+OKLO,Nuclear Energy,MOONSHOT,TRUE,Speculative nuclear
+JOBY,eVTOL/Aviation,MOONSHOT,TRUE,Speculative aviation
+SOUN,AI Software,MOONSHOT,TRUE,Speculative AI software
