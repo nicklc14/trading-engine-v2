@@ -156,26 +156,26 @@ def score_candidates():
     watch["ticker"] = watch["ticker"].astype(str).str.upper().str.strip()
     candidates["ticker"] = candidates["ticker"].astype(str).str.upper().str.strip()
 
-    if not market.empty:
+    market_map = {}
+    if not market.empty and "ticker" in market.columns:
         market["ticker"] = market["ticker"].astype(str).str.upper().str.strip()
         market_map = {r["ticker"]: r for _, r in market.iterrows()}
-    else:
-        market_map = {}
 
     held_tickers = set()
     if not holdings.empty and "ticker" in holdings.columns:
         held_tickers = set(holdings["ticker"].astype(str).str.upper().str.strip())
 
     active_tickers = set(watch.loc[watch["enabled"].apply(truthy), "ticker"])
-    review_rows = []
 
     new_watch_rows = []
     new_candidate_rows = []
+    review_rows = []
 
-    # Review active watchlist
+    # Rebalance active watchlist, but do not write active rows to candidate_review.
     for _, row in watch.iterrows():
         ticker = row["ticker"]
         enabled = truthy(row.get("enabled", True))
+
         market_row = market_map.get(ticker, {})
         score, trend_score, momentum_score, accelerator_score = score_market_row(market_row)
         timing, timing_score = timing_action(market_row)
@@ -186,25 +186,6 @@ def score_candidates():
             )
         else:
             rec, why = "DISABLED", "Already disabled in active watchlist"
-
-        review_rows.append({
-            "ticker": ticker,
-            "source_list": "ACTIVE",
-            "sector": row.get("sector", ""),
-            "tier": row.get("tier", ""),
-            "price": market_row.get("price", np.nan),
-            "score": score,
-            "trend_score": trend_score,
-            "momentum_score": momentum_score,
-            "accelerator_score": accelerator_score,
-            "timing_action": timing,
-            "timing_score": timing_score,
-            "recommendation": rec,
-            "why": why,
-            "notes": row.get("notes", ""),
-            "date_added": "",
-            "candidate_reason": "",
-        })
 
         if rec == "DEMOTE WATCHLIST":
             new_candidate_rows.append({
@@ -235,32 +216,17 @@ def score_candidates():
                 "notes": row.get("notes", ""),
             })
 
-    # Review candidates
+    # Rebalance candidates and write only candidates to candidate_review.
+    current_active = set([r["ticker"] for r in new_watch_rows])
+
     for _, row in candidates.iterrows():
         ticker = row["ticker"]
 
         if not ticker or ticker == "NAN":
             continue
 
-        if ticker in active_tickers:
-            review_rows.append({
-                "ticker": ticker,
-                "source_list": "CANDIDATE",
-                "sector": row.get("sector", ""),
-                "tier": row.get("tier", ""),
-                "price": np.nan,
-                "score": np.nan,
-                "trend_score": np.nan,
-                "momentum_score": np.nan,
-                "accelerator_score": np.nan,
-                "timing_action": "",
-                "timing_score": np.nan,
-                "recommendation": "ALREADY ACTIVE",
-                "why": "Duplicate candidate — already active",
-                "notes": row.get("notes", ""),
-                "date_added": row.get("date_added", ""),
-                "candidate_reason": row.get("candidate_reason", ""),
-            })
+        if ticker in current_active:
+            # Keep lists clean: do not keep duplicates in candidates.
             continue
 
         enabled = truthy(row.get("enabled", True))
@@ -312,7 +278,7 @@ def score_candidates():
                 "date_added": row.get("date_added", today),
                 "candidate_reason": row.get("candidate_reason", ""),
             })
-        elif rec in ["KEEP CANDIDATE", "DISABLED"]:
+        else:
             new_candidate_rows.append({
                 "ticker": ticker,
                 "sector": row.get("sector", ""),
@@ -329,6 +295,26 @@ def score_candidates():
 
     new_watch = ensure_columns(new_watch, WATCHLIST_COLUMNS)
     new_candidates = ensure_columns(new_candidates, CANDIDATE_COLUMNS)
+
+    if review.empty:
+        review = pd.DataFrame([{
+            "ticker": "",
+            "source_list": "CANDIDATE",
+            "sector": "",
+            "tier": "",
+            "price": np.nan,
+            "score": np.nan,
+            "trend_score": np.nan,
+            "momentum_score": np.nan,
+            "accelerator_score": np.nan,
+            "timing_action": "",
+            "timing_score": np.nan,
+            "recommendation": "NO CANDIDATES",
+            "why": "No non-active candidate tickers to review",
+            "notes": "",
+            "date_added": "",
+            "candidate_reason": "",
+        }])
 
     new_watch.to_csv(WATCHLIST_PATH, index=False)
     new_candidates.to_csv(CANDIDATE_PATH, index=False)
