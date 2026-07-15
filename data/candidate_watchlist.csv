@@ -1,14 +1,14 @@
 ticker,sector,tier,enabled,notes,date_added,candidate_reason
-ASTS,Space/Telecom,MOONSHOT,FALSE,Speculative space/telecom,2026-07-15,Auto-demoted from active watchlist
-IONQ,Quantum Computing,MOONSHOT,FALSE,Speculative quantum computing,2026-07-15,Auto-demoted from active watchlist
-KYTX,Biotech,MOONSHOT,FALSE,Biotech catalyst risk,2026-07-15,Auto-demoted from active watchlist
-LUNR,Space,MOONSHOT,FALSE,Speculative space,2026-07-15,Auto-demoted from active watchlist
+ASTS,Space/Telecom,MOONSHOT,False,Speculative space/telecom,2026-07-15,Auto-demoted from active watchlist
+IONQ,Quantum Computing,MOONSHOT,False,Speculative quantum computing,2026-07-15,Auto-demoted from active watchlist
+KYTX,Biotech,MOONSHOT,False,Biotech catalyst risk,2026-07-15,Auto-demoted from active watchlist
+LUNR,Space,MOONSHOT,False,Speculative space,2026-07-15,Auto-demoted from active watchlist
 CCJ,Uranium/Nuclear Energy,QUALITY,False,Uranium quality/cyclical,2026-07-15,Auto-removed from active watchlist
-PL,Space,MOONSHOT,FALSE,Speculative space,2026-07-15,Auto-demoted from active watchlist
-SMCI,AI Infrastructure,MOONSHOT,FALSE,High-risk AI infrastructure,2026-07-15,Auto-demoted from active watchlist
-SMR,Nuclear Energy,MOONSHOT,FALSE,Speculative nuclear,2026-07-15,Auto-demoted from active watchlist
-OKLO,Nuclear Energy,MOONSHOT,FALSE,Speculative nuclear,2026-07-15,Auto-demoted from active watchlist
-JOBY,eVTOL/Aviation,MOONSHOT,FALSE,Speculative aviation,2026-07-15,Auto-demoted from active watchlist
+PL,Space,MOONSHOT,False,Speculative space,2026-07-15,Auto-demoted from active watchlist
+SMCI,AI Infrastructure,MOONSHOT,False,High-risk AI infrastructure,2026-07-15,Auto-demoted from active watchlist
+SMR,Nuclear Energy,MOONSHOT,False,Speculative nuclear,2026-07-15,Auto-demoted from active watchlist
+OKLO,Nuclear Energy,MOONSHOT,False,Speculative nuclear,2026-07-15,Auto-demoted from active watchlist
+JOBY,eVTOL/Aviation,MOONSHOT,False,Speculative aviation,2026-07-15,Auto-demoted from active watchlist
 PLTR,Technology,MOMENTUM,False,AI software platform,2026-07-16,Strong AI demand
 CLS,Technology,MOMENTUM,True,AI infrastructure supplier,2026-07-16,AI server demand
 POET,Technology,MOONSHOT,True,Optical interconnects,2026-07-16,AI networking bet
