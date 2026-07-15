@@ -1,5 +1,6 @@
 from normalize_trades import normalize_trades
 from update_market_data import update_market_data
+from update_sec_events import update_sec_events
 from check_data_quality import check_data_quality
 from calculate_cash import calculate_cash
 from calculate_holdings import calculate_holdings
@@ -20,7 +21,10 @@ normalize_trades()
 print("Step 1: Updating market data...")
 update_market_data()
 
-print("Step 1b: Checking data quality...")
+print("Step 1b: Updating SEC events...")
+update_sec_events()
+
+print("Step 1c: Checking data quality...")
 check_data_quality()
 
 print("Step 2: Calculating cash...")
