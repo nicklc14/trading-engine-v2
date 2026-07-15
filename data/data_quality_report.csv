@@ -1,0 +1,5 @@
+as_of,ticker,issue_type,severity,issue,suggested_action
+2026-07-15T01:57:30.226965+00:00,SKHY,missing_avg_volume,MEDIUM,Missing 50-day average volume,Volume trend may be unreliable
+2026-07-15T01:57:30.226974+00:00,SKHY,missing_volume_trend,MEDIUM,Missing volume trend,Do not rely on volume confirmation
+2026-07-15T01:57:30.226978+00:00,SKHY,missing_rsi,LOW,Missing RSI,RSI quality score may be unreliable
+2026-07-15T01:57:30.226980+00:00,SKHY,missing_atr,HIGH,Missing or invalid ATR,Stop loss and sizing may be unreliable
