@@ -13,7 +13,7 @@ SEC_TICKERS_URL = "https://www.sec.gov/files/company_tickers.json"
 SEC_SUBMISSIONS_URL = "https://data.sec.gov/submissions/CIK{cik}.json"
 
 HEADERS = {
-    "User-Agent": "trading-engine-v2 YOUR_EMAIL_HERE"
+    "User-Agent": "nicklc-secevents@outlook.com"
 }
 
 LOOKBACK_DAYS = 30
