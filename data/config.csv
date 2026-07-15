@@ -9,12 +9,17 @@ momentum_priority_boost,5,Boost MOMENTUM tier scores
 quality_position_size_factor,0.65,QUALITY buys smaller than MOMENTUM
 add_more_min_return,0.05,Only add to winners above 5 percent
 add_more_min_score,80,Only add if signal score remains strong
-max_moonshot_positions,2,Maximum open MOONSHOT positions
+max_moonshot_positions,3,Maximum open MOONSHOT positions
 moonshot_score_boost,8,Boost MOONSHOT candidates
 moonshot_position_size_factor,0.50,Initial MOONSHOT position size factor
 moonshot_add_min_return,0.15,Only add to MOONSHOT winners above 15 percent
 moonshot_stop_atr_multiplier,2.5,Wider moonshot stop using ATR
 moonshot_trim_atr_multiplier,4.0,Wider moonshot trim target using ATR
+risk_off_score_penalty,8,Score penalty for new buys when market regime is Risk Off
+risk_off_position_size_factor,0.50,Reduce sizing when market regime is Risk Off
+risk_off_buy_threshold,85,Higher BUY threshold when market regime is Risk Off
+risk_off_buy_small_threshold,80,Higher BUY SMALL threshold when market regime is Risk Off
+risk_off_block_new_moonshots,TRUE,Block new MOONSHOT buys when market regime is Risk Off
 aggressive_mode,TRUE,Allow extra aggression only when market regime is Risk On
 aggressive_risk_on_score_boost,3,Extra score boost in Risk On
 aggressive_risk_on_position_size_factor,1.25,Larger sizing in Risk On
