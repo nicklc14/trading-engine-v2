@@ -13,14 +13,14 @@ SEC_TICKERS_URL = "https://www.sec.gov/files/company_tickers.json"
 SEC_SUBMISSIONS_URL = "https://data.sec.gov/submissions/CIK{cik}.json"
 
 HEADERS = {
-    "User-Agent": "nicklc-secevents@outlook.com"
+    "User-Agent": "trading-engine-v2 YOUR_EMAIL_HERE"
 }
 
 LOOKBACK_DAYS = 30
 
-POSITIVE_FORMS = {"4"}
 MATERIAL_FORMS = {"8-K"}
-RISK_FORMS = {"S-1", "S-3", "424B5", "424B3"}
+RISK_FORMS = {"S-1", "S-3", "424B5", "424B3", "424B2"}
+OWNERSHIP_FORMS = {"3", "4", "5", "SC 13D", "SC 13G"}
 
 def get_cik_map():
     r = requests.get(SEC_TICKERS_URL, headers=HEADERS, timeout=30)
@@ -39,12 +39,14 @@ def get_cik_map():
 def classify_form(form):
     form = str(form).upper()
 
-    if form in POSITIVE_FORMS:
-        return "INSIDER_OR_OWNERSHIP", "MEDIUM", 2, "Recent Form 4/ownership filing"
-    if form in MATERIAL_FORMS:
-        return "MATERIAL_EVENT", "MEDIUM", 1, "Recent 8-K material event filing"
     if form in RISK_FORMS:
         return "OFFERING_OR_DILUTION_RISK", "HIGH", -5, "Recent offering/registration filing risk"
+
+    if form in MATERIAL_FORMS:
+        return "MATERIAL_EVENT", "MEDIUM", 1, "Recent 8-K material event filing"
+
+    if form in OWNERSHIP_FORMS:
+        return "INSIDER_OR_OWNERSHIP", "LOW", 0, "Recent insider/ownership filing"
 
     return "OTHER_FILING", "LOW", 0, f"Recent {form} filing"
 
@@ -111,9 +113,14 @@ def update_sec_events():
                     })
 
             if ticker_events:
+                severity_rank = {"HIGH": 3, "MEDIUM": 2, "LOW": 1, "NONE": 0}
                 ticker_events = sorted(
                     ticker_events,
-                    key=lambda x: (x["sec_score_adjustment"], x["sec_event_date"]),
+                    key=lambda x: (
+                        severity_rank.get(x["sec_severity"], 0),
+                        abs(x["sec_score_adjustment"]),
+                        x["sec_event_date"]
+                    ),
                     reverse=True
                 )
                 rows.append(ticker_events[0])
