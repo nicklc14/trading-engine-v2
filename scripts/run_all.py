@@ -7,6 +7,8 @@ from score_signals import score_signals
 from score_premarket_signals import score_premarket_signals
 from build_weekly_review import build_weekly_review
 from build_dashboard import build_dashboard
+from build_holdings_view import build_holdings_view
+from build_performance_summary import build_performance_summary
 from build_excel_workbook import build_excel_workbook
 
 print("Starting Trading Engine V2...")
@@ -38,7 +40,13 @@ build_weekly_review()
 print("Step 8: Building dashboard output...")
 build_dashboard()
 
-print("Step 9: Building Excel workbook...")
+print("Step 9: Building holdings view...")
+build_holdings_view()
+
+print("Step 10: Building performance summary...")
+build_performance_summary()
+
+print("Step 11: Building Excel workbook...")
 build_excel_workbook()
 
 print("Done.")
