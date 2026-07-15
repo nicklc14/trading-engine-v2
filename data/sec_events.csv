@@ -4,7 +4,6 @@ AMD,YES,MATERIAL_EVENT,2026-07-01,8-K,MEDIUM,0,Recent 8-K material event filing
 AMZN,YES,DILUTION_RISK,2026-07-08,424B5,HIGH,-5,Recent offering/registration filing risk
 ANET,YES,OWNERSHIP_FILING,2026-07-14,4,LOW,0,Recent insider/ownership filing
 ARM,NONE,,,,NONE,0,No major SEC events in lookback window
-ASTS,YES,MATERIAL_EVENT,2026-07-15,8-K,MEDIUM,0,Recent 8-K material event filing
 AVGO,YES,DILUTION_RISK,2026-06-17,424B3,HIGH,-5,Recent offering/registration filing risk
 BFLY,YES,MATERIAL_EVENT,2026-06-22,8-K,MEDIUM,0,Recent 8-K material event filing
 BLZE,YES,MATERIAL_EVENT,2026-07-02,8-K,MEDIUM,0,Recent 8-K material event filing
@@ -13,16 +12,11 @@ CELC,YES,MATERIAL_EVENT,2026-07-15,8-K,MEDIUM,0,Recent 8-K material event filing
 CRDO,YES,OWNERSHIP_FILING,2026-07-15,4,LOW,0,Recent insider/ownership filing
 GOOGL,YES,OWNERSHIP_FILING,2026-07-06,4,LOW,0,Recent insider/ownership filing
 INTC,NONE,,,,NONE,0,No major SEC events in lookback window
-IONQ,YES,MATERIAL_EVENT,2026-06-22,8-K,MEDIUM,0,Recent 8-K material event filing
-KYTX,YES,MATERIAL_EVENT,2026-07-09,8-K,MEDIUM,0,Recent 8-K material event filing
 LLY,YES,OWNERSHIP_FILING,2026-06-16,4,LOW,0,Recent insider/ownership filing
-LUNR,YES,OWNERSHIP_FILING,2026-07-01,4,LOW,0,Recent insider/ownership filing
 MRVL,YES,MATERIAL_EVENT,2026-07-09,8-K,MEDIUM,0,Recent 8-K material event filing
 MU,YES,MATERIAL_EVENT,2026-06-24,8-K,MEDIUM,0,Recent 8-K material event filing
 NBIS,YES,OWNERSHIP_FILING,2026-07-08,3,LOW,0,Recent insider/ownership filing
 NVDA,YES,DILUTION_RISK,2026-06-17,424B5,HIGH,-5,Recent offering/registration filing risk
-CCJ,NONE,,,,NONE,0,No major SEC events in lookback window
-PL,YES,MATERIAL_EVENT,2026-07-10,8-K,MEDIUM,0,Recent 8-K material event filing
 PUBM,YES,OWNERSHIP_FILING,2026-07-06,4,LOW,0,Recent insider/ownership filing
 RKLB,YES,MATERIAL_EVENT,2026-06-29,8-K,MEDIUM,0,Recent 8-K material event filing
 SOFI,YES,MATERIAL_EVENT,2026-06-18,8-K,MEDIUM,0,Recent 8-K material event filing
@@ -31,9 +25,5 @@ TSLA,YES,MATERIAL_EVENT,2026-07-02,8-K,MEDIUM,0,Recent 8-K material event filing
 TSM,YES,OWNERSHIP_FILING,2026-07-09,4,LOW,0,Recent insider/ownership filing
 VRT,YES,MATERIAL_EVENT,2026-06-18,8-K,MEDIUM,0,Recent 8-K material event filing
 STX,YES,OWNERSHIP_FILING,2026-07-02,4,LOW,0,Recent insider/ownership filing
-SMCI,YES,MATERIAL_EVENT,2026-06-15,8-K,MEDIUM,0,Recent 8-K material event filing
 DDOG,YES,MATERIAL_EVENT,2026-06-16,8-K,MEDIUM,0,Recent 8-K material event filing
-SMR,YES,OWNERSHIP_FILING,2026-07-01,4,LOW,0,Recent insider/ownership filing
-OKLO,YES,OWNERSHIP_FILING,2026-07-06,4,LOW,0,Recent insider/ownership filing
-JOBY,YES,MATERIAL_EVENT,2026-06-30,8-K,MEDIUM,0,Recent 8-K material event filing
 SOUN,YES,DILUTION_RISK,2026-07-09,424B3,HIGH,-5,Recent offering/registration filing risk

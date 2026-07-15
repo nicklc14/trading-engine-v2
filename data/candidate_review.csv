@@ -1,46 +1,17 @@
 ticker,source_list,sector,tier,price,score,trend_score,momentum_score,accelerator_score,timing_action,timing_score,recommendation,why,notes,date_added,candidate_reason
-ALAB,ACTIVE,Semiconductors,MOMENTUM,350.6199951171875,75,80,75,50,WAIT,35,KEEP ACTIVE,Still strong enough for active monitoring,AI/semi momentum,,
-AMD,ACTIVE,Semiconductors,QUALITY,529.1400146484375,75,80,75,50,WAIT,50,KEEP ACTIVE,Still strong enough for active monitoring,Large-cap semiconductor,,
-AMZN,ACTIVE,Internet/E-Commerce,QUALITY,254.9600067138672,79,80,100,75,WAIT,60,KEEP ACTIVE,Still strong enough for active monitoring,Large-cap quality,,
-ANET,ACTIVE,Networking,MOMENTUM,171.9199981689453,89,80,100,75,TIMING WATCH,70,KEEP ACTIVE,Currently held — keep active until sold,Strong trend momentum,,
-ARM,ACTIVE,Semiconductors,MOMENTUM,277.010009765625,55,40,75,50,WAIT,10,KEEP ACTIVE,Still strong enough for active monitoring,High-growth semi momentum,,
-ASTS,ACTIVE,Space/Telecom,MOONSHOT,66.30999755859375,32,0,0,50,WAIT,35,DEMOTE WATCHLIST,Weak active setup — move to candidates,Speculative space/telecom,,
-AVGO,ACTIVE,Semiconductors,QUALITY,394.2799987792969,68,40,65,75,WAIT,55,KEEP ACTIVE,Still strong enough for active monitoring,Large-cap semiconductor,,
-BFLY,ACTIVE,Medical Devices,MOONSHOT,7.300000190734863,89,80,100,75,WAIT,65,KEEP ACTIVE,Currently held — keep active until sold,Speculative medical device,,
-BLZE,ACTIVE,Gaming/Digital Media,MOONSHOT,14.979999542236328,82,80,100,50,WAIT,35,KEEP ACTIVE,Currently held — keep active until sold,High-risk momentum/moonshot,,
-CBOE,ACTIVE,Financial Services,QUALITY,277.1099853515625,61,40,40,75,WAIT,55,KEEP ACTIVE,Still strong enough for active monitoring,Established financial services,,
-CELC,ACTIVE,Biotech,MOONSHOT,91.51000213623048,52,0,25,100,WAIT,65,KEEP ACTIVE,Still strong enough for active monitoring,Biotech catalyst risk,,
-CRDO,ACTIVE,Semiconductors,MOMENTUM,226.7400054931641,55,40,75,50,WAIT,25,KEEP ACTIVE,Still strong enough for active monitoring,High-growth semiconductor momentum,,
-GOOGL,ACTIVE,Internet/Software,QUALITY,370.9200134277344,79,40,100,75,TIMING WATCH,70,KEEP ACTIVE,Currently held — keep active until sold,Large-cap quality,,
-INTC,ACTIVE,Semiconductors,QUALITY,102.98999786376952,55,40,75,50,WAIT,25,KEEP ACTIVE,Still strong enough for active monitoring,Large-cap turnaround,,
-IONQ,ACTIVE,Quantum Computing,MOONSHOT,37.5099983215332,22,0,0,50,WAIT,25,DEMOTE WATCHLIST,Weak active setup — move to candidates,Speculative quantum computing,,
-KYTX,ACTIVE,Biotech,MOONSHOT,7.78000020980835,32,0,0,50,WAIT,50,DEMOTE WATCHLIST,Weak active setup — move to candidates,Biotech catalyst risk,,
-LLY,ACTIVE,Healthcare/Pharma,QUALITY,1156.6300048828125,82,80,100,50,WAIT,50,KEEP ACTIVE,Still strong enough for active monitoring,Large-cap pharma,,
-LUNR,ACTIVE,Space,MOONSHOT,14.850000381469728,22,0,0,50,WAIT,10,DEMOTE WATCHLIST,Weak active setup — move to candidates,Speculative space,,
-MRVL,ACTIVE,Semiconductors,QUALITY,206.25999450683597,55,40,75,50,WAIT,25,KEEP ACTIVE,Still strong enough for active monitoring,Established semiconductor,,
-MU,ACTIVE,Semiconductors,MOMENTUM,904.280029296875,65,40,75,50,WAIT,50,KEEP ACTIVE,Still strong enough for active monitoring,Cyclical semi momentum,,
-NBIS,ACTIVE,AI Infrastructure,MOONSHOT,199.50999450683597,55,40,75,50,WAIT,40,KEEP ACTIVE,Still strong enough for active monitoring,Speculative AI infrastructure,,
-NVDA,ACTIVE,Semiconductors,QUALITY,212.5,89,80,100,75,TIMING WATCH,70,KEEP ACTIVE,Still strong enough for active monitoring,Large-cap AI leader,,
-CCJ,ACTIVE,Uranium/Nuclear Energy,QUALITY,90.9800033569336,22,0,0,50,WAIT,25,REMOVE WATCHLIST,Low score and does not fit high-return focus,Uranium quality/cyclical,,
-PL,ACTIVE,Space,MOONSHOT,24.899999618530277,32,0,0,50,WAIT,35,DEMOTE WATCHLIST,Weak active setup — move to candidates,Speculative space,,
-PUBM,ACTIVE,AdTech,MOMENTUM,13.800000190734863,79,80,100,75,WAIT,45,KEEP ACTIVE,Still strong enough for active monitoring,Small/mid-cap adtech momentum,,
-RKLB,ACTIVE,Space,MOONSHOT,76.19999694824219,43,0,35,50,WAIT,35,KEEP ACTIVE,No demotion rule triggered,Speculative space,,
-SOFI,ACTIVE,Fintech,MOMENTUM,17.8700008392334,50,40,25,50,WAIT,50,KEEP ACTIVE,Currently held — keep active until sold,Fintech momentum,,
-STTK,ACTIVE,Industrials,MOONSHOT,6.769999980926514,84,80,65,100,TIMING CONFIRMED,95,KEEP ACTIVE,Still strong enough for active monitoring,Speculative small-cap,,
-TSLA,ACTIVE,Electric Vehicles,QUALITY,394.4599914550781,43,0,35,50,WAIT,35,KEEP ACTIVE,No demotion rule triggered,Large-cap volatile quality,,
-TSM,ACTIVE,Semiconductors,QUALITY,419.4800109863281,65,40,75,50,WAIT,50,KEEP ACTIVE,Still strong enough for active monitoring,Large-cap semiconductor,,
-VRT,ACTIVE,Data Centers,QUALITY,304.57000732421875,65,40,75,50,WAIT,35,KEEP ACTIVE,Still strong enough for active monitoring,Data center infrastructure,,
-STX,ACTIVE,Data Storage,QUALITY,828.2999877929688,55,40,75,50,WAIT,40,KEEP ACTIVE,Still strong enough for active monitoring,Established data storage,,
-SMCI,ACTIVE,AI Infrastructure,MOONSHOT,26.88999938964844,22,0,0,50,WAIT,10,DEMOTE WATCHLIST,Weak active setup — move to candidates,High-risk AI infrastructure,,
-DDOG,ACTIVE,Cloud Software,QUALITY,264.4599914550781,79,80,100,75,WAIT,45,KEEP ACTIVE,Still strong enough for active monitoring,Established SaaS/cloud,,
-SKHY,ACTIVE,High Yield ETF,QUALITY,,22,0,0,50,WAIT,50,DISABLED,Already disabled in active watchlist,Disabled due to missing yfinance indicator data,,
-SMR,ACTIVE,Nuclear Energy,MOONSHOT,8.359999656677246,22,0,0,50,WAIT,10,DEMOTE WATCHLIST,Weak active setup — move to candidates,Speculative nuclear,,
-OKLO,ACTIVE,Nuclear Energy,MOONSHOT,45.68999862670898,22,0,0,50,WAIT,10,DEMOTE WATCHLIST,Weak active setup — move to candidates,Speculative nuclear,,
-JOBY,ACTIVE,eVTOL/Aviation,MOONSHOT,7.760000228881836,22,0,0,50,WAIT,40,DEMOTE WATCHLIST,Weak active setup — move to candidates,Speculative aviation,,
-SOUN,ACTIVE,AI Software,MOONSHOT,6.5,39,0,0,75,TIMING WATCH,70,KEEP ACTIVE,Timing still worth monitoring,Speculative AI software,,
-PLTR,CANDIDATE,Technology,MOMENTUM,133.75999450683594,39,40,0,75,WAIT,45,REMOVE,Low score and weak setup,AI software platform,2026-07-16,Strong AI demand
+ASTS,CANDIDATE,Space/Telecom,MOONSHOT,66.30999755859375,32,0,0,50,WAIT,35,REMOVE,Low score and weak setup,Speculative space/telecom,2026-07-15,Auto-demoted from active watchlist
+IONQ,CANDIDATE,Quantum Computing,MOONSHOT,37.5099983215332,22,0,0,50,WAIT,25,REMOVE,Low score and weak setup,Speculative quantum computing,2026-07-15,Auto-demoted from active watchlist
+KYTX,CANDIDATE,Biotech,MOONSHOT,7.78000020980835,32,0,0,50,WAIT,50,REMOVE,Low score and weak setup,Biotech catalyst risk,2026-07-15,Auto-demoted from active watchlist
+LUNR,CANDIDATE,Space,MOONSHOT,14.850000381469728,22,0,0,50,WAIT,10,REMOVE,Low score and weak setup,Speculative space,2026-07-15,Auto-demoted from active watchlist
+CCJ,CANDIDATE,Uranium/Nuclear Energy,QUALITY,,22,0,0,50,WAIT,50,DISABLED,Candidate disabled,Uranium quality/cyclical,2026-07-15,Auto-removed from active watchlist
+PL,CANDIDATE,Space,MOONSHOT,24.899999618530277,32,0,0,50,WAIT,35,REMOVE,Low score and weak setup,Speculative space,2026-07-15,Auto-demoted from active watchlist
+SMCI,CANDIDATE,AI Infrastructure,MOONSHOT,26.88999938964844,22,0,0,50,WAIT,10,REMOVE,Low score and weak setup,High-risk AI infrastructure,2026-07-15,Auto-demoted from active watchlist
+SMR,CANDIDATE,Nuclear Energy,MOONSHOT,8.359999656677246,22,0,0,50,WAIT,10,REMOVE,Low score and weak setup,Speculative nuclear,2026-07-15,Auto-demoted from active watchlist
+OKLO,CANDIDATE,Nuclear Energy,MOONSHOT,45.68999862670898,22,0,0,50,WAIT,10,REMOVE,Low score and weak setup,Speculative nuclear,2026-07-15,Auto-demoted from active watchlist
+JOBY,CANDIDATE,eVTOL/Aviation,MOONSHOT,7.760000228881836,22,0,0,50,WAIT,40,REMOVE,Low score and weak setup,Speculative aviation,2026-07-15,Auto-demoted from active watchlist
+PLTR,CANDIDATE,Technology,MOMENTUM,,22,0,0,50,WAIT,50,DISABLED,Candidate disabled,AI software platform,2026-07-16,Strong AI demand
 CLS,CANDIDATE,Technology,MOMENTUM,334.7699890136719,54,40,40,50,WAIT,50,KEEP CANDIDATE,Monitor for improvement,AI infrastructure supplier,2026-07-16,AI server demand
 POET,CANDIDATE,Technology,MOONSHOT,8.270000457763672,55,40,75,50,WAIT,25,KEEP CANDIDATE,Monitor for improvement,Optical interconnects,2026-07-16,AI networking bet
 HPE,CANDIDATE,Technology,MOMENTUM,47.38999938964844,75,80,75,50,WAIT,35,KEEP CANDIDATE,Interesting but not ready,Enterprise AI infrastructure,2026-07-16,AI server demand
 RXRX,CANDIDATE,Healthcare,MOONSHOT,3.309999942779541,40,0,25,50,WAIT,50,KEEP CANDIDATE,Monitor for improvement,AI drug discovery,2026-07-16,AI biotech upside
-SERV,CANDIDATE,Industrials,MOONSHOT,5.75,39,0,0,75,WAIT,55,REMOVE,Low score and weak setup,Autonomous robots,2026-07-16,Warehouse automation
+SERV,CANDIDATE,Industrials,MOONSHOT,,22,0,0,50,WAIT,50,DISABLED,Candidate disabled,Autonomous robots,2026-07-16,Warehouse automation

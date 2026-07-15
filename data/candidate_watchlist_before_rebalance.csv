@@ -1,7 +1,17 @@
 ticker,sector,tier,enabled,notes,date_added,candidate_reason
-PLTR,Technology,MOMENTUM,True,AI software platform,2026-07-16,Strong AI demand
+ASTS,Space/Telecom,MOONSHOT,True,Speculative space/telecom,2026-07-15,Auto-demoted from active watchlist
+IONQ,Quantum Computing,MOONSHOT,True,Speculative quantum computing,2026-07-15,Auto-demoted from active watchlist
+KYTX,Biotech,MOONSHOT,True,Biotech catalyst risk,2026-07-15,Auto-demoted from active watchlist
+LUNR,Space,MOONSHOT,True,Speculative space,2026-07-15,Auto-demoted from active watchlist
+CCJ,Uranium/Nuclear Energy,QUALITY,False,Uranium quality/cyclical,2026-07-15,Auto-removed from active watchlist
+PL,Space,MOONSHOT,True,Speculative space,2026-07-15,Auto-demoted from active watchlist
+SMCI,AI Infrastructure,MOONSHOT,True,High-risk AI infrastructure,2026-07-15,Auto-demoted from active watchlist
+SMR,Nuclear Energy,MOONSHOT,True,Speculative nuclear,2026-07-15,Auto-demoted from active watchlist
+OKLO,Nuclear Energy,MOONSHOT,True,Speculative nuclear,2026-07-15,Auto-demoted from active watchlist
+JOBY,eVTOL/Aviation,MOONSHOT,True,Speculative aviation,2026-07-15,Auto-demoted from active watchlist
+PLTR,Technology,MOMENTUM,False,AI software platform,2026-07-16,Strong AI demand
 CLS,Technology,MOMENTUM,True,AI infrastructure supplier,2026-07-16,AI server demand
 POET,Technology,MOONSHOT,True,Optical interconnects,2026-07-16,AI networking bet
 HPE,Technology,MOMENTUM,True,Enterprise AI infrastructure,2026-07-16,AI server demand
 RXRX,Healthcare,MOONSHOT,True,AI drug discovery,2026-07-16,AI biotech upside
-SERV,Industrials,MOONSHOT,True,Autonomous robots,2026-07-16,Warehouse automation
+SERV,Industrials,MOONSHOT,False,Autonomous robots,2026-07-16,Warehouse automation
