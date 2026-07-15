@@ -99,7 +99,7 @@ def score_signals():
 
     holdings["ticker"] = holdings["ticker"].astype(str).str.upper().str.strip()
 
-        for col in ["shares", "holding_return_pct", "market_value"]:
+    for col in ["shares", "holding_return_pct", "market_value"]:
         if col not in holdings.columns:
             holdings[col] = np.nan
 
