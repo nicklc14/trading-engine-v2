@@ -1,0 +1,7 @@
+ticker,sector,tier,price,score,trend_score,momentum_score,accelerator_score,timing_action,timing_score,recommendation,why,notes,date_added,candidate_reason
+HPE,Technology,MOMENTUM,47.38999938964844,75,80,75,50,WAIT,35,KEEP CANDIDATE,Interesting but not ready,Enterprise AI infrastructure,2026-07-16,AI server demand
+POET,Technology,MOONSHOT,8.270000457763672,55,40,75,50,WAIT,25,KEEP CANDIDATE,Monitor for improvement,Optical interconnects,2026-07-16,AI networking bet
+CLS,Technology,MOMENTUM,334.7699890136719,54,40,40,50,WAIT,50,KEEP CANDIDATE,Monitor for improvement,AI infrastructure supplier,2026-07-16,AI server demand
+RXRX,Healthcare,MOONSHOT,3.309999942779541,40,0,25,50,WAIT,50,KEEP CANDIDATE,Monitor for improvement,AI drug discovery,2026-07-16,AI biotech upside
+PLTR,Technology,MOMENTUM,133.75999450683594,39,40,0,75,WAIT,45,REMOVE,Low score and weak setup,AI software platform,2026-07-16,Strong AI demand
+SERV,Industrials,MOONSHOT,5.75,39,0,0,75,WAIT,55,REMOVE,Low score and weak setup,Autonomous robots,2026-07-16,Warehouse automation
