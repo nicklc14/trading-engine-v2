@@ -43,6 +43,11 @@ def load_config():
         "risk_off_buy_threshold": 85,
         "risk_off_buy_small_threshold": 80,
         "risk_off_block_new_moonshots": "TRUE",
+        "aggressive_mode": "TRUE",
+        "aggressive_risk_on_score_boost": 3,
+        "aggressive_risk_on_position_size_factor": 1.25,
+        "aggressive_risk_on_buy_threshold": 78,
+        "aggressive_risk_on_buy_small_threshold": 73,
     }
 
     if CONFIG_PATH.exists():
@@ -89,13 +94,7 @@ def get_weekly_realized_pnl():
     today = pd.Timestamp(datetime.utcnow().date())
     week_start = today.to_period("W").start_time
 
-    sells = trades[
-        (trades["type_upper"] == "SELL")
-        & (trades["date"] >= week_start)
-    ]
-
-    if sells.empty:
-        return 0.0
+    sells = trades[(trades["type_upper"] == "SELL") & (trades["date"] >= week_start)]
 
     realized_pnl = 0.0
 
@@ -111,7 +110,6 @@ def get_weekly_realized_pnl():
 
         buy_cost = pd.to_numeric(buys.get("usd_amount", 0), errors="coerce").fillna(0).sum()
         sell_proceeds = pd.to_numeric(pd.Series([sell.get("usd_amount", 0)]), errors="coerce").fillna(0).iloc[0]
-
         realized_pnl += sell_proceeds - buy_cost
 
     return float(realized_pnl)
@@ -134,6 +132,7 @@ def review_priority(action, exit_action="", exit_priority="", position_rule=""):
 def score_signals():
     cfg = load_config()
     market_regime = load_market_regime()
+    is_risk_on = market_regime.upper() == "RISK ON"
     is_risk_off = market_regime.upper() == "RISK OFF"
 
     max_positions = cfg_int(cfg, "max_positions")
@@ -160,8 +159,21 @@ def score_signals():
     risk_off_buy_small_threshold = cfg_float(cfg, "risk_off_buy_small_threshold")
     risk_off_block_new_moonshots = cfg_bool(cfg, "risk_off_block_new_moonshots")
 
-    buy_threshold = risk_off_buy_threshold if is_risk_off else 80
-    buy_small_threshold = risk_off_buy_small_threshold if is_risk_off else 75
+    aggressive_mode = cfg_bool(cfg, "aggressive_mode")
+    aggressive_score_boost = cfg_float(cfg, "aggressive_risk_on_score_boost")
+    aggressive_size_factor = cfg_float(cfg, "aggressive_risk_on_position_size_factor")
+    aggressive_buy_threshold = cfg_float(cfg, "aggressive_risk_on_buy_threshold")
+    aggressive_buy_small_threshold = cfg_float(cfg, "aggressive_risk_on_buy_small_threshold")
+
+    buy_threshold = 80
+    buy_small_threshold = 75
+
+    if is_risk_off:
+        buy_threshold = risk_off_buy_threshold
+        buy_small_threshold = risk_off_buy_small_threshold
+    elif is_risk_on and aggressive_mode:
+        buy_threshold = aggressive_buy_threshold
+        buy_small_threshold = aggressive_buy_small_threshold
 
     watch = pd.read_csv(WATCHLIST_PATH)
     watch["enabled"] = watch["enabled"].astype(str).str.upper().isin(["TRUE", "YES", "1", "Y"])
@@ -207,6 +219,9 @@ def score_signals():
     if is_risk_off:
         risk_budget_usd *= risk_off_position_size_factor
         max_position_usd *= risk_off_position_size_factor
+    elif is_risk_on and aggressive_mode:
+        risk_budget_usd *= aggressive_size_factor
+        max_position_usd *= aggressive_size_factor
 
     df = watch.merge(market, on="ticker", how="left")
     df = df.merge(holdings[["ticker", "shares", "holding_return_pct"]], on="ticker", how="left")
@@ -261,11 +276,12 @@ def score_signals():
         sec_score_adjustment = pd.to_numeric(row.get("sec_score_adjustment", 0), errors="coerce")
         if pd.isna(sec_score_adjustment):
             sec_score_adjustment = 0
-
         final_score = clamp(final_score + sec_score_adjustment)
 
         if is_risk_off and not already_held:
             final_score = clamp(final_score - risk_off_score_penalty)
+        elif is_risk_on and aggressive_mode and not already_held:
+            final_score = clamp(final_score + aggressive_score_boost)
 
         if tier == "MOONSHOT":
             stop_loss = price - (moonshot_stop_atr_multiplier * atr) if pd.notna(price) and pd.notna(atr) and atr > 0 else price * 0.75
@@ -345,9 +361,10 @@ def score_signals():
         else:
             warnings.append("Market regime unknown")
 
+        if is_risk_on and aggressive_mode:
+            reasons.append("Aggressive mode active")
         if is_risk_off:
             warnings.append("Risk Off: stricter buy rules and smaller sizing applied")
-
         if weekly_loss_stop_triggered:
             warnings.append(f"Weekly loss stop active: weekly realized P&L ${weekly_realized_pnl:.2f}")
 
@@ -377,14 +394,12 @@ def score_signals():
         if tier == "MOONSHOT" and pd.notna(atr_pct) and atr_pct < 0.08:
             warnings.append("Moonshot volatility may be too low")
 
-        buy_amount_usd = 0.0
-        shares_to_buy = 0.0
-
         rows.append({
             "ticker": ticker,
             "sector": row.get("sector", ""),
             "tier": tier,
             "market_regime": market_regime,
+            "aggressive_mode_active": bool(is_risk_on and aggressive_mode),
             "price": price,
             "score": final_score,
             "sort_priority": review_priority(action, exit_action, exit_priority, position_rule),
@@ -399,8 +414,8 @@ def score_signals():
             "stop_loss": stop_loss,
             "trim_price": trim_price,
             "atr": atr,
-            "buy_amount_usd": buy_amount_usd,
-            "shares_to_buy": shares_to_buy,
+            "buy_amount_usd": 0.0,
+            "shares_to_buy": 0.0,
             "risk_budget_usd": round(risk_budget_usd, 2),
             "max_position_usd": round(max_position_usd, 2),
             "holding_return_pct": holding_return_pct,
@@ -418,19 +433,9 @@ def score_signals():
             "weekly_loss_stop_triggered": weekly_loss_stop_triggered,
             "decision_reasons": "; ".join(reasons),
             "warnings": "; ".join(warnings),
-            "sec_event_flag": row.get("sec_event_flag", "NONE"),
-            "sec_event_type": row.get("sec_event_type", ""),
-            "sec_event_date": row.get("sec_event_date", ""),
-            "sec_form": row.get("sec_form", ""),
-            "sec_severity": row.get("sec_severity", ""),
-            "sec_score_adjustment": sec_score_adjustment,
-            "sec_event_note": row.get("sec_event_note", ""),
         })
 
-    high_priority_sell_exists = any(
-        r["exit_action"] == "SELL" and r["exit_priority"] == "HIGH"
-        for r in rows
-    )
+    high_priority_sell_exists = any(r["exit_action"] == "SELL" and r["exit_priority"] == "HIGH" for r in rows)
 
     block_new_risk = False
     block_reasons = []
@@ -448,8 +453,6 @@ def score_signals():
 
         if block_new_risk and r["action"] in ["BUY", "BUY SMALL"]:
             r["action"] = "WATCH"
-            r["buy_amount_usd"] = 0.0
-            r["shares_to_buy"] = 0.0
             r["warnings"] = "; ".join([x for x in [r["warnings"], *block_reasons] if x])
             if not already_held:
                 r["position_rule"] = "; ".join([r["position_rule"], *block_reasons])
@@ -488,7 +491,6 @@ def score_signals():
             r["shares_to_buy"] = round(buy_amount_usd / price, 6) if buy_amount_usd > 0 else 0.0
 
         r["sort_priority"] = review_priority(r["action"], r["exit_action"], r["exit_priority"], r["position_rule"])
-
         del r["already_held"]
 
     out = pd.DataFrame(rows).sort_values(
