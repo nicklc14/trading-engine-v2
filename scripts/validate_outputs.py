@@ -26,7 +26,8 @@ REQUIRED_COLUMNS = {
         "stop_loss", "trim_target", "risk_note", "position_rule",
     ],
     "candidate_review": [
-        "ticker", "sector", "tier", "price", "score",
+        "ticker", "source_list", "sector", "tier", "price", "score",
+        "trend_score", "momentum_score", "accelerator_score",
         "timing_action", "timing_score", "recommendation", "why",
     ],
     "weekly_review": [
@@ -73,15 +74,37 @@ NON_EMPTY_FILES = [
     "market_data",
 ]
 
-VALID_DASHBOARD_ACTIONS = {"SELL", "TRIM", "HOLD", "BUY", "BUY SMALL", "WATCH"}
-VALID_TIMING_ACTIONS = {"TIMING CONFIRMED", "TIMING WATCH", "WAIT"}
-VALID_QUALITY_SEVERITIES = {"OK", "LOW", "MEDIUM", "HIGH"}
+VALID_DASHBOARD_ACTIONS = {
+    "SELL", "TRIM", "HOLD", "BUY", "BUY SMALL", "WATCH"
+}
+
+VALID_TIMING_ACTIONS = {
+    "TIMING CONFIRMED", "TIMING WATCH", "WAIT", ""
+}
+
+VALID_QUALITY_SEVERITIES = {
+    "OK", "LOW", "MEDIUM", "HIGH"
+}
+
 VALID_CANDIDATE_RECOMMENDATIONS = {
-    "PROMOTE", "KEEP CANDIDATE", "REMOVE", "ALREADY ACTIVE"
+    "PROMOTE",
+    "KEEP CANDIDATE",
+    "REMOVE",
+    "ALREADY ACTIVE",
+    "KEEP ACTIVE",
+    "DEMOTE WATCHLIST",
+    "REMOVE WATCHLIST",
+    "DISABLED",
+}
+
+VALID_SOURCE_LISTS = {
+    "ACTIVE",
+    "CANDIDATE",
 }
 
 def read_csv(name):
     path = REQUIRED_FILES[name]
+
     if not path.exists():
         raise FileNotFoundError(f"Missing required output file: {path}")
 
@@ -102,7 +125,11 @@ def require_non_empty(name, df):
         raise ValueError(f"{name}.csv has no rows")
 
 def validate_dashboard(df):
-    bad_actions = set(df["action_required"].dropna().astype(str).str.upper()) - VALID_DASHBOARD_ACTIONS
+    bad_actions = (
+        set(df["action_required"].dropna().astype(str).str.upper())
+        - VALID_DASHBOARD_ACTIONS
+    )
+
     if bad_actions:
         raise ValueError(f"dashboard.csv has invalid action_required values: {sorted(bad_actions)}")
 
@@ -110,12 +137,20 @@ def validate_dashboard(df):
         raise ValueError("dashboard.csv has blank ticker values")
 
 def validate_market_timing(df):
-    bad_actions = set(df["timing_action"].dropna().astype(str).str.upper()) - VALID_TIMING_ACTIONS
+    bad_actions = (
+        set(df["timing_action"].fillna("").astype(str).str.upper())
+        - VALID_TIMING_ACTIONS
+    )
+
     if bad_actions:
         raise ValueError(f"market_timing.csv has invalid timing_action values: {sorted(bad_actions)}")
 
 def validate_data_quality(df):
-    bad_severities = set(df["severity"].dropna().astype(str).str.upper()) - VALID_QUALITY_SEVERITIES
+    bad_severities = (
+        set(df["severity"].dropna().astype(str).str.upper())
+        - VALID_QUALITY_SEVERITIES
+    )
+
     if bad_severities:
         raise ValueError(f"data_quality_report.csv has invalid severity values: {sorted(bad_severities)}")
 
@@ -132,6 +167,14 @@ def validate_signals(df):
 def validate_candidate_review(df):
     if "status" in df.columns:
         return
+
+    bad_sources = (
+        set(df["source_list"].dropna().astype(str).str.upper())
+        - VALID_SOURCE_LISTS
+    )
+
+    if bad_sources:
+        raise ValueError(f"candidate_review.csv has invalid source_list values: {sorted(bad_sources)}")
 
     bad_recommendations = (
         set(df["recommendation"].dropna().astype(str).str.upper())
