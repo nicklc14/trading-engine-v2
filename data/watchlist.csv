@@ -33,7 +33,7 @@ VRT,Data Centers,QUALITY,TRUE,Current workbook watchlist
 STX,Data Storage,QUALITY,TRUE,Added watchlist ticker
 SMCI,AI Infrastructure,MOMENTUM,TRUE,Added watchlist ticker
 DDOG,Cloud Software,QUALITY,TRUE,Added watchlist ticker
-SKHY,High Yield ETF,QUALITY,TRUE,Added watchlist ticker
+SKHY,High Yield ETF,QUALITY,FALSE,Disabled due to missing yfinance indicator data
 SMR,Nuclear Energy,MOMENTUM,TRUE,Adding ticker to watchlist
 OKLO,Nuclear Energy,MOMENTUM,TRUE,Adding ticker to watchlist
 JOBY,eVTOL/Aviation,MOMENTUM,TRUE,Adding ticker to watchlist
