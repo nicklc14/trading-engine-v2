@@ -7,22 +7,22 @@ SIGNALS_PATH = DATA_DIR / "signals.csv"
 HOLDINGS_PATH = DATA_DIR / "holdings.csv"
 DASHBOARD_PATH = DATA_DIR / "dashboard.csv"
 
-OUTPUT_COLUMNS = [
-    "Ticker",
-    "Action Required",
-    "Plan / Why",
-    "Buy USD",
-    "Sell USD",
-    "Shares To Buy",
-    "Shares To Sell",
-    "Price",
-    "Score",
-    "Tier",
-    "Holding Return %",
-    "Stop Loss",
-    "Trim Target",
-    "Risk Note",
-    "Position Rule",
+VISIBLE_COLUMNS = [
+    "ticker",
+    "action_required",
+    "plan_why",
+    "buy_usd",
+    "sell_usd",
+    "shares_to_buy",
+    "shares_to_sell",
+    "price",
+    "score",
+    "tier",
+    "holding_return_pct",
+    "stop_loss",
+    "trim_target",
+    "risk_note",
+    "position_rule",
 ]
 
 def clean_text(x):
@@ -105,34 +105,32 @@ def build_dashboard():
         + pd.to_numeric(signals.get("stop_loss", np.nan), errors="coerce").round(2).astype(str)
     )
 
-    working = signals.copy()
-    if "sort_priority" not in working.columns:
-        working["sort_priority"] = 99
+    out = pd.DataFrame({
+        "ticker": signals.get("ticker", ""),
+        "action_required": signals["action_required"],
+        "plan_why": signals["plan_why"],
+        "buy_usd": signals.get("buy_amount_usd", 0),
+        "sell_usd": signals["sell_usd"],
+        "shares_to_buy": signals.get("shares_to_buy", 0),
+        "shares_to_sell": signals["shares_to_sell"],
+        "price": signals.get("price", np.nan),
+        "score": signals.get("score", np.nan),
+        "tier": signals.get("tier", ""),
+        "holding_return_pct": signals.get("holding_return_pct", np.nan),
+        "stop_loss": signals.get("stop_loss", np.nan),
+        "trim_target": signals.get("trim_price", np.nan),
+        "risk_note": signals["risk_note"],
+        "position_rule": signals.get("position_rule", ""),
+        "sort_priority": signals.get("sort_priority", 99),
+    })
 
-    working = working.sort_values(
+    out = out.sort_values(
         ["sort_priority", "score", "ticker"],
         ascending=[True, False, True]
     )
 
-    out = pd.DataFrame({
-        "Ticker": working.get("ticker", ""),
-        "Action Required": working["action_required"],
-        "Plan / Why": working["plan_why"],
-        "Buy USD": working.get("buy_amount_usd", 0),
-        "Sell USD": working["sell_usd"],
-        "Shares To Buy": working.get("shares_to_buy", 0),
-        "Shares To Sell": working["shares_to_sell"],
-        "Price": working.get("price", np.nan),
-        "Score": working.get("score", np.nan),
-        "Tier": working.get("tier", ""),
-        "Holding Return %": working.get("holding_return_pct", np.nan),
-        "Stop Loss": working.get("stop_loss", np.nan),
-        "Trim Target": working.get("trim_price", np.nan),
-        "Risk Note": working["risk_note"],
-        "Position Rule": working.get("position_rule", ""),
-    })
+    out = out[VISIBLE_COLUMNS]
 
-    out = out[OUTPUT_COLUMNS]
     out.to_csv(DASHBOARD_PATH, index=False)
     return out
 
