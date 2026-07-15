@@ -64,6 +64,31 @@ def highlight_actions(ws, action_header):
             for cell in row:
                 cell.fill = fill
 
+def highlight_data_quality(ws):
+    headers = [cell.value for cell in ws[1]]
+    if "severity" not in headers:
+        return
+
+    severity_col = headers.index("severity") + 1
+
+    for row in ws.iter_rows(min_row=2):
+        severity = str(row[severity_col - 1].value).upper()
+
+        if severity == "HIGH":
+            fill = PatternFill("solid", fgColor="F4CCCC")
+        elif severity == "MEDIUM":
+            fill = PatternFill("solid", fgColor="FFF2CC")
+        elif severity == "LOW":
+            fill = PatternFill("solid", fgColor="D9EAF7")
+        elif severity == "OK":
+            fill = PatternFill("solid", fgColor="C6EFCE")
+        else:
+            fill = None
+
+        if fill:
+            for cell in row:
+                cell.fill = fill
+
 def build_excel_workbook():
     OUTPUT_DIR.mkdir(exist_ok=True)
 
@@ -73,6 +98,7 @@ def build_excel_workbook():
         "Trades": DATA_DIR / "trades.csv",
         "Performance Summary": DATA_DIR / "performance_summary.csv",
         "Weekly Review": DATA_DIR / "weekly_review.csv",
+        "Data Quality": DATA_DIR / "data_quality_report.csv",
         "Signals Full": DATA_DIR / "signals.csv",
         "Premarket Full": DATA_DIR / "premarket_signals.csv",
         "Market Data": DATA_DIR / "market_data.csv",
@@ -94,8 +120,9 @@ def build_excel_workbook():
             {"Step": 2, "Action": "Review SELL / TRIM rows before any buys."},
             {"Step": 3, "Action": "Check Holdings and Performance Summary before trading."},
             {"Step": 4, "Action": "Use BUY / BUY SMALL as candidates, not automatic trades."},
-            {"Step": 5, "Action": "For full sells in trades.csv, use shares=ALL."},
-            {"Step": 6, "Action": "Run GitHub workflow, then refresh Excel."},
+            {"Step": 5, "Action": "Check Data Quality if a signal looks strange."},
+            {"Step": 6, "Action": "For full sells in trades.csv, use shares=ALL."},
+            {"Step": 7, "Action": "Run GitHub workflow, then refresh Excel."},
         ])
         instructions.to_excel(writer, sheet_name="How To Use", index=False)
 
@@ -112,6 +139,9 @@ def build_excel_workbook():
 
             if ws.title == "Premarket Full":
                 highlight_actions(ws, "premarket_action")
+
+            if ws.title == "Data Quality":
+                highlight_data_quality(ws)
 
     print(f"Excel workbook created: {excel_file}")
     return excel_file
