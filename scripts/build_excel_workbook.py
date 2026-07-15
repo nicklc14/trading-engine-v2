@@ -98,6 +98,7 @@ def build_excel_workbook():
         "Trades": DATA_DIR / "trades.csv",
         "Performance Summary": DATA_DIR / "performance_summary.csv",
         "Weekly Review": DATA_DIR / "weekly_review.csv",
+        "Performance Learning": DATA_DIR / "performance_learning.csv",
         "Data Quality": DATA_DIR / "data_quality_report.csv",
         "Signals Full": DATA_DIR / "signals.csv",
         "Premarket Full": DATA_DIR / "premarket_signals.csv",
@@ -120,9 +121,10 @@ def build_excel_workbook():
             {"Step": 2, "Action": "Review SELL / TRIM rows before any buys."},
             {"Step": 3, "Action": "Check Holdings and Performance Summary before trading."},
             {"Step": 4, "Action": "Use BUY / BUY SMALL as candidates, not automatic trades."},
-            {"Step": 5, "Action": "Check Data Quality if a signal looks strange."},
-            {"Step": 6, "Action": "For full sells in trades.csv, use shares=ALL."},
-            {"Step": 7, "Action": "Run GitHub workflow, then refresh Excel."},
+            {"Step": 5, "Action": "Check Weekly Review and Performance Learning to see what is working."},
+            {"Step": 6, "Action": "Check Data Quality if a signal looks strange."},
+            {"Step": 7, "Action": "For full sells in trades.csv, use shares=ALL."},
+            {"Step": 8, "Action": "Run GitHub workflow, then refresh Excel."},
         ])
         instructions.to_excel(writer, sheet_name="How To Use", index=False)
 
