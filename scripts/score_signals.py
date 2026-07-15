@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 from pathlib import Path
+from datetime import datetime
 
 DATA_DIR = Path("data")
 SIGNALS_PATH = DATA_DIR / "signals.csv"
@@ -11,6 +12,7 @@ HOLDINGS_PATH = DATA_DIR / "holdings.csv"
 CONFIG_PATH = DATA_DIR / "config.csv"
 SEC_EVENTS_PATH = DATA_DIR / "sec_events.csv"
 REGIME_PATH = DATA_DIR / "market_regime.csv"
+TRADES_PATH = DATA_DIR / "trades.csv"
 
 def clamp(x, lo=0, hi=100):
     return max(lo, min(hi, x))
@@ -24,6 +26,8 @@ def load_config():
         "cash_reserve_pct": 0,
         "risk_pct_per_trade": 0.05,
         "max_position_pct": 0.35,
+        "block_new_buys_on_high_sell": "TRUE",
+        "weekly_loss_stop_pct": 0.10,
         "momentum_priority_boost": 5,
         "quality_position_size_factor": 0.65,
         "add_more_min_return": 0.05,
@@ -65,6 +69,53 @@ def load_market_regime():
         return "UNKNOWN"
     return str(regime["market_regime"].iloc[0]).strip()
 
+def get_cash_available():
+    if not CASH_PATH.exists():
+        return 0.0
+    cash = pd.read_csv(CASH_PATH)
+    return float(cash["cash_available_usd"].iloc[0]) if not cash.empty else 0.0
+
+def get_weekly_realized_pnl():
+    if not TRADES_PATH.exists():
+        return 0.0
+
+    trades = pd.read_csv(TRADES_PATH)
+    if trades.empty:
+        return 0.0
+
+    trades["date"] = pd.to_datetime(trades["date"], errors="coerce")
+    trades["type_upper"] = trades["type"].astype(str).str.upper().str.strip()
+
+    today = pd.Timestamp(datetime.utcnow().date())
+    week_start = today.to_period("W").start_time
+
+    sells = trades[
+        (trades["type_upper"] == "SELL")
+        & (trades["date"] >= week_start)
+    ]
+
+    if sells.empty:
+        return 0.0
+
+    realized_pnl = 0.0
+
+    for _, sell in sells.iterrows():
+        ticker = str(sell["ticker"]).upper().strip()
+        holding_key = str(sell.get("holding_key", "")).strip()
+
+        buys = trades[
+            (trades["type_upper"] == "BUY")
+            & (trades["ticker"].astype(str).str.upper().str.strip() == ticker)
+            & (trades["holding_key"].astype(str).str.strip() == holding_key)
+        ]
+
+        buy_cost = pd.to_numeric(buys.get("usd_amount", 0), errors="coerce").fillna(0).sum()
+        sell_proceeds = pd.to_numeric(pd.Series([sell.get("usd_amount", 0)]), errors="coerce").fillna(0).iloc[0]
+
+        realized_pnl += sell_proceeds - buy_cost
+
+    return float(realized_pnl)
+
 def review_priority(action, exit_action="", exit_priority="", position_rule=""):
     if exit_action == "SELL" and exit_priority == "HIGH":
         return 1
@@ -80,12 +131,6 @@ def review_priority(action, exit_action="", exit_priority="", position_rule=""):
         return 7
     return 8
 
-def get_cash_available():
-    if not CASH_PATH.exists():
-        return 0.0
-    cash = pd.read_csv(CASH_PATH)
-    return float(cash["cash_available_usd"].iloc[0]) if not cash.empty else 0.0
-
 def score_signals():
     cfg = load_config()
     market_regime = load_market_regime()
@@ -95,6 +140,9 @@ def score_signals():
     cash_reserve_pct = cfg_float(cfg, "cash_reserve_pct")
     risk_pct_per_trade = cfg_float(cfg, "risk_pct_per_trade")
     max_position_pct = cfg_float(cfg, "max_position_pct")
+    block_new_buys_on_high_sell = cfg_bool(cfg, "block_new_buys_on_high_sell")
+    weekly_loss_stop_pct = cfg_float(cfg, "weekly_loss_stop_pct")
+
     momentum_priority_boost = cfg_float(cfg, "momentum_priority_boost")
     quality_position_size_factor = cfg_float(cfg, "quality_position_size_factor")
     add_more_min_return = cfg_float(cfg, "add_more_min_return")
@@ -148,6 +196,10 @@ def score_signals():
     cash_available = max(raw_cash * (1 - cash_reserve_pct), 0)
     holdings_value = pd.to_numeric(holdings["market_value"], errors="coerce").fillna(0).sum()
     equity = raw_cash + holdings_value
+
+    weekly_realized_pnl = get_weekly_realized_pnl()
+    weekly_loss_stop_usd = equity * weekly_loss_stop_pct
+    weekly_loss_stop_triggered = weekly_loss_stop_pct > 0 and weekly_realized_pnl <= -weekly_loss_stop_usd
 
     risk_budget_usd = equity * risk_pct_per_trade
     max_position_usd = equity * max_position_pct
@@ -296,6 +348,9 @@ def score_signals():
         if is_risk_off:
             warnings.append("Risk Off: stricter buy rules and smaller sizing applied")
 
+        if weekly_loss_stop_triggered:
+            warnings.append(f"Weekly loss stop active: weekly realized P&L ${weekly_realized_pnl:.2f}")
+
         if trend_score >= 70:
             reasons.append("Strong trend")
         if momentum_score >= 70:
@@ -325,32 +380,6 @@ def score_signals():
         buy_amount_usd = 0.0
         shares_to_buy = 0.0
 
-        can_buy = not already_held and open_slots > 0 and action in ["BUY", "BUY SMALL"]
-        can_add = already_held and add_more_signal == "ADD SMALL" and exit_action not in ["SELL", "TRIM"]
-
-        if tier == "MOONSHOT" and not already_held and moonshot_open_slots <= 0:
-            can_buy = False
-
-        if (can_buy or can_add) and pd.notna(price) and price > 0:
-            risk_per_share = max(price - stop_loss, 0) if pd.notna(stop_loss) else 0
-            if risk_per_share > 0:
-                atr_sized_amount = (risk_budget_usd / risk_per_share) * price
-                buy_amount_usd = min(atr_sized_amount, max_position_usd, cash_available)
-            else:
-                buy_amount_usd = min(max_position_usd, cash_available)
-
-            if tier == "QUALITY":
-                buy_amount_usd *= quality_position_size_factor
-            if tier == "MOONSHOT":
-                buy_amount_usd *= moonshot_position_size_factor
-            if action == "BUY SMALL" or can_add:
-                buy_amount_usd *= 0.5
-
-            buy_amount_usd = min(buy_amount_usd, cash_available)
-            shares_to_buy = buy_amount_usd / price if buy_amount_usd > 0 else 0
-
-        sort_priority = review_priority(action, exit_action, exit_priority, position_rule)
-
         rows.append({
             "ticker": ticker,
             "sector": row.get("sector", ""),
@@ -358,7 +387,7 @@ def score_signals():
             "market_regime": market_regime,
             "price": price,
             "score": final_score,
-            "sort_priority": sort_priority,
+            "sort_priority": review_priority(action, exit_action, exit_priority, position_rule),
             "action": action,
             "trend_score": trend_score,
             "momentum_score": momentum_score,
@@ -370,8 +399,8 @@ def score_signals():
             "stop_loss": stop_loss,
             "trim_price": trim_price,
             "atr": atr,
-            "buy_amount_usd": round(buy_amount_usd, 2),
-            "shares_to_buy": round(shares_to_buy, 6),
+            "buy_amount_usd": buy_amount_usd,
+            "shares_to_buy": shares_to_buy,
             "risk_budget_usd": round(risk_budget_usd, 2),
             "max_position_usd": round(max_position_usd, 2),
             "holding_return_pct": holding_return_pct,
@@ -384,6 +413,9 @@ def score_signals():
             "position_rule": position_rule,
             "add_more_signal": add_more_signal,
             "add_more_reason": add_more_reason,
+            "already_held": already_held,
+            "weekly_realized_pnl": round(weekly_realized_pnl, 2),
+            "weekly_loss_stop_triggered": weekly_loss_stop_triggered,
             "decision_reasons": "; ".join(reasons),
             "warnings": "; ".join(warnings),
             "sec_event_flag": row.get("sec_event_flag", "NONE"),
@@ -394,6 +426,70 @@ def score_signals():
             "sec_score_adjustment": sec_score_adjustment,
             "sec_event_note": row.get("sec_event_note", ""),
         })
+
+    high_priority_sell_exists = any(
+        r["exit_action"] == "SELL" and r["exit_priority"] == "HIGH"
+        for r in rows
+    )
+
+    block_new_risk = False
+    block_reasons = []
+
+    if block_new_buys_on_high_sell and high_priority_sell_exists:
+        block_new_risk = True
+        block_reasons.append("New buys blocked while HIGH priority SELL exists")
+
+    if weekly_loss_stop_triggered:
+        block_new_risk = True
+        block_reasons.append(f"New buys blocked by weekly loss stop (${weekly_realized_pnl:.2f})")
+
+    for r in rows:
+        already_held = bool(r["already_held"])
+
+        if block_new_risk and r["action"] in ["BUY", "BUY SMALL"]:
+            r["action"] = "WATCH"
+            r["buy_amount_usd"] = 0.0
+            r["shares_to_buy"] = 0.0
+            r["warnings"] = "; ".join([x for x in [r["warnings"], *block_reasons] if x])
+            if not already_held:
+                r["position_rule"] = "; ".join([r["position_rule"], *block_reasons])
+
+        can_buy = not already_held and open_slots > 0 and r["action"] in ["BUY", "BUY SMALL"]
+        can_add = already_held and r["add_more_signal"] == "ADD SMALL" and r["exit_action"] not in ["SELL", "TRIM"]
+
+        if block_new_risk:
+            can_buy = False
+            can_add = False
+
+        if r["tier"] == "MOONSHOT" and not already_held and moonshot_open_slots <= 0:
+            can_buy = False
+
+        price = r["price"]
+        stop_loss = r["stop_loss"]
+
+        if (can_buy or can_add) and pd.notna(price) and price > 0:
+            risk_per_share = max(price - stop_loss, 0) if pd.notna(stop_loss) else 0
+
+            if risk_per_share > 0:
+                atr_sized_amount = (risk_budget_usd / risk_per_share) * price
+                buy_amount_usd = min(atr_sized_amount, max_position_usd, cash_available)
+            else:
+                buy_amount_usd = min(max_position_usd, cash_available)
+
+            if r["tier"] == "QUALITY":
+                buy_amount_usd *= quality_position_size_factor
+            if r["tier"] == "MOONSHOT":
+                buy_amount_usd *= moonshot_position_size_factor
+            if r["action"] == "BUY SMALL" or can_add:
+                buy_amount_usd *= 0.5
+
+            buy_amount_usd = min(buy_amount_usd, cash_available)
+            r["buy_amount_usd"] = round(buy_amount_usd, 2)
+            r["shares_to_buy"] = round(buy_amount_usd / price, 6) if buy_amount_usd > 0 else 0.0
+
+        r["sort_priority"] = review_priority(r["action"], r["exit_action"], r["exit_priority"], r["position_rule"])
+
+        del r["already_held"]
 
     out = pd.DataFrame(rows).sort_values(
         ["sort_priority", "score", "ticker"],
