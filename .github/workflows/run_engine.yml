@@ -2,7 +2,7 @@ name: Trading Engine V2
 
 on:
   schedule:
-    - cron: '0 6 * * 1-5'
+    - cron: '30 20 * * 1-5'
   workflow_dispatch:
 
 permissions:
