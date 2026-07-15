@@ -15,3 +15,13 @@ POET,CANDIDATE,Technology,MOONSHOT,8.270000457763672,55,40,75,50,WAIT,25,KEEP CA
 HPE,CANDIDATE,Technology,MOMENTUM,47.38999938964844,75,80,75,50,WAIT,35,KEEP CANDIDATE,Interesting but not ready,Enterprise AI infrastructure,2026-07-16,AI server demand
 RXRX,CANDIDATE,Healthcare,MOONSHOT,3.309999942779541,40,0,25,50,WAIT,50,KEEP CANDIDATE,Monitor for improvement,AI drug discovery,2026-07-16,AI biotech upside
 SERV,CANDIDATE,Industrials,MOONSHOT,,22,0,0,50,WAIT,50,DISABLED,Candidate disabled,Autonomous robots,2026-07-16,Warehouse automation
+RGTI,CANDIDATE,CANDIDATE,Quantum Computing,,22,0,0,50,WAIT,50,DISABLED,Candidate disabled,Speculative quantum computing,Higher-risk quantum peer to IONQ,
+QBTS,CANDIDATE,CANDIDATE,Quantum Computing,,22,0,0,50,WAIT,50,DISABLED,Candidate disabled,Speculative quantum hardware/software,Quantum moonshot candidate,
+RDW,CANDIDATE,CANDIDATE,Space Infrastructure,,22,0,0,50,WAIT,50,DISABLED,Candidate disabled,Space systems exposure,Space infrastructure moonshot,
+BKSY,CANDIDATE,CANDIDATE,Satellite Analytics,,22,0,0,50,WAIT,50,DISABLED,Candidate disabled,Small-cap space/data play,Satellite data/analytics upside,
+IREN,CANDIDATE,CANDIDATE,AI Data Centers,,22,0,0,50,WAIT,50,DISABLED,Candidate disabled,AI infrastructure/power theme,AI data center momentum,
+APLD,CANDIDATE,CANDIDATE,AI Cloud/Data Centers,,22,0,0,50,WAIT,50,DISABLED,Candidate disabled,Aggressive AI infrastructure candidate,AI cloud infrastructure upside,
+SYM,CANDIDATE,CANDIDATE,Robotics Automation,,22,0,0,50,WAIT,50,DISABLED,Candidate disabled,Warehouse automation/robotics,Robotics automation upside,
+SDGR,CANDIDATE,CANDIDATE,AI Drug Discovery,,22,0,0,50,WAIT,50,DISABLED,Candidate disabled,AI biotech candidate,AI drug discovery upside,
+ABCL,CANDIDATE,CANDIDATE,AI Biotech,,22,0,0,50,WAIT,50,DISABLED,Candidate disabled,AI antibody/drug discovery exposure,AI biotech moonshot,
+TEM,CANDIDATE,CANDIDATE,AI Healthcare,,22,0,0,50,WAIT,50,DISABLED,Candidate disabled,Aggressive AI health/data platform,AI healthcare data upside,
