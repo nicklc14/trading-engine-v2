@@ -1,4 +1,4 @@
-Ticker,Action Required,Plan / Why,Buy USD,Sell USD,Shares To Buy,Shares To Sell,Price,Score,Tier,Holding Return %,Stop Loss,Trim Target,Risk Note,Position Rule
+ticker,action_required,plan_why,buy_usd,sell_usd,shares_to_buy,shares_to_sell,price,score,tier,holding_return_pct,stop_loss,trim_target,risk_note,position_rule
 TSLA,SELL,Sell: Trend and score weakened,0.0,10.790223830073044,0.0,0.0272356606329269,396.1799926757813,43.0,QUALITY,-0.0417207966187322,368.3292813982283,433.31427437918535,Do not average down; Trend and score weakened | Stop 368.33,Already held
 ANET,BUY,BUY: MOMENTUM. Strong trend; Positive momentum; MACD/volume acceleration; Momentum tier boost,0.0,0.0,0.0,0.0,182.57000732421875,94.0,MOMENTUM,-0.0273823999246683,161.64559718540735,213.95662253243583,Do not average down | Stop 161.65,Already held
 BFLY,BUY,BUY: MOMENTUM. Strong trend; Positive momentum; Momentum tier boost,0.0,0.0,0.0,0.0,7.75,87.0,MOMENTUM,-0.0670394023961399,6.272785867963519,9.965821198054725,Do not average down | Stop 6.27,Already held
