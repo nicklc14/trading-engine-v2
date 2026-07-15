@@ -36,6 +36,7 @@ def calc_atr(high, low, close, period=14):
     return tr.rolling(period).mean()
 
 def fetch_one(ticker):
+    fetched_at = datetime.now(timezone.utc).isoformat()
     hist = yf.download(ticker, period="1y", interval="1d", auto_adjust=False, progress=False)
 
     if hist.empty:
@@ -74,6 +75,8 @@ def fetch_one(ticker):
     atr_series = calc_atr(high, low, close)
     atr = float(atr_series.iloc[-1]) if len(atr_series) and pd.notna(atr_series.iloc[-1]) else np.nan
 
+    market_data_date = hist.index[-1].date().isoformat()
+
     return {
         "ticker": ticker,
         "price": price,
@@ -94,7 +97,9 @@ def fetch_one(ticker):
         "gap_direction": gap_direction,
         "atr": atr,
         "atr_pct": atr / price if pd.notna(atr) and price > 0 else np.nan,
-        "as_of": datetime.now(timezone.utc).date().isoformat()
+        "as_of": datetime.now(timezone.utc).date().isoformat(),
+        "market_data_date": market_data_date,
+        "fetched_at_utc": fetched_at,
     }
 
 def update_market_data():
@@ -120,7 +125,8 @@ def update_market_data():
 
     pd.DataFrame([{
         "as_of": datetime.now(timezone.utc).date().isoformat(),
-        "market_regime": regime
+        "market_regime": regime,
+        "fetched_at_utc": datetime.now(timezone.utc).isoformat(),
     }]).to_csv(REGIME_PATH, index=False)
 
     return market
