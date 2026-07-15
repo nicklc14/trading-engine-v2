@@ -5,9 +5,9 @@ from check_data_quality import check_data_quality
 from calculate_cash import calculate_cash
 from calculate_holdings import calculate_holdings
 from calculate_performance import calculate_performance
+from score_candidates import score_candidates
 from score_signals import score_signals
 from score_market_timing import score_market_timing
-from score_candidates import score_candidates
 from build_weekly_review import build_weekly_review
 from build_dashboard import build_dashboard
 from build_holdings_view import build_holdings_view
@@ -38,31 +38,31 @@ calculate_holdings()
 print("Step 4: Calculating performance...")
 calculate_performance()
 
-print("Step 5: Scoring standard signals...")
-score_signals()
-
-print("Step 6: Scoring market timing...")
-score_market_timing()
-
-print("Step 6b: Scoring candidate watchlist...")
+print("Step 5: Rebalancing candidate/watchlist tickers...")
 score_candidates()
 
-print("Step 7: Building weekly review...")
+print("Step 6: Scoring standard signals...")
+score_signals()
+
+print("Step 7: Scoring market timing...")
+score_market_timing()
+
+print("Step 8: Building weekly review...")
 build_weekly_review()
 
-print("Step 8: Building dashboard output...")
+print("Step 9: Building dashboard output...")
 build_dashboard()
 
-print("Step 9: Building holdings view...")
+print("Step 10: Building holdings view...")
 build_holdings_view()
 
-print("Step 10: Building performance summary...")
+print("Step 11: Building performance summary...")
 build_performance_summary()
 
-print("Step 11: Building Excel workbook...")
+print("Step 12: Building Excel workbook...")
 build_excel_workbook()
 
-print("Step 12: Validating outputs...")
+print("Step 13: Validating outputs...")
 validate_outputs()
 
 print("Done.")
