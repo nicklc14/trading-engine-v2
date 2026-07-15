@@ -2,10 +2,10 @@ import pandas as pd
 from pathlib import Path
 
 DATA_DIR = Path("data")
-OUTPUT_DIR = Path("output")
 
 REQUIRED_FILES = {
     "dashboard": DATA_DIR / "dashboard.csv",
+    "candidate_review": DATA_DIR / "candidate_review.csv",
     "holdings_view": DATA_DIR / "holdings_view.csv",
     "trades": DATA_DIR / "trades.csv",
     "performance_summary": DATA_DIR / "performance_summary.csv",
@@ -24,6 +24,10 @@ REQUIRED_COLUMNS = {
         "buy_usd", "sell_usd", "shares_to_buy", "shares_to_sell",
         "price", "score", "tier", "holding_return_pct",
         "stop_loss", "trim_target", "risk_note", "position_rule",
+    ],
+    "candidate_review": [
+        "ticker", "sector", "tier", "price", "score",
+        "timing_action", "timing_score", "recommendation", "why",
     ],
     "weekly_review": [
         "week_start", "closed_trades", "wins", "losses", "win_rate",
@@ -59,6 +63,7 @@ REQUIRED_COLUMNS = {
 
 NON_EMPTY_FILES = [
     "dashboard",
+    "candidate_review",
     "performance_summary",
     "weekly_review",
     "performance_learning",
@@ -71,6 +76,9 @@ NON_EMPTY_FILES = [
 VALID_DASHBOARD_ACTIONS = {"SELL", "TRIM", "HOLD", "BUY", "BUY SMALL", "WATCH"}
 VALID_TIMING_ACTIONS = {"TIMING CONFIRMED", "TIMING WATCH", "WAIT"}
 VALID_QUALITY_SEVERITIES = {"OK", "LOW", "MEDIUM", "HIGH"}
+VALID_CANDIDATE_RECOMMENDATIONS = {
+    "PROMOTE", "KEEP CANDIDATE", "REMOVE", "ALREADY ACTIVE"
+}
 
 def read_csv(name):
     path = REQUIRED_FILES[name]
@@ -121,6 +129,21 @@ def validate_signals(df):
     if ((df["score"] < 0) | (df["score"] > 100)).any():
         raise ValueError("signals.csv has score values outside 0–100")
 
+def validate_candidate_review(df):
+    if "status" in df.columns:
+        return
+
+    bad_recommendations = (
+        set(df["recommendation"].dropna().astype(str).str.upper())
+        - VALID_CANDIDATE_RECOMMENDATIONS
+    )
+
+    if bad_recommendations:
+        raise ValueError(f"candidate_review.csv has invalid recommendations: {sorted(bad_recommendations)}")
+
+    if df["ticker"].isna().any():
+        raise ValueError("candidate_review.csv has blank ticker values")
+
 def validate_outputs():
     print("Validating output files...")
 
@@ -133,6 +156,7 @@ def validate_outputs():
         loaded[name] = df
 
     validate_dashboard(loaded["dashboard"])
+    validate_candidate_review(loaded["candidate_review"])
     validate_market_timing(loaded["market_timing"])
     validate_data_quality(loaded["data_quality_report"])
     validate_signals(loaded["signals"])
