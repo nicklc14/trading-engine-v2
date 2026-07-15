@@ -70,13 +70,21 @@ def apply_table_style(ws):
 
     for row in ws.iter_rows():
         for cell in row:
-            cell.alignment = Alignment(vertical="top", wrap_text=False)
+            cell.alignment = Alignment(
+                horizontal="left",
+                vertical="top",
+                wrap_text=False
+            )
             cell.border = Border(bottom=thin)
 
     for cell in ws[1]:
         cell.fill = PatternFill("solid", fgColor=HEADER_FILL)
         cell.font = Font(color=HEADER_FONT, bold=True)
-        cell.alignment = Alignment(horizontal="center", vertical="center", wrap_text=True)
+        cell.alignment = Alignment(
+            horizontal="center",
+            vertical="center",
+            wrap_text=True
+        )
 
     ws.freeze_panes = "A2"
     ws.auto_filter.ref = ws.dimensions
@@ -142,7 +150,11 @@ def set_column_widths(ws):
         if header_key in LONG_TEXT_COLUMNS:
             ws.column_dimensions[col_letter].width = 42
             for row in range(1, ws.max_row + 1):
-                ws.cell(row=row, column=col_idx).alignment = Alignment(vertical="top", wrap_text=True)
+                ws.cell(row=row, column=col_idx).alignment = Alignment(
+                    horizontal="left",
+                    vertical="top",
+                    wrap_text=True
+                )
         elif header_key in {"ticker", "tier", "action_required", "add_more", "timing_action", "severity"}:
             ws.column_dimensions[col_letter].width = 16
         elif header_key in CURRENCY_COLUMNS or header_key in PERCENT_COLUMNS:
@@ -155,6 +167,13 @@ def set_column_widths(ws):
                 value = ws.cell(row=row, column=col_idx).value
                 max_len = max(max_len, len("" if value is None else str(value)))
             ws.column_dimensions[col_letter].width = min(max(max_len + 2, 10), 24)
+
+    for cell in ws[1]:
+        cell.alignment = Alignment(
+            horizontal="center",
+            vertical="center",
+            wrap_text=True
+        )
 
 def style_dashboard(ws):
     set_column_widths(ws)
@@ -182,6 +201,13 @@ def style_dashboard(ws):
     for idx, header in enumerate(headers, start=1):
         if header in preferred:
             ws.column_dimensions[get_column_letter(idx)].width = preferred[header]
+
+    for cell in ws[1]:
+        cell.alignment = Alignment(
+            horizontal="center",
+            vertical="center",
+            wrap_text=True
+        )
 
 def build_excel_workbook():
     OUTPUT_DIR.mkdir(exist_ok=True)
@@ -228,7 +254,6 @@ def build_excel_workbook():
 
         wb = writer.book
 
-        # Put key sheets first.
         preferred_order = [
             "Dashboard",
             "Holdings",
@@ -268,6 +293,13 @@ def build_excel_workbook():
 
             for row in range(1, ws.max_row + 1):
                 ws.row_dimensions[row].height = 24 if row == 1 else None
+
+            for cell in ws[1]:
+                cell.alignment = Alignment(
+                    horizontal="center",
+                    vertical="center",
+                    wrap_text=True
+                )
 
     print(f"Excel workbook created: {excel_file}")
     return excel_file
