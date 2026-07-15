@@ -7,22 +7,22 @@ SIGNALS_PATH = DATA_DIR / "signals.csv"
 HOLDINGS_PATH = DATA_DIR / "holdings.csv"
 DASHBOARD_PATH = DATA_DIR / "dashboard.csv"
 
-VISIBLE_COLUMNS = [
-    "ticker",
-    "action_required",
-    "plan_why",
-    "buy_usd",
-    "sell_usd",
-    "shares_to_buy",
-    "shares_to_sell",
-    "price",
-    "score",
-    "tier",
-    "holding_return_pct",
-    "stop_loss",
-    "trim_target",
-    "risk_note",
-    "position_rule",
+OUTPUT_COLUMNS = [
+    "Ticker",
+    "Action Required",
+    "Plan / Why",
+    "Buy USD",
+    "Sell USD",
+    "Shares To Buy",
+    "Shares To Sell",
+    "Price",
+    "Score",
+    "Tier",
+    "Holding Return %",
+    "Stop Loss",
+    "Trim Target",
+    "Risk Note",
+    "Position Rule",
 ]
 
 def clean_text(x):
@@ -41,12 +41,22 @@ def action_required(row):
         return "HOLD"
     return "WATCH"
 
+def candidate_buy_usd(row):
+    action = clean_text(row.get("action")).upper()
+    blocked_by_max = "MAX" in clean_text(row.get("position_rule")).upper()
+
+    if blocked_by_max and action in ["BUY", "BUY SMALL"]:
+        return row.get("max_position_usd", 0)
+
+    return 0
+
 def plan_why(row):
     action = clean_text(row.get("action_required"))
     tier = clean_text(row.get("tier"))
     reasons = clean_text(row.get("decision_reasons"))
     warnings = clean_text(row.get("warnings"))
     exit_reason = clean_text(row.get("exit_reason"))
+    candidate = row.get("_candidate_buy_usd", 0)
 
     if action == "SELL":
         return f"Sell: {exit_reason or warnings}"
@@ -56,6 +66,8 @@ def plan_why(row):
         return f"{action}: {tier}. {reasons}"
     if action == "HOLD":
         return f"Hold. {warnings or reasons}"
+    if candidate and candidate > 0:
+        return f"Watch only — max positions reached. Candidate if slot frees: ${candidate:.2f}. {reasons or warnings}"
     return warnings or reasons or "Watch only."
 
 def build_dashboard():
@@ -72,6 +84,7 @@ def build_dashboard():
         signals["shares"] = np.nan
 
     signals["action_required"] = signals.apply(action_required, axis=1)
+    signals["_candidate_buy_usd"] = signals.apply(candidate_buy_usd, axis=1)
     signals["plan_why"] = signals.apply(plan_why, axis=1)
 
     signals["sell_usd"] = np.where(
@@ -102,24 +115,24 @@ def build_dashboard():
     )
 
     out = pd.DataFrame({
-        "ticker": working.get("ticker", ""),
-        "action_required": working["action_required"],
-        "plan_why": working["plan_why"],
-        "buy_usd": working.get("buy_amount_usd", 0),
-        "sell_usd": working["sell_usd"],
-        "shares_to_buy": working.get("shares_to_buy", 0),
-        "shares_to_sell": working["shares_to_sell"],
-        "price": working.get("price", np.nan),
-        "score": working.get("score", np.nan),
-        "tier": working.get("tier", ""),
-        "holding_return_pct": working.get("holding_return_pct", np.nan),
-        "stop_loss": working.get("stop_loss", np.nan),
-        "trim_target": working.get("trim_price", np.nan),
-        "risk_note": working["risk_note"],
-        "position_rule": working.get("position_rule", ""),
+        "Ticker": working.get("ticker", ""),
+        "Action Required": working["action_required"],
+        "Plan / Why": working["plan_why"],
+        "Buy USD": working.get("buy_amount_usd", 0),
+        "Sell USD": working["sell_usd"],
+        "Shares To Buy": working.get("shares_to_buy", 0),
+        "Shares To Sell": working["shares_to_sell"],
+        "Price": working.get("price", np.nan),
+        "Score": working.get("score", np.nan),
+        "Tier": working.get("tier", ""),
+        "Holding Return %": working.get("holding_return_pct", np.nan),
+        "Stop Loss": working.get("stop_loss", np.nan),
+        "Trim Target": working.get("trim_price", np.nan),
+        "Risk Note": working["risk_note"],
+        "Position Rule": working.get("position_rule", ""),
     })
 
-    out = out[VISIBLE_COLUMNS]
+    out = out[OUTPUT_COLUMNS]
     out.to_csv(DASHBOARD_PATH, index=False)
     return out
 
