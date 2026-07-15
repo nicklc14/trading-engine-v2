@@ -63,7 +63,6 @@ def review_priority(action, exit_action="", exit_priority="", position_rule=""):
 def get_cash_available():
     if not CASH_PATH.exists():
         return 0.0
-
     cash = pd.read_csv(CASH_PATH)
     return float(cash["cash_available_usd"].iloc[0]) if not cash.empty else 0.0
 
@@ -98,7 +97,6 @@ def score_signals():
         holdings = pd.DataFrame(columns=["ticker", "shares", "holding_return_pct", "market_value"])
 
     holdings["ticker"] = holdings["ticker"].astype(str).str.upper().str.strip()
-
     for col in ["shares", "holding_return_pct", "market_value"]:
         if col not in holdings.columns:
             holdings[col] = np.nan
@@ -123,7 +121,6 @@ def score_signals():
 
     raw_cash = get_cash_available()
     cash_available = max(raw_cash * (1 - cash_reserve_pct), 0)
-
     holdings_value = pd.to_numeric(holdings["market_value"], errors="coerce").fillna(0).sum()
     equity = raw_cash + holdings_value
 
@@ -132,7 +129,7 @@ def score_signals():
 
     df = watch.merge(market, on="ticker", how="left")
     df = df.merge(
-        holdings["ticker", "shares", "holding_return_pct"],
+        holdings[["ticker", "shares", "holding_return_pct"]],
         on="ticker",
         how="left"
     )
@@ -148,7 +145,6 @@ def score_signals():
             & (pd.to_numeric(df["shares"], errors="coerce").fillna(0) > 0)
         ).sum()
     )
-
     moonshot_open_slots = max(max_moonshot_positions - moonshot_position_count, 0)
 
     rows = []
@@ -229,8 +225,6 @@ def score_signals():
             action = "BUY"
         elif final_score >= 75:
             action = "BUY SMALL"
-
-        position_rule = ""
 
         if already_held:
             position_rule = "Already held"
@@ -346,9 +340,6 @@ def score_signals():
         buy_amount_usd = 0.0
         shares_to_buy = 0.0
 
-        buy_amount_usd = 0.0
-        shares_to_buy = 0.0
-
         can_buy = not already_held and open_slots > 0 and action in ["BUY", "BUY SMALL"]
         can_add = already_held and add_more_signal == "ADD SMALL" and exit_action not in ["SELL", "TRIM"]
 
@@ -405,6 +396,8 @@ def score_signals():
             "exit_action": exit_action,
             "exit_priority": exit_priority,
             "exit_reason": exit_reason,
+            "position_count": position_count,
+            "open_slots": open_slots,
             "position_rule": position_rule,
             "add_more_signal": add_more_signal,
             "add_more_reason": add_more_reason,
