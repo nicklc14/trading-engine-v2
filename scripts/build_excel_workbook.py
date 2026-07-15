@@ -54,6 +54,16 @@ LONG_TEXT_COLUMNS = {
     "macd_reason", "rsi_reason", "data_note", "details", "Action",
 }
 
+DISPLAY_OVERRIDES = {
+    "usd": "USD",
+    "nzd": "NZD",
+    "pnl": "P&L",
+    "rsi": "RSI",
+    "macd": "MACD",
+    "atr": "ATR",
+    "sec": "SEC",
+}
+
 def read_csv_safe(path):
     try:
         if path.exists() and path.stat().st_size > 0:
@@ -64,6 +74,23 @@ def read_csv_safe(path):
 
 def safe_sheet_name(name):
     return name[:31]
+
+def prettify_header(header):
+    parts = str(header).replace("_", " ").split()
+    pretty = []
+
+    for part in parts:
+        key = part.lower()
+        if key in DISPLAY_OVERRIDES:
+            pretty.append(DISPLAY_OVERRIDES[key])
+        else:
+            pretty.append(part.capitalize())
+
+    return " ".join(pretty)
+
+def prettify_headers(ws):
+    for cell in ws[1]:
+        cell.value = prettify_header(cell.value)
 
 def apply_table_style(ws):
     thin = Side(style="thin", color="D9EAD3")
@@ -89,10 +116,8 @@ def apply_table_style(ws):
     ws.freeze_panes = "A2"
     ws.auto_filter.ref = ws.dimensions
 
-def apply_number_formats(ws):
-    headers = [cell.value for cell in ws[1]]
-
-    for col_idx, header in enumerate(headers, start=1):
+def apply_number_formats(ws, raw_headers):
+    for col_idx, header in enumerate(raw_headers, start=1):
         header_key = str(header).strip()
 
         if header_key in CURRENCY_COLUMNS:
@@ -110,12 +135,11 @@ def apply_number_formats(ws):
             for row in range(2, ws.max_row + 1):
                 ws.cell(row=row, column=col_idx).number_format = fmt
 
-def apply_action_highlights(ws, action_header):
-    headers = [cell.value for cell in ws[1]]
-    if action_header not in headers:
+def apply_action_highlights(ws, raw_headers, action_header):
+    if action_header not in raw_headers:
         return
 
-    action_col = headers.index(action_header) + 1
+    action_col = raw_headers.index(action_header) + 1
 
     for row in ws.iter_rows(min_row=2):
         action = str(row[action_col - 1].value).upper()
@@ -125,12 +149,11 @@ def apply_action_highlights(ws, action_header):
             for cell in row:
                 cell.fill = PatternFill("solid", fgColor=fill_color)
 
-def apply_quality_highlights(ws):
-    headers = [cell.value for cell in ws[1]]
-    if "severity" not in headers:
+def apply_quality_highlights(ws, raw_headers):
+    if "severity" not in raw_headers:
         return
 
-    severity_col = headers.index("severity") + 1
+    severity_col = raw_headers.index("severity") + 1
 
     for row in ws.iter_rows(min_row=2):
         severity = str(row[severity_col - 1].value).upper()
@@ -140,10 +163,8 @@ def apply_quality_highlights(ws):
             for cell in row:
                 cell.fill = PatternFill("solid", fgColor=fill_color)
 
-def set_column_widths(ws):
-    headers = [cell.value for cell in ws[1]]
-
-    for col_idx, header in enumerate(headers, start=1):
+def set_column_widths(ws, raw_headers):
+    for col_idx, header in enumerate(raw_headers, start=1):
         header_key = str(header).strip()
         col_letter = get_column_letter(col_idx)
 
@@ -162,7 +183,7 @@ def set_column_widths(ws):
         elif header_key in {"date", "week_start", "sell_date", "first_buy_date", "as_of", "fetched_at_utc", "market_data_date"}:
             ws.column_dimensions[col_letter].width = 18
         else:
-            max_len = len(header_key)
+            max_len = len(prettify_header(header_key))
             for row in range(2, min(ws.max_row, 60) + 1):
                 value = ws.cell(row=row, column=col_idx).value
                 max_len = max(max_len, len("" if value is None else str(value)))
@@ -175,8 +196,8 @@ def set_column_widths(ws):
             wrap_text=True
         )
 
-def style_dashboard(ws):
-    set_column_widths(ws)
+def style_dashboard(ws, raw_headers):
+    set_column_widths(ws, raw_headers)
 
     preferred = {
         "ticker": 12,
@@ -197,8 +218,7 @@ def style_dashboard(ws):
         "position_rule": 28,
     }
 
-    headers = [cell.value for cell in ws[1]]
-    for idx, header in enumerate(headers, start=1):
+    for idx, header in enumerate(raw_headers, start=1):
         if header in preferred:
             ws.column_dimensions[get_column_letter(idx)].width = preferred[header]
 
@@ -227,6 +247,7 @@ def build_excel_workbook():
     }
 
     excel_file = OUTPUT_DIR / "trading_summary.xlsx"
+    raw_headers_by_sheet = {}
 
     with pd.ExcelWriter(excel_file, engine="openpyxl") as writer:
         for sheet_name, path in files.items():
@@ -235,7 +256,9 @@ def build_excel_workbook():
             if df.empty:
                 df = pd.DataFrame([{"status": "No data available yet"}])
 
-            df.to_excel(writer, sheet_name=safe_sheet_name(sheet_name), index=False)
+            safe_name = safe_sheet_name(sheet_name)
+            raw_headers_by_sheet[safe_name] = list(df.columns)
+            df.to_excel(writer, sheet_name=safe_name, index=False)
 
         instructions = pd.DataFrame([
             {"Step": 1, "Action": "Open Dashboard first. Review from top to bottom."},
@@ -250,6 +273,7 @@ def build_excel_workbook():
             {"Step": 10, "Action": "Run GitHub workflow, then open the generated workbook."},
         ])
 
+        raw_headers_by_sheet["How To Use"] = list(instructions.columns)
         instructions.to_excel(writer, sheet_name="How To Use", index=False)
 
         wb = writer.book
@@ -274,22 +298,26 @@ def build_excel_workbook():
         )
 
         for ws in wb.worksheets:
+            raw_headers = raw_headers_by_sheet.get(ws.title, [cell.value for cell in ws[1]])
+
             apply_table_style(ws)
-            apply_number_formats(ws)
-            set_column_widths(ws)
+            apply_number_formats(ws, raw_headers)
+            set_column_widths(ws, raw_headers)
 
             if ws.title == "Dashboard":
-                apply_action_highlights(ws, "action_required")
-                style_dashboard(ws)
+                apply_action_highlights(ws, raw_headers, "action_required")
+                style_dashboard(ws, raw_headers)
 
             if ws.title == "Signals Full":
-                apply_action_highlights(ws, "action")
+                apply_action_highlights(ws, raw_headers, "action")
 
             if ws.title == "Market Timing":
-                apply_action_highlights(ws, "timing_action")
+                apply_action_highlights(ws, raw_headers, "timing_action")
 
             if ws.title == "Data Quality":
-                apply_quality_highlights(ws)
+                apply_quality_highlights(ws, raw_headers)
+
+            prettify_headers(ws)
 
             for row in range(1, ws.max_row + 1):
                 ws.row_dimensions[row].height = 24 if row == 1 else None
