@@ -1,0 +1,20 @@
+section,step,task,what_to_do,details
+Daily workflow,1,Open Dashboard,Review Dashboard from top to bottom,SELL/TRIM rows first then HOLD/WATCH/BUY rows.
+Daily workflow,2,Check action,Read Action Required,Only act on rows that are actionable and make sense.
+Daily workflow,3,Read plan,Read Plan / Why,This explains the reason for the action.
+Daily workflow,4,Check risk,Review Stop Loss Trim Target and Risk Note,Do not place trades without understanding the risk.
+Trades,1,Log a buy,Add a Buy row to data/trades.csv,Use actual Sharesies price USD amount fee and notes.
+Trades,2,Log a full sell,Use shares=ALL in data/trades.csv,The script calculates the exact remaining shares for that holding key.
+Trades,3,Log a partial sell,Enter exact shares sold manually,Use Sharesies net USD received and transaction fee.
+Trades,4,Use holding key,Use a new holding_key for each new buy,Reuse the same holding_key for sells/trims of that buy.
+Deposits,1,Log deposit,Add a row to data/deposits.csv,Use actual NZD deposited and actual USD credited.
+Watchlist,1,Add ticker,Add row to data/watchlist.csv,Set ticker sector tier enabled notes.
+Watchlist,2,Disable ticker,Change enabled to FALSE,Disable instead of deleting if you may want it later.
+Watchlist,3,Choose tier,Use QUALITY MOMENTUM or MOONSHOT,Use QUALITY for stable names MOMENTUM for stronger trends and MOONSHOT for speculative high-risk ideas.
+Refresh,1,Run workflow,Run GitHub Actions Trading Engine V2,Wait for a successful green run.
+Refresh,2,Refresh Excel,Use Data > Refresh All,Excel only displays GitHub CSV outputs.
+Review,1,Check performance,Open Performance Summary,Focus on equity P&L and account return.
+Review,2,Check weekly results,Open Weekly Review,Use win rate and realized P&L to judge whether the strategy works.
+Rules,1,Do not average down,Only add to winners,System blocks or warns against adding to losers.
+Rules,2,Respect max positions,If max positions is reached new buys become WATCH,Free a slot before opening new positions.
+Rules,3,Excel is viewer only,Do not add decision formulas in Excel,All logic should stay in GitHub.
