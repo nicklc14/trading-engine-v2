@@ -9,6 +9,7 @@ WATCHLIST_PATH = DATA_DIR / "watchlist.csv"
 CASH_PATH = DATA_DIR / "cash.csv"
 HOLDINGS_PATH = DATA_DIR / "holdings.csv"
 CONFIG_PATH = DATA_DIR / "config.csv"
+SEC_EVENTS_PATH = DATA_DIR / "sec_events.csv"
 
 def clamp(x, lo=0, hi=100):
     return max(lo, min(hi, x))
@@ -98,9 +99,24 @@ def score_signals():
 
     holdings["ticker"] = holdings["ticker"].astype(str).str.upper().str.strip()
 
-    for col in ["shares", "holding_return_pct", "market_value"]:
+        for col in ["shares", "holding_return_pct", "market_value"]:
         if col not in holdings.columns:
             holdings[col] = np.nan
+
+    sec_events = pd.read_csv(SEC_EVENTS_PATH) if SEC_EVENTS_PATH.exists() else pd.DataFrame()
+    if not sec_events.empty:
+        sec_events["ticker"] = sec_events["ticker"].astype(str).str.upper().str.strip()
+    else:
+        sec_events = pd.DataFrame(columns=[
+            "ticker",
+            "sec_event_flag",
+            "sec_event_type",
+            "sec_event_date",
+            "sec_form",
+            "sec_severity",
+            "sec_score_adjustment",
+            "sec_event_note",
+        ])
 
     position_count = int((holdings["shares"].fillna(0) > 0).sum())
     open_slots = max(max_positions - position_count, 0)
@@ -116,7 +132,12 @@ def score_signals():
 
     df = watch.merge(market, on="ticker", how="left")
     df = df.merge(
-        holdings[["ticker", "shares", "holding_return_pct"]],
+        holdings["ticker", "shares", "holding_return_pct"],
+        on="ticker",
+        how="left"
+    )
+    df = df.merge(
+        sec_events,
         on="ticker",
         how="left"
     )
@@ -178,6 +199,12 @@ def score_signals():
 
         if tier == "MOONSHOT":
             final_score = clamp(final_score + moonshot_score_boost)
+
+        sec_score_adjustment = pd.to_numeric(row.get("sec_score_adjustment", 0), errors="coerce")
+        if pd.isna(sec_score_adjustment):
+            sec_score_adjustment = 0
+
+        final_score = clamp(final_score + sec_score_adjustment)
 
         if tier == "MOONSHOT":
             stop_loss = (
@@ -302,6 +329,23 @@ def score_signals():
         if tier == "MOONSHOT" and pd.notna(atr_pct) and atr_pct < 0.08:
             warnings.append("Moonshot volatility may be too low")
 
+        sec_event_flag = str(row.get("sec_event_flag", "NONE")).upper()
+        sec_event_type = str(row.get("sec_event_type", "")).strip()
+        sec_event_note = str(row.get("sec_event_note", "")).strip()
+        sec_severity = str(row.get("sec_severity", "")).upper()
+
+        if sec_event_flag == "YES":
+            if sec_event_type:
+                reasons.append(f"SEC: {sec_event_type}")
+            if sec_event_note:
+                warnings.append(sec_event_note)
+
+        if sec_severity == "HIGH":
+            warnings.append("SEC high-risk filing")
+
+        buy_amount_usd = 0.0
+        shares_to_buy = 0.0
+
         buy_amount_usd = 0.0
         shares_to_buy = 0.0
 
@@ -361,13 +405,18 @@ def score_signals():
             "exit_action": exit_action,
             "exit_priority": exit_priority,
             "exit_reason": exit_reason,
-            "position_count": position_count,
-            "open_slots": open_slots,
             "position_rule": position_rule,
             "add_more_signal": add_more_signal,
             "add_more_reason": add_more_reason,
             "decision_reasons": "; ".join(reasons),
             "warnings": "; ".join(warnings),
+            "sec_event_flag": row.get("sec_event_flag", "NONE"),
+            "sec_event_type": row.get("sec_event_type", ""),
+            "sec_event_date": row.get("sec_event_date", ""),
+            "sec_form": row.get("sec_form", ""),
+            "sec_severity": row.get("sec_severity", ""),
+            "sec_score_adjustment": sec_score_adjustment,
+            "sec_event_note": row.get("sec_event_note", ""),
         })
 
     out = pd.DataFrame(rows).sort_values(
