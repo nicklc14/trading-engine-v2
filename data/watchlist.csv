@@ -1,39 +1,39 @@
 ticker,sector,tier,enabled,notes,date_added,candidate_reason,last_reviewed,review_count,status_reason
-ALAB,Semiconductors,MOMENTUM,True,AI/semi momentum,2026-07-16,AI/semi momentum
-AMD,Semiconductors,QUALITY,True,Large-cap semiconductor,2026-07-16,Large-cap semiconductor
-AMZN,Internet/E-Commerce,QUALITY,True,Large-cap quality,2026-07-16,Large-cap quality
-ANET,Networking,MOMENTUM,True,Strong trend momentum,2026-07-16,Strong trend momentum
-ARM,Semiconductors,MOMENTUM,True,High-growth semi momentum,2026-07-16,High-growth semi momentum
-AVGO,Semiconductors,QUALITY,True,Large-cap semiconductor,2026-07-16,Large-cap semiconductor
-BFLY,Medical Devices,MOONSHOT,True,Speculative medical device,2026-07-16,Speculative medical device
-BLZE,Gaming/Digital Media,MOONSHOT,True,High-risk momentum/moonshot,2026-07-16,High-risk momentum/moonshot
-CBOE,Financial Services,QUALITY,True,Established financial services,2026-07-16,Established financial services
-CELC,Biotech,MOONSHOT,True,Biotech catalyst risk,2026-07-16,Biotech catalyst risk
-CRDO,Semiconductors,MOMENTUM,True,High-growth semiconductor momentum,2026-07-16,High-growth semiconductor momentum
-GOOGL,Internet/Software,QUALITY,True,Large-cap quality,2026-07-16,Large-cap quality
-INTC,Semiconductors,QUALITY,True,Large-cap turnaround,2026-07-16,Large-cap turnaround
-LLY,Healthcare/Pharma,QUALITY,True,Large-cap pharma,2026-07-16,Large-cap pharma
-MRVL,Semiconductors,QUALITY,True,Established semiconductor,2026-07-16,Established semiconductor
-MU,Semiconductors,MOMENTUM,True,Cyclical semi momentum,2026-07-16,Cyclical semi momentum
-NBIS,AI Infrastructure,MOONSHOT,True,Speculative AI infrastructure,2026-07-16,Speculative AI infrastructure
-NVDA,Semiconductors,QUALITY,True,Large-cap AI leader,2026-07-16,Large-cap AI leader
-PUBM,AdTech,MOMENTUM,True,Small/mid-cap adtech momentum,2026-07-16,Small/mid-cap adtech momentum
-RKLB,Space,MOONSHOT,True,Speculative space,2026-07-16,Speculative space
-SOFI,Fintech,MOMENTUM,True,Fintech momentum,2026-07-16,Fintech momentum
-STTK,Industrials,MOONSHOT,True,Speculative small-cap,2026-07-16,Speculative small-cap
-TSLA,Electric Vehicles,QUALITY,True,Large-cap volatile quality,2026-07-16,Large-cap volatile quality
-TSM,Semiconductors,QUALITY,True,Large-cap semiconductor,2026-07-16,Large-cap semiconductor
-VRT,Data Centers,QUALITY,True,Data center infrastructure,2026-07-16,Data center infrastructure
-STX,Data Storage,QUALITY,True,Established data storage,2026-07-16,Established data storage
-DDOG,Cloud Software,QUALITY,True,Established SaaS/cloud,2026-07-16,Established SaaS/cloud
-SOUN,AI Software,MOONSHOT,True,Speculative AI software,2026-07-16,Speculative AI software
-CLS,Technology,MOMENTUM,True,AI infrastructure supplier,2026-07-16,AI server demand
-POET,Technology,MOONSHOT,True,Optical interconnects,2026-07-16,AI networking bet
-HPE,Technology,MOMENTUM,True,Enterprise AI infrastructure,2026-07-16,AI server demand
-RXRX,Healthcare,MOONSHOT,True,AI drug discovery,2026-07-16,AI biotech upside
-SYM,Robotics Automation,MOONSHOT,True,Warehouse automation/robotics,2026-07-16,Robotics automation upside
-SDGR,AI Drug Discovery,MOONSHOT,True,AI biotech candidate,2026-07-16,AI drug discovery upside
-ABCL,AI Biotech,MOONSHOT,True,AI antibody/drug discovery exposure,2026-07-16,AI biotech moonshot
-TEM,AI Healthcare,MOONSHOT,True,Aggressive AI health/data platform,2026-07-16,AI healthcare data upside
-SERV,Industrials,MOONSHOT,True,Autonomous robots,2026-07-16,Warehouse automation
-BKSY,Satellite Analytics,MOONSHOT,True,Small-cap space/data play,2026-07-16,Satellite data/analytics upside
+ALAB,Semiconductors,MOMENTUM,True,AI/semi momentum,2026-07-16,AI/semi momentum,2026-07-16,1,"Kept active: score 50, timing 60"
+AMD,Semiconductors,QUALITY,True,Large-cap semiconductor,2026-07-16,Large-cap semiconductor,2026-07-16,1,"Kept active: score 75, timing 60"
+AMZN,Internet/E-Commerce,QUALITY,True,Large-cap quality,2026-07-16,Large-cap quality,2026-07-16,1,"Kept active: score 100, timing 60"
+ANET,Networking,MOMENTUM,True,Strong trend momentum,2026-07-16,Strong trend momentum,2026-07-16,1,"Kept active: score 100, timing 70"
+ARM,Semiconductors,MOMENTUM,True,High-growth semi momentum,2026-07-16,High-growth semi momentum,2026-07-16,1,"Kept active: score 50, timing 50"
+AVGO,Semiconductors,QUALITY,True,Large-cap semiconductor,2026-07-16,Large-cap semiconductor,2026-07-16,1,"Kept active: score 100, timing 70"
+BFLY,Medical Devices,MOONSHOT,True,Speculative medical device,2026-07-16,Speculative medical device,2026-07-16,1,"Kept active: score 95, timing 75"
+BLZE,Gaming/Digital Media,MOONSHOT,True,High-risk momentum/moonshot,2026-07-16,High-risk momentum/moonshot,2026-07-16,1,"Kept active: score 75, timing 60"
+CBOE,Financial Services,QUALITY,True,Established financial services,2026-07-16,Established financial services,2026-07-16,1,"Kept active: score 100, timing 70"
+CELC,Biotech,MOONSHOT,True,Biotech catalyst risk,2026-07-16,Biotech catalyst risk,2026-07-16,1,"Kept active: score 120, timing 85"
+CRDO,Semiconductors,MOMENTUM,True,High-growth semiconductor momentum,2026-07-16,High-growth semiconductor momentum,2026-07-16,1,"Kept active: score 50, timing 50"
+GOOGL,Internet/Software,QUALITY,True,Large-cap quality,2026-07-16,Large-cap quality,2026-07-16,1,"Kept active: score 100, timing 70"
+INTC,Semiconductors,QUALITY,True,Large-cap turnaround,2026-07-16,Large-cap turnaround,2026-07-16,1,"Kept active: score 50, timing 50"
+LLY,Healthcare/Pharma,QUALITY,True,Large-cap pharma,2026-07-16,Large-cap pharma,2026-07-16,1,"Kept active: score 75, timing 60"
+MRVL,Semiconductors,QUALITY,True,Established semiconductor,2026-07-16,Established semiconductor,2026-07-16,1,"Kept active: score 50, timing 50"
+MU,Semiconductors,MOMENTUM,True,Cyclical semi momentum,2026-07-16,Cyclical semi momentum,2026-07-16,1,"Kept active: score 50, timing 60"
+NBIS,AI Infrastructure,MOONSHOT,True,Speculative AI infrastructure,2026-07-16,Speculative AI infrastructure,2026-07-16,1,"Kept active: score 50, timing 50"
+NVDA,Semiconductors,QUALITY,True,Large-cap AI leader,2026-07-16,Large-cap AI leader,2026-07-16,1,"Kept active: score 100, timing 70"
+PUBM,AdTech,MOMENTUM,True,Small/mid-cap adtech momentum,2026-07-16,Small/mid-cap adtech momentum,2026-07-16,1,"Kept active: score 100, timing 60"
+RKLB,Space,MOONSHOT,True,Speculative space,2026-07-16,Speculative space,2026-07-16,1,"Kept active: score 50, timing 60"
+SOFI,Fintech,MOMENTUM,True,Fintech momentum,2026-07-16,Fintech momentum,2026-07-16,1,"Kept active: score 75, timing 60"
+STTK,Industrials,MOONSHOT,True,Speculative small-cap,2026-07-16,Speculative small-cap,2026-07-16,1,"Kept active: score 120, timing 85"
+TSLA,Electric Vehicles,QUALITY,True,Large-cap volatile quality,2026-07-16,Large-cap volatile quality,2026-07-16,1,"Kept active: score 75, timing 60"
+TSM,Semiconductors,QUALITY,True,Large-cap semiconductor,2026-07-16,Large-cap semiconductor,2026-07-16,1,"Kept active: score 50, timing 60"
+VRT,Data Centers,QUALITY,True,Data center infrastructure,2026-07-16,Data center infrastructure,2026-07-16,1,"Kept active: score 75, timing 60"
+STX,Data Storage,QUALITY,True,Established data storage,2026-07-16,Established data storage,2026-07-16,1,"Kept active: score 50, timing 50"
+DDOG,Cloud Software,QUALITY,True,Established SaaS/cloud,2026-07-16,Established SaaS/cloud,2026-07-16,1,"Kept active: score 100, timing 60"
+SOUN,AI Software,MOONSHOT,True,Speculative AI software,2026-07-16,Speculative AI software,2026-07-16,1,"Kept active: score 100, timing 70"
+CLS,Technology,MOMENTUM,True,AI infrastructure supplier,2026-07-16,AI server demand,2026-07-16,1,"Kept active: score 50, timing 60"
+POET,Technology,MOONSHOT,True,Optical interconnects,2026-07-16,AI networking bet,2026-07-16,1,"Kept active: score 50, timing 50"
+HPE,Technology,MOMENTUM,True,Enterprise AI infrastructure,2026-07-16,AI server demand,2026-07-16,1,"Kept active: score 75, timing 60"
+RXRX,Healthcare,MOONSHOT,True,AI drug discovery,2026-07-16,AI biotech upside,2026-07-16,1,"Kept active: score 75, timing 60"
+SYM,Robotics Automation,MOONSHOT,True,Warehouse automation/robotics,2026-07-16,Robotics automation upside,2026-07-16,1,"Kept active: score 100, timing 70"
+SDGR,AI Drug Discovery,MOONSHOT,True,AI biotech candidate,2026-07-16,AI drug discovery upside,2026-07-16,1,"Kept active: score 75, timing 60"
+ABCL,AI Biotech,MOONSHOT,True,AI antibody/drug discovery exposure,2026-07-16,AI biotech moonshot,2026-07-16,1,"Kept active: score 75, timing 60"
+TEM,AI Healthcare,MOONSHOT,True,Aggressive AI health/data platform,2026-07-16,AI healthcare data upside,2026-07-16,1,"Kept active: score 75, timing 60"
+SERV,Industrials,MOONSHOT,True,Autonomous robots,2026-07-16,Warehouse automation,2026-07-16,1,"Kept active: score 75, timing 70"
+BKSY,Satellite Analytics,MOONSHOT,True,Small-cap space/data play,2026-07-16,Satellite data/analytics upside,2026-07-16,1,"Kept active: score 100, timing 70"
