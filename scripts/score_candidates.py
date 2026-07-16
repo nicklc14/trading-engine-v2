@@ -6,7 +6,7 @@ from datetime import date
 DATA_DIR = Path("data")
 
 WATCHLIST_PATH = DATA_DIR / "watchlist.csv"
-CANDIDATES_PATH = DATA_DIR / "candidates_watchlist.csv"
+CANDIDATES_PATH = DATA_DIR / "candidate_watchlist.csv"
 MARKET_PATH = DATA_DIR / "market_data.csv"
 HOLDINGS_PATH = DATA_DIR / "holdings.csv"
 CANDIDATE_REVIEW_PATH = DATA_DIR / "candidate_review.csv"
