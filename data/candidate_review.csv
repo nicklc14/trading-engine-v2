@@ -1,27 +1,30 @@
 ticker,source_list,sector,tier,price,score,trend_score,momentum_score,accelerator_score,timing_action,timing_score,recommendation,why,notes,date_added,candidate_reason
-ASTS,CANDIDATE,Space/Telecom,MOONSHOT,,22,0,0,50,WAIT,50,DISABLED,Candidate disabled,Speculative space/telecom,2026-07-15,Auto-demoted from active watchlist
-IONQ,CANDIDATE,Quantum Computing,MOONSHOT,,22,0,0,50,WAIT,50,DISABLED,Candidate disabled,Speculative quantum computing,2026-07-15,Auto-demoted from active watchlist
-KYTX,CANDIDATE,Biotech,MOONSHOT,,22,0,0,50,WAIT,50,DISABLED,Candidate disabled,Biotech catalyst risk,2026-07-15,Auto-demoted from active watchlist
-LUNR,CANDIDATE,Space,MOONSHOT,,22,0,0,50,WAIT,50,DISABLED,Candidate disabled,Speculative space,2026-07-15,Auto-demoted from active watchlist
-CCJ,CANDIDATE,Uranium/Nuclear Energy,QUALITY,,22,0,0,50,WAIT,50,DISABLED,Candidate disabled,Uranium quality/cyclical,2026-07-15,Auto-removed from active watchlist
-PL,CANDIDATE,Space,MOONSHOT,,22,0,0,50,WAIT,50,DISABLED,Candidate disabled,Speculative space,2026-07-15,Auto-demoted from active watchlist
-SMCI,CANDIDATE,AI Infrastructure,MOONSHOT,,22,0,0,50,WAIT,50,DISABLED,Candidate disabled,High-risk AI infrastructure,2026-07-15,Auto-demoted from active watchlist
-SMR,CANDIDATE,Nuclear Energy,MOONSHOT,,22,0,0,50,WAIT,50,DISABLED,Candidate disabled,Speculative nuclear,2026-07-15,Auto-demoted from active watchlist
-OKLO,CANDIDATE,Nuclear Energy,MOONSHOT,,22,0,0,50,WAIT,50,DISABLED,Candidate disabled,Speculative nuclear,2026-07-15,Auto-demoted from active watchlist
-JOBY,CANDIDATE,eVTOL/Aviation,MOONSHOT,,22,0,0,50,WAIT,50,DISABLED,Candidate disabled,Speculative aviation,2026-07-15,Auto-demoted from active watchlist
-PLTR,CANDIDATE,Technology,MOMENTUM,,22,0,0,50,WAIT,50,DISABLED,Candidate disabled,AI software platform,2026-07-16,Strong AI demand
-CLS,CANDIDATE,Technology,MOMENTUM,334.7699890136719,54,40,40,50,WAIT,50,KEEP CANDIDATE,Monitor for improvement,AI infrastructure supplier,2026-07-16,AI server demand
-POET,CANDIDATE,Technology,MOONSHOT,8.270000457763672,55,40,75,50,WAIT,25,KEEP CANDIDATE,Monitor for improvement,Optical interconnects,2026-07-16,AI networking bet
-HPE,CANDIDATE,Technology,MOMENTUM,47.38999938964844,75,80,75,50,WAIT,35,KEEP CANDIDATE,Interesting but not ready,Enterprise AI infrastructure,2026-07-16,AI server demand
-RXRX,CANDIDATE,Healthcare,MOONSHOT,3.309999942779541,40,0,25,50,WAIT,50,KEEP CANDIDATE,Monitor for improvement,AI drug discovery,2026-07-16,AI biotech upside
-SERV,CANDIDATE,Industrials,MOONSHOT,,22,0,0,50,WAIT,50,DISABLED,Candidate disabled,Autonomous robots,2026-07-16,Warehouse automation
-RGTI,CANDIDATE,Quantum Computing,MOONSHOT,15.25,22,0,0,50,WAIT,10,REMOVE,Low score and weak setup,Speculative quantum computing,2026-07-16,Higher-risk quantum peer to IONQ
-QBTS,CANDIDATE,Quantum Computing,MOONSHOT,18.270000457763672,22,0,0,50,WAIT,10,REMOVE,Low score and weak setup,Speculative quantum hardware/software,2026-07-16,Quantum moonshot candidate
-RDW,CANDIDATE,Space Infrastructure,MOONSHOT,9.359999656677246,22,0,0,50,WAIT,25,REMOVE,Low score and weak setup,Space systems exposure,2026-07-16,Space infrastructure moonshot
-BKSY,CANDIDATE,Satellite Analytics,MOONSHOT,24.299999237060547,39,0,0,75,WAIT,55,REMOVE,Low score and weak setup,Small-cap space/data play,2026-07-16,Satellite data/analytics upside
-IREN,CANDIDATE,AI Data Centers,MOMENTUM,38.27999877929688,22,0,0,50,WAIT,25,REMOVE,Low score and weak setup,AI infrastructure/power theme,2026-07-16,AI data center momentum
-APLD,CANDIDATE,AI Cloud/Data Centers,MOMENTUM,29.030000686645508,22,0,0,50,WAIT,25,REMOVE,Low score and weak setup,Aggressive AI infrastructure candidate,2026-07-16,AI cloud infrastructure upside
-SYM,CANDIDATE,Robotics Automation,MOONSHOT,42.63999938964844,46,0,25,75,WAIT,55,KEEP CANDIDATE,Monitor for improvement,Warehouse automation/robotics,2026-07-16,Robotics automation upside
-SDGR,CANDIDATE,AI Drug Discovery,MOONSHOT,16.270000457763672,70,80,60,50,WAIT,35,KEEP CANDIDATE,Interesting but not ready,AI biotech candidate,2026-07-16,AI drug discovery upside
-ABCL,CANDIDATE,AI Biotech,MOONSHOT,6.739999771118164,82,80,100,50,WAIT,35,KEEP CANDIDATE,Interesting but not ready,AI antibody/drug discovery exposure,2026-07-16,AI biotech moonshot
-TEM,CANDIDATE,AI Healthcare,MOONSHOT,57.25,60,40,60,50,WAIT,35,KEEP CANDIDATE,Monitor for improvement,Aggressive AI health/data platform,2026-07-16,AI healthcare data upside
+STTK,CANDIDATE,Industrials,MOONSHOT,6.769999980926514,120,25,25,70,TIMING CONFIRMED,100,KEEP CANDIDATE,Promoted to active watchlist — score and timing meet threshold,Speculative small-cap,2026-07-16,Speculative small-cap
+CELC,CANDIDATE,Biotech,MOONSHOT,91.51000213623048,120,25,25,70,TIMING WATCH,70,KEEP CANDIDATE,Promoted to active watchlist — score and timing meet threshold,Biotech catalyst risk,2026-07-16,Biotech catalyst risk
+ANET,CANDIDATE,Networking,MOMENTUM,171.9199981689453,100,25,25,50,TIMING WATCH,75,KEEP CANDIDATE,Promoted to active watchlist — score and timing meet threshold,Strong trend momentum,2026-07-16,Strong trend momentum
+GOOGL,CANDIDATE,Internet/Software,QUALITY,370.9200134277344,100,25,25,50,TIMING WATCH,75,KEEP CANDIDATE,Promoted to active watchlist — score and timing meet threshold,Large-cap quality,2026-07-16,Large-cap quality
+NVDA,CANDIDATE,Semiconductors,QUALITY,212.5,100,25,25,50,TIMING WATCH,75,KEEP CANDIDATE,Promoted to active watchlist — score and timing meet threshold,Large-cap AI leader,2026-07-16,Large-cap AI leader
+SOUN,CANDIDATE,AI Software,MOONSHOT,6.5,100,25,25,50,TIMING WATCH,75,KEEP CANDIDATE,Promoted to active watchlist — score and timing meet threshold,Speculative AI software,2026-07-16,Speculative AI software
+BFLY,CANDIDATE,Medical Devices,MOONSHOT,7.300000190734863,95,0,25,70,TIMING WATCH,70,KEEP CANDIDATE,Promoted to active watchlist — score and timing meet threshold,Speculative medical device,2026-07-16,Speculative medical device
+AMZN,CANDIDATE,Internet/E-Commerce,QUALITY,254.9600067138672,100,25,25,50,WAIT,65,KEEP CANDIDATE,Monitor for improvement,Large-cap quality,2026-07-16,Large-cap quality
+AVGO,CANDIDATE,Semiconductors,QUALITY,394.2799987792969,100,25,25,50,WAIT,60,KEEP CANDIDATE,Monitor for improvement,Large-cap semiconductor,2026-07-16,Large-cap semiconductor
+CBOE,CANDIDATE,Financial Services,QUALITY,277.1099853515625,100,25,25,50,WAIT,60,KEEP CANDIDATE,Monitor for improvement,Established financial services,2026-07-16,Established financial services
+DDOG,CANDIDATE,Cloud Software,QUALITY,264.4599914550781,100,25,25,50,WAIT,50,KEEP CANDIDATE,Monitor for improvement,Established SaaS/cloud,2026-07-16,Established SaaS/cloud
+PUBM,CANDIDATE,AdTech,MOMENTUM,13.800000190734863,100,25,25,50,WAIT,50,KEEP CANDIDATE,Monitor for improvement,Small/mid-cap adtech momentum,2026-07-16,Small/mid-cap adtech momentum
+AMD,CANDIDATE,Semiconductors,QUALITY,529.1400146484375,75,0,25,50,WAIT,55,KEEP CANDIDATE,Monitor for improvement,Large-cap semiconductor,2026-07-16,Large-cap semiconductor
+LLY,CANDIDATE,Healthcare/Pharma,QUALITY,1156.6300048828125,75,0,25,50,WAIT,55,KEEP CANDIDATE,Monitor for improvement,Large-cap pharma,2026-07-16,Large-cap pharma
+SOFI,CANDIDATE,Fintech,MOMENTUM,17.8700008392334,75,0,25,50,WAIT,55,KEEP CANDIDATE,Monitor for improvement,Fintech momentum,2026-07-16,Fintech momentum
+BLZE,CANDIDATE,Gaming/Digital Media,MOONSHOT,14.979999542236328,75,0,25,50,WAIT,40,KEEP CANDIDATE,Monitor for improvement,High-risk momentum/moonshot,2026-07-16,High-risk momentum/moonshot
+TSLA,CANDIDATE,Electric Vehicles,QUALITY,394.4599914550781,75,0,25,50,WAIT,40,KEEP CANDIDATE,Monitor for improvement,Large-cap volatile quality,2026-07-16,Large-cap volatile quality
+VRT,CANDIDATE,Data Centers,QUALITY,304.57000732421875,75,0,25,50,WAIT,40,KEEP CANDIDATE,Monitor for improvement,Data center infrastructure,2026-07-16,Data center infrastructure
+MU,CANDIDATE,Semiconductors,MOMENTUM,904.280029296875,50,0,0,50,WAIT,55,KEEP CANDIDATE,Monitor for improvement,Cyclical semi momentum,2026-07-16,Cyclical semi momentum
+TSM,CANDIDATE,Semiconductors,QUALITY,419.4800109863281,50,0,0,50,WAIT,55,KEEP CANDIDATE,Monitor for improvement,Large-cap semiconductor,2026-07-16,Large-cap semiconductor
+NBIS,CANDIDATE,AI Infrastructure,MOONSHOT,199.50999450683597,50,0,0,50,WAIT,45,KEEP CANDIDATE,Monitor for improvement,Speculative AI infrastructure,2026-07-16,Speculative AI infrastructure
+STX,CANDIDATE,Data Storage,QUALITY,828.2999877929688,50,0,0,50,WAIT,45,KEEP CANDIDATE,Monitor for improvement,Established data storage,2026-07-16,Established data storage
+ALAB,CANDIDATE,Semiconductors,MOMENTUM,350.6199951171875,50,0,0,50,WAIT,40,KEEP CANDIDATE,Monitor for improvement,AI/semi momentum,2026-07-16,AI/semi momentum
+RKLB,CANDIDATE,Space,MOONSHOT,76.19999694824219,50,0,0,50,WAIT,40,KEEP CANDIDATE,Monitor for improvement,Speculative space,2026-07-16,Speculative space
+CRDO,CANDIDATE,Semiconductors,MOMENTUM,226.7400054931641,50,0,0,50,WAIT,30,KEEP CANDIDATE,Monitor for improvement,High-growth semiconductor momentum,2026-07-16,High-growth semiconductor momentum
+INTC,CANDIDATE,Semiconductors,QUALITY,102.98999786376952,50,0,0,50,WAIT,30,KEEP CANDIDATE,Monitor for improvement,Large-cap turnaround,2026-07-16,Large-cap turnaround
+MRVL,CANDIDATE,Semiconductors,QUALITY,206.25999450683597,50,0,0,50,WAIT,30,KEEP CANDIDATE,Monitor for improvement,Established semiconductor,2026-07-16,Established semiconductor
+ARM,CANDIDATE,Semiconductors,MOMENTUM,277.010009765625,50,0,0,50,WAIT,15,KEEP CANDIDATE,Monitor for improvement,High-growth semi momentum,2026-07-16,High-growth semi momentum
+SKHY,CANDIDATE,High Yield ETF,QUALITY,,22,0,0,50,WAIT,50,DISABLED,Candidate disabled,Disabled due to missing yfinance indicator data,2026-07-16,Disabled due to missing yfinance indicator data

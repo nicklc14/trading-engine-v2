@@ -1,30 +1,30 @@
-ticker,sector,tier,enabled,notes
-ALAB,Semiconductors,MOMENTUM,True,AI/semi momentum
-AMD,Semiconductors,QUALITY,True,Large-cap semiconductor
-AMZN,Internet/E-Commerce,QUALITY,True,Large-cap quality
-ANET,Networking,MOMENTUM,True,Strong trend momentum
-ARM,Semiconductors,MOMENTUM,True,High-growth semi momentum
-AVGO,Semiconductors,QUALITY,True,Large-cap semiconductor
-BFLY,Medical Devices,MOONSHOT,True,Speculative medical device
-BLZE,Gaming/Digital Media,MOONSHOT,True,High-risk momentum/moonshot
-CBOE,Financial Services,QUALITY,True,Established financial services
-CELC,Biotech,MOONSHOT,True,Biotech catalyst risk
-CRDO,Semiconductors,MOMENTUM,True,High-growth semiconductor momentum
-GOOGL,Internet/Software,QUALITY,True,Large-cap quality
-INTC,Semiconductors,QUALITY,True,Large-cap turnaround
-LLY,Healthcare/Pharma,QUALITY,True,Large-cap pharma
-MRVL,Semiconductors,QUALITY,True,Established semiconductor
-MU,Semiconductors,MOMENTUM,True,Cyclical semi momentum
-NBIS,AI Infrastructure,MOONSHOT,True,Speculative AI infrastructure
-NVDA,Semiconductors,QUALITY,True,Large-cap AI leader
-PUBM,AdTech,MOMENTUM,True,Small/mid-cap adtech momentum
-RKLB,Space,MOONSHOT,True,Speculative space
-SOFI,Fintech,MOMENTUM,True,Fintech momentum
-STTK,Industrials,MOONSHOT,True,Speculative small-cap
-TSLA,Electric Vehicles,QUALITY,True,Large-cap volatile quality
-TSM,Semiconductors,QUALITY,True,Large-cap semiconductor
-VRT,Data Centers,QUALITY,True,Data center infrastructure
-STX,Data Storage,QUALITY,True,Established data storage
-DDOG,Cloud Software,QUALITY,True,Established SaaS/cloud
-SKHY,High Yield ETF,QUALITY,False,Disabled due to missing yfinance indicator data
-SOUN,AI Software,MOONSHOT,True,Speculative AI software
+ticker,sector,tier,enabled,notes,date_added,candidate_reason
+ALAB,Semiconductors,MOMENTUM,True,AI/semi momentum,2026-07-16,AI/semi momentum
+AMD,Semiconductors,QUALITY,True,Large-cap semiconductor,2026-07-16,Large-cap semiconductor
+AMZN,Internet/E-Commerce,QUALITY,True,Large-cap quality,2026-07-16,Large-cap quality
+ANET,Networking,MOMENTUM,True,Strong trend momentum,2026-07-16,Strong trend momentum
+ARM,Semiconductors,MOMENTUM,True,High-growth semi momentum,2026-07-16,High-growth semi momentum
+AVGO,Semiconductors,QUALITY,True,Large-cap semiconductor,2026-07-16,Large-cap semiconductor
+BFLY,Medical Devices,MOONSHOT,True,Speculative medical device,2026-07-16,Speculative medical device
+BLZE,Gaming/Digital Media,MOONSHOT,True,High-risk momentum/moonshot,2026-07-16,High-risk momentum/moonshot
+CBOE,Financial Services,QUALITY,True,Established financial services,2026-07-16,Established financial services
+CELC,Biotech,MOONSHOT,True,Biotech catalyst risk,2026-07-16,Biotech catalyst risk
+CRDO,Semiconductors,MOMENTUM,True,High-growth semiconductor momentum,2026-07-16,High-growth semiconductor momentum
+GOOGL,Internet/Software,QUALITY,True,Large-cap quality,2026-07-16,Large-cap quality
+INTC,Semiconductors,QUALITY,True,Large-cap turnaround,2026-07-16,Large-cap turnaround
+LLY,Healthcare/Pharma,QUALITY,True,Large-cap pharma,2026-07-16,Large-cap pharma
+MRVL,Semiconductors,QUALITY,True,Established semiconductor,2026-07-16,Established semiconductor
+MU,Semiconductors,MOMENTUM,True,Cyclical semi momentum,2026-07-16,Cyclical semi momentum
+NBIS,AI Infrastructure,MOONSHOT,True,Speculative AI infrastructure,2026-07-16,Speculative AI infrastructure
+NVDA,Semiconductors,QUALITY,True,Large-cap AI leader,2026-07-16,Large-cap AI leader
+PUBM,AdTech,MOMENTUM,True,Small/mid-cap adtech momentum,2026-07-16,Small/mid-cap adtech momentum
+RKLB,Space,MOONSHOT,True,Speculative space,2026-07-16,Speculative space
+SOFI,Fintech,MOMENTUM,True,Fintech momentum,2026-07-16,Fintech momentum
+STTK,Industrials,MOONSHOT,True,Speculative small-cap,2026-07-16,Speculative small-cap
+TSLA,Electric Vehicles,QUALITY,True,Large-cap volatile quality,2026-07-16,Large-cap volatile quality
+TSM,Semiconductors,QUALITY,True,Large-cap semiconductor,2026-07-16,Large-cap semiconductor
+VRT,Data Centers,QUALITY,True,Data center infrastructure,2026-07-16,Data center infrastructure
+STX,Data Storage,QUALITY,True,Established data storage,2026-07-16,Established data storage
+DDOG,Cloud Software,QUALITY,True,Established SaaS/cloud,2026-07-16,Established SaaS/cloud
+SKHY,High Yield ETF,QUALITY,False,Disabled due to missing yfinance indicator data,2026-07-16,Disabled due to missing yfinance indicator data
+SOUN,AI Software,MOONSHOT,True,Speculative AI software,2026-07-16,Speculative AI software
