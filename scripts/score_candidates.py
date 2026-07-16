@@ -16,7 +16,7 @@ KEEP_SCORE = 50
 
 
 def truthy(x):
-    return str(x).strip().upper() in ["TRUE", "YES", "1", "Y"]
+    return str(x).strip().upper() in ["TRUE", "YES", "1", "Y", "TRUE"]
 
 
 def score_candidates():
@@ -92,7 +92,7 @@ def score_candidates():
 
         rows.append({
             "ticker": ticker,
-            "source_list": "WATCHLIST" if row["enabled"] else "CANDIDATE",
+            "source_list": "CANDIDATE",
             "sector": row.get("sector", ""),
             "tier": row.get("tier", ""),
             "price": price,
