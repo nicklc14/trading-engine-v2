@@ -8,12 +8,17 @@ DATA_DIR = Path("data")
 WATCHLIST_PATH = DATA_DIR / "watchlist.csv"
 MARKET_PATH = DATA_DIR / "market_data.csv"
 TIMING_PATH = DATA_DIR / "market_timing.csv"
+DASHBOARD_PATH = DATA_DIR / "dashboard.csv"
 CANDIDATE_REVIEW_PATH = DATA_DIR / "candidate_review.csv"
+
+COLUMNS = [
+    "ticker","source_list","sector","tier","price","score","trend_score",
+    "momentum_score","accelerator_score","timing_action","timing_score",
+    "recommendation","why","notes","date_added","candidate_reason"
+]
 
 PROMOTE_SCORE = 75
 PROMOTE_TIMING_SCORE = 70
-DEMOTE_SCORE = 45
-KEEP_SCORE = 50
 
 
 def truthy(x):
@@ -44,7 +49,6 @@ def score_one(row, market, timing):
 
         trend_score = 25 if pd.notna(macd_hist) and macd_hist > 0 else 0
         momentum_score = 25 if pd.notna(rsi) and 45 <= rsi <= 75 else 0
-        accelerator_score = 50
 
         if pd.notna(volume_trend) and volume_trend >= 1.5:
             accelerator_score += 20
@@ -59,18 +63,10 @@ def score_one(row, market, timing):
         timing_action = tr.get("timing_action", "WAIT")
         timing_score = pd.to_numeric(tr.get("timing_score", 50), errors="coerce")
 
-    return {
-        "price": price,
-        "score": score,
-        "trend_score": trend_score,
-        "momentum_score": momentum_score,
-        "accelerator_score": accelerator_score,
-        "timing_action": timing_action,
-        "timing_score": timing_score,
-    }
+    return price, score, trend_score, momentum_score, accelerator_score, timing_action, timing_score
 
 
-def score_candidates():
+def score_candidates(rebalance_only=False):
     watch = pd.read_csv(WATCHLIST_PATH)
     market = pd.read_csv(MARKET_PATH) if MARKET_PATH.exists() else pd.DataFrame()
     timing = pd.read_csv(TIMING_PATH) if TIMING_PATH.exists() else pd.DataFrame()
@@ -80,58 +76,57 @@ def score_candidates():
 
     if "date_added" not in watch.columns:
         watch["date_added"] = str(date.today())
-
     if "candidate_reason" not in watch.columns:
         watch["candidate_reason"] = watch.get("notes", "")
 
-    if not market.empty:
-        market["ticker"] = market["ticker"].astype(str).str.upper().str.strip()
+    for df in [market, timing]:
+        if not df.empty:
+            df["ticker"] = df["ticker"].astype(str).str.upper().str.strip()
 
-    if not timing.empty:
-        timing["ticker"] = timing["ticker"].astype(str).str.upper().str.strip()
+    scored_rows = []
+
+    for idx, row in watch.iterrows():
+        price, score, trend, momentum, accel, timing_action, timing_score = score_one(row, market, timing)
+
+        if score >= PROMOTE_SCORE and timing_score >= PROMOTE_TIMING_SCORE:
+            watch.at[idx, "enabled"] = True
+
+        scored_rows.append((row, price, score, trend, momentum, accel, timing_action, timing_score))
+
+    watch.to_csv(WATCHLIST_PATH, index=False)
+
+    if rebalance_only:
+        return pd.DataFrame(columns=COLUMNS)
+
+    dashboard_tickers = set()
+    if DASHBOARD_PATH.exists():
+        dash = pd.read_csv(DASHBOARD_PATH)
+        if "ticker" in dash.columns:
+            dashboard_tickers = set(dash["ticker"].astype(str).str.upper().str.strip())
 
     review_rows = []
 
-    for idx, row in watch.iterrows():
-        scored = score_one(row, market, timing)
+    for row, price, score, trend, momentum, accel, timing_action, timing_score in scored_rows:
+        ticker = row["ticker"]
 
-        currently_enabled = bool(row["enabled"])
-        score = scored["score"]
-        timing_score = scored["timing_score"]
-
-        promote = (not currently_enabled) and score >= PROMOTE_SCORE and timing_score >= PROMOTE_TIMING_SCORE
-        demote = currently_enabled and score < DEMOTE_SCORE
-
-        if promote:
-            watch.at[idx, "enabled"] = True
+        if ticker in dashboard_tickers:
             continue
 
-        if demote:
-            watch.at[idx, "enabled"] = False
-            recommendation = "KEEP CANDIDATE"
-            why = "Demoted from active watchlist — score fell below threshold"
-        elif not currently_enabled:
-            if score >= KEEP_SCORE:
-                recommendation = "KEEP CANDIDATE"
-                why = "Monitor for improvement"
-            else:
-                recommendation = "DISABLED"
-                why = "Candidate disabled"
-        else:
-            continue
+        recommendation = "KEEP CANDIDATE" if score >= 50 else "DISABLED"
+        why = "Not currently shown on Dashboard — keep under candidate review" if score >= 50 else "Candidate disabled"
 
         review_rows.append({
-            "ticker": row["ticker"],
+            "ticker": ticker,
             "source_list": "CANDIDATE",
             "sector": row.get("sector", ""),
             "tier": row.get("tier", ""),
-            "price": scored["price"],
-            "score": scored["score"],
-            "trend_score": scored["trend_score"],
-            "momentum_score": scored["momentum_score"],
-            "accelerator_score": scored["accelerator_score"],
-            "timing_action": scored["timing_action"],
-            "timing_score": scored["timing_score"],
+            "price": price,
+            "score": score,
+            "trend_score": trend,
+            "momentum_score": momentum,
+            "accelerator_score": accel,
+            "timing_action": timing_action,
+            "timing_score": timing_score,
             "recommendation": recommendation,
             "why": why,
             "notes": row.get("notes", ""),
@@ -139,26 +134,20 @@ def score_candidates():
             "candidate_reason": row.get("candidate_reason", row.get("notes", "")),
         })
 
-    review = pd.DataFrame(review_rows)
+    review = pd.DataFrame(review_rows, columns=COLUMNS)
 
     if not review.empty:
-        review["priority_rank"] = np.where(
-            review["why"].str.contains("Demoted", case=False, na=False),
-            1,
-            review["recommendation"].map({
-                "KEEP CANDIDATE": 2,
-                "DISABLED": 4,
-            }).fillna(9)
-        )
+        review["priority_rank"] = review["recommendation"].map({
+            "KEEP CANDIDATE": 1,
+            "DISABLED": 4,
+        }).fillna(9)
 
         review = review.sort_values(
             ["priority_rank", "score", "timing_score", "ticker"],
             ascending=[True, False, False, True]
         ).drop(columns=["priority_rank"])
 
-    watch.to_csv(WATCHLIST_PATH, index=False)
     review.to_csv(CANDIDATE_REVIEW_PATH, index=False)
-
     return review
 
 
