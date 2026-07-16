@@ -15,13 +15,13 @@ POET,CANDIDATE,Technology,MOONSHOT,8.270000457763672,55,40,75,50,WAIT,25,KEEP CA
 HPE,CANDIDATE,Technology,MOMENTUM,47.38999938964844,75,80,75,50,WAIT,35,KEEP CANDIDATE,Interesting but not ready,Enterprise AI infrastructure,2026-07-16,AI server demand
 RXRX,CANDIDATE,Healthcare,MOONSHOT,3.309999942779541,40,0,25,50,WAIT,50,KEEP CANDIDATE,Monitor for improvement,AI drug discovery,2026-07-16,AI biotech upside
 SERV,CANDIDATE,Industrials,MOONSHOT,,22,0,0,50,WAIT,50,DISABLED,Candidate disabled,Autonomous robots,2026-07-16,Warehouse automation
-RGTI,CANDIDATE,CANDIDATE,Quantum Computing,,22,0,0,50,WAIT,50,DISABLED,Candidate disabled,Speculative quantum computing,Higher-risk quantum peer to IONQ,
-QBTS,CANDIDATE,CANDIDATE,Quantum Computing,,22,0,0,50,WAIT,50,DISABLED,Candidate disabled,Speculative quantum hardware/software,Quantum moonshot candidate,
-RDW,CANDIDATE,CANDIDATE,Space Infrastructure,,22,0,0,50,WAIT,50,DISABLED,Candidate disabled,Space systems exposure,Space infrastructure moonshot,
-BKSY,CANDIDATE,CANDIDATE,Satellite Analytics,,22,0,0,50,WAIT,50,DISABLED,Candidate disabled,Small-cap space/data play,Satellite data/analytics upside,
-IREN,CANDIDATE,CANDIDATE,AI Data Centers,,22,0,0,50,WAIT,50,DISABLED,Candidate disabled,AI infrastructure/power theme,AI data center momentum,
-APLD,CANDIDATE,CANDIDATE,AI Cloud/Data Centers,,22,0,0,50,WAIT,50,DISABLED,Candidate disabled,Aggressive AI infrastructure candidate,AI cloud infrastructure upside,
-SYM,CANDIDATE,CANDIDATE,Robotics Automation,,22,0,0,50,WAIT,50,DISABLED,Candidate disabled,Warehouse automation/robotics,Robotics automation upside,
-SDGR,CANDIDATE,CANDIDATE,AI Drug Discovery,,22,0,0,50,WAIT,50,DISABLED,Candidate disabled,AI biotech candidate,AI drug discovery upside,
-ABCL,CANDIDATE,CANDIDATE,AI Biotech,,22,0,0,50,WAIT,50,DISABLED,Candidate disabled,AI antibody/drug discovery exposure,AI biotech moonshot,
-TEM,CANDIDATE,CANDIDATE,AI Healthcare,,22,0,0,50,WAIT,50,DISABLED,Candidate disabled,Aggressive AI health/data platform,AI healthcare data upside,
+RGTI,CANDIDATE,Quantum Computing,MOONSHOT,15.25,22,0,0,50,WAIT,10,REMOVE,Low score and weak setup,Speculative quantum computing,2026-07-16,Higher-risk quantum peer to IONQ
+QBTS,CANDIDATE,Quantum Computing,MOONSHOT,18.270000457763672,22,0,0,50,WAIT,10,REMOVE,Low score and weak setup,Speculative quantum hardware/software,2026-07-16,Quantum moonshot candidate
+RDW,CANDIDATE,Space Infrastructure,MOONSHOT,9.359999656677246,22,0,0,50,WAIT,25,REMOVE,Low score and weak setup,Space systems exposure,2026-07-16,Space infrastructure moonshot
+BKSY,CANDIDATE,Satellite Analytics,MOONSHOT,24.299999237060547,39,0,0,75,WAIT,55,REMOVE,Low score and weak setup,Small-cap space/data play,2026-07-16,Satellite data/analytics upside
+IREN,CANDIDATE,AI Data Centers,MOMENTUM,38.27999877929688,22,0,0,50,WAIT,25,REMOVE,Low score and weak setup,AI infrastructure/power theme,2026-07-16,AI data center momentum
+APLD,CANDIDATE,AI Cloud/Data Centers,MOMENTUM,29.030000686645508,22,0,0,50,WAIT,25,REMOVE,Low score and weak setup,Aggressive AI infrastructure candidate,2026-07-16,AI cloud infrastructure upside
+SYM,CANDIDATE,Robotics Automation,MOONSHOT,42.63999938964844,46,0,25,75,WAIT,55,KEEP CANDIDATE,Monitor for improvement,Warehouse automation/robotics,2026-07-16,Robotics automation upside
+SDGR,CANDIDATE,AI Drug Discovery,MOONSHOT,16.270000457763672,70,80,60,50,WAIT,35,KEEP CANDIDATE,Interesting but not ready,AI biotech candidate,2026-07-16,AI drug discovery upside
+ABCL,CANDIDATE,AI Biotech,MOONSHOT,6.739999771118164,82,80,100,50,WAIT,35,KEEP CANDIDATE,Interesting but not ready,AI antibody/drug discovery exposure,2026-07-16,AI biotech moonshot
+TEM,CANDIDATE,AI Healthcare,MOONSHOT,57.25,60,40,60,50,WAIT,35,KEEP CANDIDATE,Monitor for improvement,Aggressive AI health/data platform,2026-07-16,AI healthcare data upside
