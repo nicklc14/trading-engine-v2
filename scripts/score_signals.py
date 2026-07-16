@@ -340,6 +340,13 @@ def score_signals():
         if already_held:
             if pd.notna(price) and pd.notna(stop_loss) and price <= stop_loss:
                 exit_action = "SELL"; exit_priority = "HIGH"; exit_reason = "Price at or below stop loss"
+            elif tier == "MOONSHOT" and pd.notna(holding_return_pct) and holding_return_pct <= -0.15:
+                if final_score >= 75:
+                    exit_action = "HOLD"; exit_priority = "LOW"; exit_reason = "Moonshot down 15%+, but score still strong"
+                elif final_score >= 65:
+                    exit_action = "REVIEW"; exit_priority = "MEDIUM"; exit_reason = "Moonshot down 15%+; review before selling"
+                else:
+                    exit_action = "SELL"; exit_priority = "HIGH"; exit_reason = "Moonshot down 15%+ and score weakened"
             elif pd.notna(holding_return_pct) and holding_return_pct <= -0.15:
                 exit_action = "SELL"; exit_priority = "HIGH"; exit_reason = "Holding down 15%+"
             elif trend_score < 40 and final_score < 55:
