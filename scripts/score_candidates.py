@@ -16,7 +16,7 @@ KEEP_SCORE = 50
 
 
 def truthy(x):
-    return str(x).strip().upper() in ["TRUE", "YES", "1", "Y", "TRUE"]
+    return str(x).strip().upper() in ["TRUE", "YES", "1", "Y"]
 
 
 def score_candidates():
@@ -80,9 +80,11 @@ def score_candidates():
             timing_action = tr.get("timing_action", "WAIT")
             timing_score = pd.to_numeric(tr.get("timing_score", 50), errors="coerce")
 
-        if score >= PROMOTE_SCORE and timing_score >= PROMOTE_TIMING_SCORE:
-            recommendation = "PROMOTE TO WATCHLIST"
-            why = "Score and timing meet promotion threshold"
+        promote = score >= PROMOTE_SCORE and timing_score >= PROMOTE_TIMING_SCORE
+
+        if promote:
+            recommendation = "KEEP CANDIDATE"
+            why = "Promoted to active watchlist — score and timing meet threshold"
         elif score >= KEEP_SCORE:
             recommendation = "KEEP CANDIDATE"
             why = "Monitor for improvement"
@@ -111,21 +113,23 @@ def score_candidates():
 
     review = pd.DataFrame(rows)
 
-    promote_tickers = review.loc[
-        review["recommendation"] == "PROMOTE TO WATCHLIST",
-        "ticker"
-    ]
+    promote_mask = review["why"].str.contains(
+        "Promoted to active watchlist",
+        case=False,
+        na=False
+    )
 
+    promote_tickers = review.loc[promote_mask, "ticker"]
     watch.loc[watch["ticker"].isin(promote_tickers), "enabled"] = True
 
-    priority = {
-        "PROMOTE TO WATCHLIST": 1,
-        "KEEP CANDIDATE": 2,
-        "WAIT": 3,
-        "DISABLED": 4,
-    }
-
-    review["priority_rank"] = review["recommendation"].map(priority).fillna(9)
+    review["priority_rank"] = np.where(
+        promote_mask,
+        1,
+        review["recommendation"].map({
+            "KEEP CANDIDATE": 2,
+            "DISABLED": 4,
+        }).fillna(9)
+    )
 
     review = review.sort_values(
         ["priority_rank", "score", "timing_score", "ticker"],
