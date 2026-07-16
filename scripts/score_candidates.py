@@ -40,8 +40,12 @@ def score_candidates():
         timing["ticker"] = timing["ticker"].astype(str).str.upper().str.strip()
 
     rows = []
+    promote_tickers = []
 
-    for _, row in watch.iterrows():
+    # Only review non-active candidates.
+    candidates = watch[watch["enabled"] == False].copy()
+
+    for _, row in candidates.iterrows():
         ticker = row["ticker"]
         m = market[market["ticker"] == ticker]
         t = timing[timing["ticker"] == ticker]
@@ -83,9 +87,10 @@ def score_candidates():
         promote = score >= PROMOTE_SCORE and timing_score >= PROMOTE_TIMING_SCORE
 
         if promote:
-            recommendation = "KEEP CANDIDATE"
-            why = "Promoted to active watchlist — score and timing meet threshold"
-        elif score >= KEEP_SCORE:
+            promote_tickers.append(ticker)
+            continue
+
+        if score >= KEEP_SCORE:
             recommendation = "KEEP CANDIDATE"
             why = "Monitor for improvement"
         else:
@@ -111,30 +116,20 @@ def score_candidates():
             "candidate_reason": row.get("candidate_reason", row.get("notes", "")),
         })
 
-    review = pd.DataFrame(rows)
-
-    promote_mask = review["why"].str.contains(
-        "Promoted to active watchlist",
-        case=False,
-        na=False
-    )
-
-    promote_tickers = review.loc[promote_mask, "ticker"]
     watch.loc[watch["ticker"].isin(promote_tickers), "enabled"] = True
 
-    review["priority_rank"] = np.where(
-        promote_mask,
-        1,
-        review["recommendation"].map({
-            "KEEP CANDIDATE": 2,
+    review = pd.DataFrame(rows)
+
+    if not review.empty:
+        review["priority_rank"] = review["recommendation"].map({
+            "KEEP CANDIDATE": 1,
             "DISABLED": 4,
         }).fillna(9)
-    )
 
-    review = review.sort_values(
-        ["priority_rank", "score", "timing_score", "ticker"],
-        ascending=[True, False, False, True]
-    ).drop(columns=["priority_rank"])
+        review = review.sort_values(
+            ["priority_rank", "score", "timing_score", "ticker"],
+            ascending=[True, False, False, True]
+        ).drop(columns=["priority_rank"])
 
     watch.to_csv(WATCHLIST_PATH, index=False)
     review.to_csv(CANDIDATE_REVIEW_PATH, index=False)
