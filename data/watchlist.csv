@@ -26,5 +26,4 @@ TSM,Semiconductors,QUALITY,True,Large-cap semiconductor,2026-07-16,Large-cap sem
 VRT,Data Centers,QUALITY,True,Data center infrastructure,2026-07-16,Data center infrastructure
 STX,Data Storage,QUALITY,True,Established data storage,2026-07-16,Established data storage
 DDOG,Cloud Software,QUALITY,True,Established SaaS/cloud,2026-07-16,Established SaaS/cloud
-SKHY,High Yield ETF,QUALITY,False,Disabled due to missing yfinance indicator data,2026-07-16,Disabled due to missing yfinance indicator data
 SOUN,AI Software,MOONSHOT,True,Speculative AI software,2026-07-16,Speculative AI software
