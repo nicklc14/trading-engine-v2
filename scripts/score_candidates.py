@@ -11,9 +11,7 @@ MARKET_PATH = DATA_DIR / "market_data.csv"
 HOLDINGS_PATH = DATA_DIR / "holdings.csv"
 CANDIDATE_REVIEW_PATH = DATA_DIR / "candidate_review.csv"
 
-PROMOTE_SCORE = 75
-PROMOTE_TIMING_SCORE = 70
-DEMOTE_SCORE = 45
+ACTIVE_NON_HELD_LIMIT = 5
 KEEP_SCORE = 50
 
 BASE_COLUMNS = [
@@ -30,16 +28,13 @@ REVIEW_COLUMNS = [
     "last_reviewed", "review_count", "status_reason",
 ]
 
-
 def truthy(x):
     return str(x).strip().upper() in ["TRUE", "YES", "1", "Y"]
-
 
 def read_csv_safe(path, columns=None):
     if path.exists() and path.stat().st_size > 0:
         return pd.read_csv(path)
     return pd.DataFrame(columns=columns or [])
-
 
 def normalise(df, default_enabled):
     for col in BASE_COLUMNS:
@@ -63,7 +58,6 @@ def normalise(df, default_enabled):
     )
 
     return df[BASE_COLUMNS]
-
 
 def score_one(row, market):
     ticker = row["ticker"]
@@ -115,7 +109,6 @@ def score_one(row, market):
 
     return price, score, trend_score, momentum_score, accelerator_score, timing_action, timing_score
 
-
 def touch_review(row, reason):
     row = row.copy()
     today = str(date.today())
@@ -124,6 +117,15 @@ def touch_review(row, reason):
     row["status_reason"] = reason
     return row
 
+def tier_rank(tier):
+    tier = str(tier).upper()
+    if tier == "MOONSHOT":
+        return 3
+    if tier == "MOMENTUM":
+        return 2
+    if tier == "QUALITY":
+        return 1
+    return 0
 
 def score_candidates(rebalance=True, build_review=True):
     watch = normalise(read_csv_safe(WATCHLIST_PATH, BASE_COLUMNS), True)
@@ -138,65 +140,72 @@ def score_candidates(rebalance=True, build_review=True):
     if not holdings.empty and "ticker" in holdings.columns:
         held = set(holdings["ticker"].astype(str).str.upper().str.strip())
 
+    combined = pd.concat([watch, candidates], ignore_index=True)
+    combined = combined.drop_duplicates("ticker", keep="first")
+
+    scored_rows = []
+
+    for _, row in combined.iterrows():
+        price, score, trend, momentum, accel, timing_action, timing_score = score_one(row, market)
+
+        row = row.copy()
+        row["_price"] = price
+        row["_score"] = score
+        row["_trend_score"] = trend
+        row["_momentum_score"] = momentum
+        row["_accelerator_score"] = accel
+        row["_timing_action"] = timing_action
+        row["_timing_score"] = timing_score
+        row["_tier_rank"] = tier_rank(row.get("tier", ""))
+        row["_is_held"] = row["ticker"] in held
+
+        scored_rows.append(row)
+
+    scored = pd.DataFrame(scored_rows)
+
     if rebalance:
-        promoted = []
-        kept_candidates = []
+        held_rows = scored[scored["_is_held"]].copy()
 
-        for _, row in candidates.iterrows():
-            price, score, trend, momentum, accel, timing_action, timing_score = score_one(row, market)
+        non_held = scored[~scored["_is_held"]].copy()
+        non_held = non_held.sort_values(
+            ["_score", "_timing_score", "_tier_rank", "ticker"],
+            ascending=[False, False, False, True]
+        )
 
-            auto_promote = score >= PROMOTE_SCORE and timing_score >= PROMOTE_TIMING_SCORE
+        active_non_held = non_held.head(ACTIVE_NON_HELD_LIMIT).copy()
+        candidate_rows = non_held.iloc[ACTIVE_NON_HELD_LIMIT:].copy()
 
-            if auto_promote:
-                row = touch_review(
-                    row,
-                    f"Promoted: score {score} and timing {timing_score} met threshold"
-                )
-                row["enabled"] = True
-                promoted.append(row)
+        active = pd.concat([held_rows, active_non_held], ignore_index=True)
+
+        active_out = []
+        for _, row in active.iterrows():
+            if row["_is_held"]:
+                reason = f"Kept active because currently held: score {row['_score']}, timing {row['_timing_score']}"
             else:
-                row = touch_review(
-                    row,
-                    f"Kept candidate: score {score}, timing {timing_score}"
-                )
-                row["enabled"] = False
-                kept_candidates.append(row)
+                reason = f"Kept active top {ACTIVE_NON_HELD_LIMIT}: score {row['_score']}, timing {row['_timing_score']}"
 
-        demoted = []
-        kept_watch = []
+            row = touch_review(row, reason)
+            row["enabled"] = True
+            active_out.append(row[BASE_COLUMNS])
 
-        for _, row in watch.iterrows():
-            price, score, trend, momentum, accel, timing_action, timing_score = score_one(row, market)
+        candidate_out = []
+        for _, row in candidate_rows.iterrows():
+            row = touch_review(
+                row,
+                f"Kept candidate: outside top {ACTIVE_NON_HELD_LIMIT}; score {row['_score']}, timing {row['_timing_score']}"
+            )
+            row["enabled"] = False
+            if not str(row.get("candidate_reason", "")).strip():
+                row["candidate_reason"] = "Not currently in Dashboard active watchlist"
+            candidate_out.append(row[BASE_COLUMNS])
 
-            if row["ticker"] not in held and score < DEMOTE_SCORE:
-                row = touch_review(
-                    row,
-                    f"Demoted: score {score} below threshold {DEMOTE_SCORE}"
-                )
-                row["enabled"] = False
-                row["candidate_reason"] = "Auto-demoted from active watchlist"
-                demoted.append(row)
-            else:
-                row = touch_review(
-                    row,
-                    f"Kept active: score {score}, timing {timing_score}"
-                )
-                row["enabled"] = True
-                kept_watch.append(row)
-
-        watch = pd.DataFrame(kept_watch + promoted, columns=BASE_COLUMNS)
-        candidates = pd.DataFrame(kept_candidates + demoted, columns=BASE_COLUMNS)
-
-        if not watch.empty:
-            watch = watch.drop_duplicates("ticker", keep="first")
-
-        if not candidates.empty:
-            if not watch.empty:
-                candidates = candidates[~candidates["ticker"].isin(watch["ticker"])]
-            candidates = candidates.drop_duplicates("ticker", keep="first")
+        watch = pd.DataFrame(active_out, columns=BASE_COLUMNS)
+        candidates = pd.DataFrame(candidate_out, columns=BASE_COLUMNS)
 
         watch.to_csv(WATCHLIST_PATH, index=False)
         candidates.to_csv(CANDIDATES_PATH, index=False)
+    else:
+        candidates = normalise(read_csv_safe(CANDIDATES_PATH, BASE_COLUMNS), False)
 
     if not build_review:
         return pd.DataFrame(columns=REVIEW_COLUMNS)
@@ -246,7 +255,6 @@ def score_candidates(rebalance=True, build_review=True):
 
     review.to_csv(CANDIDATE_REVIEW_PATH, index=False)
     return review
-
 
 if __name__ == "__main__":
     score_candidates()
