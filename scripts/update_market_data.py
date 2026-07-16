@@ -6,12 +6,28 @@ from datetime import datetime, timezone
 
 DATA_DIR = Path("data")
 WATCHLIST_PATH = DATA_DIR / "watchlist.csv"
+CANDIDATE_PATH = DATA_DIR / "candidate_watchlist.csv"
 MARKET_PATH = DATA_DIR / "market_data.csv"
 REGIME_PATH = DATA_DIR / "market_regime.csv"
-CANDIDATE_PATH = DATA_DIR / "candidate_watchlist.csv"
 
-def truthy(x):
-    return str(x).strip().upper() in ["TRUE", "YES", "1", "Y"]
+
+def fetch_tickers():
+    frames = []
+
+    if WATCHLIST_PATH.exists():
+        frames.append(pd.read_csv(WATCHLIST_PATH))
+
+    if CANDIDATE_PATH.exists():
+        frames.append(pd.read_csv(CANDIDATE_PATH))
+
+    if not frames:
+        return []
+
+    df = pd.concat(frames, ignore_index=True)
+    df["ticker"] = df["ticker"].astype(str).str.upper().str.strip()
+    df = df[df["ticker"] != ""]
+    return sorted(df["ticker"].drop_duplicates().tolist())
+
 
 def calc_rsi(close, period=14):
     delta = close.diff()
@@ -19,6 +35,7 @@ def calc_rsi(close, period=14):
     loss = (-delta.clip(upper=0)).rolling(period).mean()
     rs = gain / loss.replace(0, np.nan)
     return 100 - (100 / (1 + rs))
+
 
 def calc_macd(close, fast=12, slow=26, signal=9):
     ema_fast = close.ewm(span=fast, adjust=False).mean()
@@ -28,6 +45,7 @@ def calc_macd(close, fast=12, slow=26, signal=9):
     hist = macd - sig
     return macd, sig, hist
 
+
 def calc_atr(high, low, close, period=14):
     tr = pd.concat([
         high - low,
@@ -36,26 +54,6 @@ def calc_atr(high, low, close, period=14):
     ], axis=1).max(axis=1)
     return tr.rolling(period).mean()
 
-def load_tickers():
-    tickers = set()
-
-    if WATCHLIST_PATH.exists():
-        watch = pd.read_csv(WATCHLIST_PATH)
-        if "enabled" in watch.columns:
-            watch["enabled"] = watch["enabled"].apply(truthy)
-            watch = watch[watch["enabled"]]
-        if "ticker" in watch.columns:
-            tickers.update(watch["ticker"].astype(str).str.upper().str.strip())
-
-    if CANDIDATE_PATH.exists():
-        candidates = pd.read_csv(CANDIDATE_PATH)
-        if not candidates.empty and "ticker" in candidates.columns:
-            if "enabled" in candidates.columns:
-                candidates["enabled"] = candidates["enabled"].apply(truthy)
-                candidates = candidates[candidates["enabled"]]
-            tickers.update(candidates["ticker"].astype(str).str.upper().str.strip())
-
-    return sorted(t for t in tickers if t and t != "NAN")
 
 def fetch_one(ticker):
     fetched_at = datetime.now(timezone.utc).isoformat()
@@ -124,11 +122,14 @@ def fetch_one(ticker):
         "fetched_at_utc": fetched_at,
     }
 
+
 def update_market_data():
     DATA_DIR.mkdir(exist_ok=True)
 
+    tickers = fetch_tickers()
+
     rows = []
-    for ticker in load_tickers():
+    for ticker in tickers:
         try:
             row = fetch_one(ticker)
             if row:
@@ -149,6 +150,7 @@ def update_market_data():
     }]).to_csv(REGIME_PATH, index=False)
 
     return market
+
 
 if __name__ == "__main__":
     update_market_data()
