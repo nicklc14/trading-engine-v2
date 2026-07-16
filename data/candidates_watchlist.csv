@@ -1,2 +1,0 @@
-ticker,sector,tier,enabled,notes,date_added,candidate_reason
-SKHY,High Yield ETF,QUALITY,False,Disabled due to missing yfinance indicator data,2026-07-16,Auto-demoted from active watchlist
