@@ -138,11 +138,11 @@ def dashboard_priority(row):
         return 2
     if action == "TRIM":
         return 3
-    if replacement:
-        return 4
     if add_signal == "ADD SMALL":
+        return 4
+    if action == "HOLD" and not replacement:
         return 5
-    if action == "HOLD":
+    if action == "HOLD" and replacement:
         return 6
     if action == "BUY":
         return 7
