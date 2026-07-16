@@ -1,5 +1,5 @@
 ticker,sec_event_flag,sec_event_type,sec_event_date,sec_form,sec_severity,sec_score_adjustment,sec_event_note
-ANET,YES,OWNERSHIP_FILING,2026-07-14,4,LOW,0,Recent insider/ownership filing
+ANET,YES,OWNERSHIP_FILING,2026-07-16,4,LOW,0,Recent insider/ownership filing
 BFLY,YES,MATERIAL_EVENT,2026-06-22,8-K,MEDIUM,0,Recent 8-K material event filing
 BLZE,YES,MATERIAL_EVENT,2026-07-02,8-K,MEDIUM,0,Recent 8-K material event filing
 GOOGL,YES,OWNERSHIP_FILING,2026-07-06,4,LOW,0,Recent insider/ownership filing
@@ -10,4 +10,4 @@ SOUN,YES,DILUTION_RISK,2026-07-09,424B3,HIGH,-5,Recent offering/registration fil
 SYM,YES,OWNERSHIP_FILING,2026-07-08,4,LOW,0,Recent insider/ownership filing
 AVGO,YES,DILUTION_RISK,2026-06-17,424B3,HIGH,-5,Recent offering/registration filing risk
 CBOE,YES,MATERIAL_EVENT,2026-06-26,8-K,MEDIUM,0,Recent 8-K material event filing
-BKSY,YES,OWNERSHIP_FILING,2026-06-30,4,LOW,0,Recent insider/ownership filing
+HPE,YES,OWNERSHIP_FILING,2026-07-07,4,LOW,0,Recent insider/ownership filing
