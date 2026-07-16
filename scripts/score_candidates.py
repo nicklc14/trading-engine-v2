@@ -6,117 +6,172 @@ from datetime import date
 DATA_DIR = Path("data")
 
 WATCHLIST_PATH = DATA_DIR / "watchlist.csv"
+CANDIDATES_PATH = DATA_DIR / "candidates_watchlist.csv"
 MARKET_PATH = DATA_DIR / "market_data.csv"
-TIMING_PATH = DATA_DIR / "market_timing.csv"
-DASHBOARD_PATH = DATA_DIR / "dashboard.csv"
+HOLDINGS_PATH = DATA_DIR / "holdings.csv"
 CANDIDATE_REVIEW_PATH = DATA_DIR / "candidate_review.csv"
-
-COLUMNS = [
-    "ticker","source_list","sector","tier","price","score","trend_score",
-    "momentum_score","accelerator_score","timing_action","timing_score",
-    "recommendation","why","notes","date_added","candidate_reason"
-]
 
 PROMOTE_SCORE = 75
 PROMOTE_TIMING_SCORE = 70
+DEMOTE_SCORE = 45
+KEEP_SCORE = 50
+
+REVIEW_COLUMNS = [
+    "ticker", "source_list", "sector", "tier", "price", "score",
+    "trend_score", "momentum_score", "accelerator_score",
+    "timing_action", "timing_score", "recommendation", "why",
+    "notes", "date_added", "candidate_reason"
+]
 
 
 def truthy(x):
     return str(x).strip().upper() in ["TRUE", "YES", "1", "Y"]
 
 
-def score_one(row, market, timing):
+def read_csv_safe(path, columns=None):
+    if path.exists() and path.stat().st_size > 0:
+        return pd.read_csv(path)
+    return pd.DataFrame(columns=columns or [])
+
+
+def normalise(df, default_enabled):
+    for col in ["ticker", "sector", "tier", "enabled", "notes", "date_added", "candidate_reason"]:
+        if col not in df.columns:
+            df[col] = ""
+
+    df["ticker"] = df["ticker"].astype(str).str.upper().str.strip()
+    df = df[df["ticker"] != ""].copy()
+    df["enabled"] = df["enabled"].apply(lambda x: truthy(x) if str(x).strip() else default_enabled)
+    df["date_added"] = df["date_added"].replace("", str(date.today()))
+    df["candidate_reason"] = df["candidate_reason"].where(
+        df["candidate_reason"].astype(str).str.strip() != "",
+        df["notes"]
+    )
+    return df
+
+
+def score_one(row, market):
     ticker = row["ticker"]
     m = market[market["ticker"] == ticker] if not market.empty else pd.DataFrame()
-    t = timing[timing["ticker"] == ticker] if not timing.empty else pd.DataFrame()
 
     price = np.nan
     score = 22
     trend_score = 0
     momentum_score = 0
     accelerator_score = 50
-    timing_action = "WAIT"
     timing_score = 50
+    timing_action = "WAIT"
 
     if not m.empty:
         mr = m.iloc[0]
         price = mr.get("price", np.nan)
 
         rsi = pd.to_numeric(mr.get("rsi_14", np.nan), errors="coerce")
-        volume_trend = pd.to_numeric(mr.get("volume_trend", np.nan), errors="coerce")
-        gap_pct = pd.to_numeric(mr.get("gap_pct", np.nan), errors="coerce")
-        macd_hist = pd.to_numeric(mr.get("macd_histogram", np.nan), errors="coerce")
+        volume = pd.to_numeric(mr.get("volume_trend", np.nan), errors="coerce")
+        gap = pd.to_numeric(mr.get("gap_pct", np.nan), errors="coerce")
+        macd = pd.to_numeric(mr.get("macd_histogram", np.nan), errors="coerce")
 
-        trend_score = 25 if pd.notna(macd_hist) and macd_hist > 0 else 0
+        trend_score = 25 if pd.notna(macd) and macd > 0 else 0
         momentum_score = 25 if pd.notna(rsi) and 45 <= rsi <= 75 else 0
 
-        if pd.notna(volume_trend) and volume_trend >= 1.5:
+        if pd.notna(volume) and volume >= 1.5:
             accelerator_score += 20
-        if pd.notna(gap_pct) and gap_pct >= 0.03:
+        if pd.notna(gap) and gap >= 0.03:
             accelerator_score += 20
 
         accelerator_score = min(accelerator_score, 100)
         score = round(trend_score + momentum_score + accelerator_score)
 
-    if not t.empty:
-        tr = t.iloc[0]
-        timing_action = tr.get("timing_action", "WAIT")
-        timing_score = pd.to_numeric(tr.get("timing_score", 50), errors="coerce")
+        if pd.notna(volume) and volume >= 1.5:
+            timing_score += 15
+        if pd.notna(gap) and gap >= 0.03:
+            timing_score += 15
+        if pd.notna(macd) and macd > 0:
+            timing_score += 10
+        if pd.notna(rsi) and 40 <= rsi <= 70:
+            timing_score += 10
+
+        timing_score = max(0, min(100, round(timing_score)))
+
+    if timing_score >= 80:
+        timing_action = "TIMING CONFIRMED"
+    elif timing_score >= 70:
+        timing_action = "TIMING WATCH"
 
     return price, score, trend_score, momentum_score, accelerator_score, timing_action, timing_score
 
 
-def score_candidates(rebalance_only=False):
-    watch = pd.read_csv(WATCHLIST_PATH)
-    market = pd.read_csv(MARKET_PATH) if MARKET_PATH.exists() else pd.DataFrame()
-    timing = pd.read_csv(TIMING_PATH) if TIMING_PATH.exists() else pd.DataFrame()
+def score_candidates(rebalance=True, build_review=True):
+    watch = normalise(read_csv_safe(WATCHLIST_PATH), True)
+    candidates = normalise(read_csv_safe(CANDIDATES_PATH), False)
 
-    watch["ticker"] = watch["ticker"].astype(str).str.upper().str.strip()
-    watch["enabled"] = watch["enabled"].apply(truthy)
+    market = read_csv_safe(MARKET_PATH)
+    if not market.empty and "ticker" in market.columns:
+        market["ticker"] = market["ticker"].astype(str).str.upper().str.strip()
 
-    if "date_added" not in watch.columns:
-        watch["date_added"] = str(date.today())
-    if "candidate_reason" not in watch.columns:
-        watch["candidate_reason"] = watch.get("notes", "")
+    holdings = read_csv_safe(HOLDINGS_PATH)
+    held = set()
+    if not holdings.empty and "ticker" in holdings.columns:
+        held = set(holdings["ticker"].astype(str).str.upper().str.strip())
 
-    for df in [market, timing]:
-        if not df.empty:
-            df["ticker"] = df["ticker"].astype(str).str.upper().str.strip()
+    if rebalance:
+        promoted = []
+        kept_candidates = []
 
-    scored_rows = []
+        for _, row in candidates.iterrows():
+            price, score, trend, momentum, accel, timing_action, timing_score = score_one(row, market)
 
-    for idx, row in watch.iterrows():
-        price, score, trend, momentum, accel, timing_action, timing_score = score_one(row, market, timing)
+            manual_promote = truthy(row.get("enabled", False))
+            auto_promote = score >= PROMOTE_SCORE and timing_score >= PROMOTE_TIMING_SCORE
 
-        if score >= PROMOTE_SCORE and timing_score >= PROMOTE_TIMING_SCORE:
-            watch.at[idx, "enabled"] = True
+            if manual_promote or auto_promote:
+                row["enabled"] = True
+                promoted.append(row)
+            else:
+                row["enabled"] = False
+                kept_candidates.append(row)
 
-        scored_rows.append((row, price, score, trend, momentum, accel, timing_action, timing_score))
+        demoted = []
+        kept_watch = []
 
-    watch.to_csv(WATCHLIST_PATH, index=False)
+        for _, row in watch.iterrows():
+            price, score, trend, momentum, accel, timing_action, timing_score = score_one(row, market)
 
-    if rebalance_only:
-        return pd.DataFrame(columns=COLUMNS)
+            if row["ticker"] not in held and score < DEMOTE_SCORE:
+                row["enabled"] = False
+                row["candidate_reason"] = "Auto-demoted from active watchlist"
+                demoted.append(row)
+            else:
+                row["enabled"] = True
+                kept_watch.append(row)
 
-    dashboard_tickers = set()
-    if DASHBOARD_PATH.exists():
-        dash = pd.read_csv(DASHBOARD_PATH)
-        if "ticker" in dash.columns:
-            dashboard_tickers = set(dash["ticker"].astype(str).str.upper().str.strip())
+        watch = pd.DataFrame(kept_watch + promoted)
+        candidates = pd.DataFrame(kept_candidates + demoted)
 
-    review_rows = []
+        if not watch.empty:
+            watch = watch.drop_duplicates("ticker", keep="first")
 
-    for row, price, score, trend, momentum, accel, timing_action, timing_score in scored_rows:
-        ticker = row["ticker"]
+        if not candidates.empty:
+            if not watch.empty:
+                candidates = candidates[~candidates["ticker"].isin(watch["ticker"])]
+            candidates = candidates.drop_duplicates("ticker", keep="first")
 
-        if ticker in dashboard_tickers:
-            continue
+        watch.to_csv(WATCHLIST_PATH, index=False)
+        candidates.to_csv(CANDIDATES_PATH, index=False)
 
-        recommendation = "KEEP CANDIDATE" if score >= 50 else "DISABLED"
-        why = "Not currently shown on Dashboard — keep under candidate review" if score >= 50 else "Candidate disabled"
+    if not build_review:
+        return pd.DataFrame(columns=REVIEW_COLUMNS)
 
-        review_rows.append({
-            "ticker": ticker,
+    rows = []
+
+    for _, row in candidates.iterrows():
+        price, score, trend, momentum, accel, timing_action, timing_score = score_one(row, market)
+
+        recommendation = "KEEP CANDIDATE" if score >= KEEP_SCORE else "DISABLED"
+        why = "Monitor for improvement" if score >= KEEP_SCORE else "Candidate disabled"
+
+        rows.append({
+            "ticker": row["ticker"],
             "source_list": "CANDIDATE",
             "sector": row.get("sector", ""),
             "tier": row.get("tier", ""),
@@ -134,7 +189,7 @@ def score_candidates(rebalance_only=False):
             "candidate_reason": row.get("candidate_reason", row.get("notes", "")),
         })
 
-    review = pd.DataFrame(review_rows, columns=COLUMNS)
+    review = pd.DataFrame(rows, columns=REVIEW_COLUMNS)
 
     if not review.empty:
         review["priority_rank"] = review["recommendation"].map({
