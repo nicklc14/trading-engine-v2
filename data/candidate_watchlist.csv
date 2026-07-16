@@ -1,4 +1,4 @@
-ticker,sector,tier,enabled,notes,date_added,candidate_reason
+ticker,sector,tier,enabled,notes,date_added,candidate_reason,last_reviewed,review_count,status_reason
 ASTS,Space/Telecom,MOONSHOT,False,Speculative space/telecom,2026-07-15,Auto-demoted from active watchlist
 IONQ,Quantum Computing,MOONSHOT,False,Speculative quantum computing,2026-07-15,Auto-demoted from active watchlist
 KYTX,Biotech,MOONSHOT,False,Biotech catalyst risk,2026-07-15,Auto-demoted from active watchlist
