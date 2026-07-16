@@ -1,2 +1,19 @@
 ticker,source_list,sector,tier,price,score,trend_score,momentum_score,accelerator_score,timing_action,timing_score,recommendation,why,notes,date_added,candidate_reason
-SKHY,CANDIDATE,High Yield ETF,QUALITY,,22,0,0,50,WAIT,50,DISABLED,Candidate disabled,Disabled due to missing yfinance indicator data,2026-07-16,Auto-demoted from active watchlist
+APLD,CANDIDATE,AI Cloud/Data Centers,MOMENTUM,,22,0,0,50,WAIT,50,DISABLED,Candidate disabled,Aggressive AI infrastructure candidate,2026-07-16,AI cloud infrastructure upside
+ASTS,CANDIDATE,Space/Telecom,MOONSHOT,,22,0,0,50,WAIT,50,DISABLED,Candidate disabled,Speculative space/telecom,2026-07-15,Auto-demoted from active watchlist
+BKSY,CANDIDATE,Satellite Analytics,MOONSHOT,,22,0,0,50,WAIT,50,DISABLED,Candidate disabled,Small-cap space/data play,2026-07-16,Satellite data/analytics upside
+CCJ,CANDIDATE,Uranium/Nuclear Energy,QUALITY,,22,0,0,50,WAIT,50,DISABLED,Candidate disabled,Uranium quality/cyclical,2026-07-15,Auto-removed from active watchlist
+IONQ,CANDIDATE,Quantum Computing,MOONSHOT,,22,0,0,50,WAIT,50,DISABLED,Candidate disabled,Speculative quantum computing,2026-07-15,Auto-demoted from active watchlist
+IREN,CANDIDATE,AI Data Centers,MOMENTUM,,22,0,0,50,WAIT,50,DISABLED,Candidate disabled,AI infrastructure/power theme,2026-07-16,AI data center momentum
+JOBY,CANDIDATE,eVTOL/Aviation,MOONSHOT,,22,0,0,50,WAIT,50,DISABLED,Candidate disabled,Speculative aviation,2026-07-15,Auto-demoted from active watchlist
+KYTX,CANDIDATE,Biotech,MOONSHOT,,22,0,0,50,WAIT,50,DISABLED,Candidate disabled,Biotech catalyst risk,2026-07-15,Auto-demoted from active watchlist
+LUNR,CANDIDATE,Space,MOONSHOT,,22,0,0,50,WAIT,50,DISABLED,Candidate disabled,Speculative space,2026-07-15,Auto-demoted from active watchlist
+OKLO,CANDIDATE,Nuclear Energy,MOONSHOT,,22,0,0,50,WAIT,50,DISABLED,Candidate disabled,Speculative nuclear,2026-07-15,Auto-demoted from active watchlist
+PL,CANDIDATE,Space,MOONSHOT,,22,0,0,50,WAIT,50,DISABLED,Candidate disabled,Speculative space,2026-07-15,Auto-demoted from active watchlist
+PLTR,CANDIDATE,Technology,MOMENTUM,,22,0,0,50,WAIT,50,DISABLED,Candidate disabled,AI software platform,2026-07-16,Strong AI demand
+QBTS,CANDIDATE,Quantum Computing,MOONSHOT,,22,0,0,50,WAIT,50,DISABLED,Candidate disabled,Speculative quantum hardware/software,2026-07-16,Quantum moonshot candidate
+RDW,CANDIDATE,Space Infrastructure,MOONSHOT,,22,0,0,50,WAIT,50,DISABLED,Candidate disabled,Space systems exposure,2026-07-16,Space infrastructure moonshot
+RGTI,CANDIDATE,Quantum Computing,MOONSHOT,,22,0,0,50,WAIT,50,DISABLED,Candidate disabled,Speculative quantum computing,2026-07-16,Higher-risk quantum peer to IONQ
+SERV,CANDIDATE,Industrials,MOONSHOT,,22,0,0,50,WAIT,50,DISABLED,Candidate disabled,Autonomous robots,2026-07-16,Warehouse automation
+SMCI,CANDIDATE,AI Infrastructure,MOONSHOT,,22,0,0,50,WAIT,50,DISABLED,Candidate disabled,High-risk AI infrastructure,2026-07-15,Auto-demoted from active watchlist
+SMR,CANDIDATE,Nuclear Energy,MOONSHOT,,22,0,0,50,WAIT,50,DISABLED,Candidate disabled,Speculative nuclear,2026-07-15,Auto-demoted from active watchlist

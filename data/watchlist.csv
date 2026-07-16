@@ -27,3 +27,11 @@ VRT,Data Centers,QUALITY,True,Data center infrastructure,2026-07-16,Data center 
 STX,Data Storage,QUALITY,True,Established data storage,2026-07-16,Established data storage
 DDOG,Cloud Software,QUALITY,True,Established SaaS/cloud,2026-07-16,Established SaaS/cloud
 SOUN,AI Software,MOONSHOT,True,Speculative AI software,2026-07-16,Speculative AI software
+CLS,Technology,MOMENTUM,True,AI infrastructure supplier,2026-07-16,AI server demand
+POET,Technology,MOONSHOT,True,Optical interconnects,2026-07-16,AI networking bet
+HPE,Technology,MOMENTUM,True,Enterprise AI infrastructure,2026-07-16,AI server demand
+RXRX,Healthcare,MOONSHOT,True,AI drug discovery,2026-07-16,AI biotech upside
+SYM,Robotics Automation,MOONSHOT,True,Warehouse automation/robotics,2026-07-16,Robotics automation upside
+SDGR,AI Drug Discovery,MOONSHOT,True,AI biotech candidate,2026-07-16,AI drug discovery upside
+ABCL,AI Biotech,MOONSHOT,True,AI antibody/drug discovery exposure,2026-07-16,AI biotech moonshot
+TEM,AI Healthcare,MOONSHOT,True,Aggressive AI health/data platform,2026-07-16,AI healthcare data upside
