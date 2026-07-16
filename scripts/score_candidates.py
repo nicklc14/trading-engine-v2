@@ -16,11 +16,18 @@ PROMOTE_TIMING_SCORE = 70
 DEMOTE_SCORE = 45
 KEEP_SCORE = 50
 
+BASE_COLUMNS = [
+    "ticker", "sector", "tier", "enabled", "notes",
+    "date_added", "candidate_reason",
+    "last_reviewed", "review_count", "status_reason",
+]
+
 REVIEW_COLUMNS = [
     "ticker", "source_list", "sector", "tier", "price", "score",
     "trend_score", "momentum_score", "accelerator_score",
     "timing_action", "timing_score", "recommendation", "why",
-    "notes", "date_added", "candidate_reason"
+    "notes", "date_added", "candidate_reason",
+    "last_reviewed", "review_count", "status_reason",
 ]
 
 
@@ -35,19 +42,27 @@ def read_csv_safe(path, columns=None):
 
 
 def normalise(df, default_enabled):
-    for col in ["ticker", "sector", "tier", "enabled", "notes", "date_added", "candidate_reason"]:
+    for col in BASE_COLUMNS:
         if col not in df.columns:
             df[col] = ""
 
     df["ticker"] = df["ticker"].astype(str).str.upper().str.strip()
     df = df[df["ticker"] != ""].copy()
-    df["enabled"] = df["enabled"].apply(lambda x: truthy(x) if str(x).strip() else default_enabled)
-    df["date_added"] = df["date_added"].replace("", str(date.today()))
+    df["enabled"] = df["enabled"].apply(
+        lambda x: truthy(x) if str(x).strip() else default_enabled
+    )
+
+    today = str(date.today())
+    df["date_added"] = df["date_added"].replace("", today)
+    df["last_reviewed"] = df["last_reviewed"].replace("", "")
+    df["review_count"] = pd.to_numeric(df["review_count"], errors="coerce").fillna(0).astype(int)
+
     df["candidate_reason"] = df["candidate_reason"].where(
         df["candidate_reason"].astype(str).str.strip() != "",
         df["notes"]
     )
-    return df
+
+    return df[BASE_COLUMNS]
 
 
 def score_one(row, market):
@@ -101,9 +116,18 @@ def score_one(row, market):
     return price, score, trend_score, momentum_score, accelerator_score, timing_action, timing_score
 
 
+def touch_review(row, reason):
+    row = row.copy()
+    today = str(date.today())
+    row["last_reviewed"] = today
+    row["review_count"] = int(pd.to_numeric(row.get("review_count", 0), errors="coerce") or 0) + 1
+    row["status_reason"] = reason
+    return row
+
+
 def score_candidates(rebalance=True, build_review=True):
-    watch = normalise(read_csv_safe(WATCHLIST_PATH), True)
-    candidates = normalise(read_csv_safe(CANDIDATES_PATH), False)
+    watch = normalise(read_csv_safe(WATCHLIST_PATH, BASE_COLUMNS), True)
+    candidates = normalise(read_csv_safe(CANDIDATES_PATH, BASE_COLUMNS), False)
 
     market = read_csv_safe(MARKET_PATH)
     if not market.empty and "ticker" in market.columns:
@@ -121,13 +145,20 @@ def score_candidates(rebalance=True, build_review=True):
         for _, row in candidates.iterrows():
             price, score, trend, momentum, accel, timing_action, timing_score = score_one(row, market)
 
-            manual_promote = truthy(row.get("enabled", False))
             auto_promote = score >= PROMOTE_SCORE and timing_score >= PROMOTE_TIMING_SCORE
 
-            if manual_promote or auto_promote:
+            if auto_promote:
+                row = touch_review(
+                    row,
+                    f"Promoted: score {score} and timing {timing_score} met threshold"
+                )
                 row["enabled"] = True
                 promoted.append(row)
             else:
+                row = touch_review(
+                    row,
+                    f"Kept candidate: score {score}, timing {timing_score}"
+                )
                 row["enabled"] = False
                 kept_candidates.append(row)
 
@@ -138,15 +169,23 @@ def score_candidates(rebalance=True, build_review=True):
             price, score, trend, momentum, accel, timing_action, timing_score = score_one(row, market)
 
             if row["ticker"] not in held and score < DEMOTE_SCORE:
+                row = touch_review(
+                    row,
+                    f"Demoted: score {score} below threshold {DEMOTE_SCORE}"
+                )
                 row["enabled"] = False
                 row["candidate_reason"] = "Auto-demoted from active watchlist"
                 demoted.append(row)
             else:
+                row = touch_review(
+                    row,
+                    f"Kept active: score {score}, timing {timing_score}"
+                )
                 row["enabled"] = True
                 kept_watch.append(row)
 
-        watch = pd.DataFrame(kept_watch + promoted)
-        candidates = pd.DataFrame(kept_candidates + demoted)
+        watch = pd.DataFrame(kept_watch + promoted, columns=BASE_COLUMNS)
+        candidates = pd.DataFrame(kept_candidates + demoted, columns=BASE_COLUMNS)
 
         if not watch.empty:
             watch = watch.drop_duplicates("ticker", keep="first")
@@ -187,6 +226,9 @@ def score_candidates(rebalance=True, build_review=True):
             "notes": row.get("notes", ""),
             "date_added": row.get("date_added", str(date.today())),
             "candidate_reason": row.get("candidate_reason", row.get("notes", "")),
+            "last_reviewed": row.get("last_reviewed", ""),
+            "review_count": row.get("review_count", 0),
+            "status_reason": row.get("status_reason", ""),
         })
 
     review = pd.DataFrame(rows, columns=REVIEW_COLUMNS)
