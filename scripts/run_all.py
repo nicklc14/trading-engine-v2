@@ -38,8 +38,8 @@ calculate_holdings()
 print("Step 4: Calculating performance...")
 calculate_performance()
 
-print("Step 5: Rebalancing candidate/watchlist tickers...")
-score_candidates(rebalance_only=True)
+print("Step 5: Rebalancing candidates/watchlist...")
+score_candidates(rebalance=True, build_review=False)
 
 print("Step 6: Scoring standard signals...")
 score_signals()
@@ -54,7 +54,7 @@ print("Step 9: Building dashboard output...")
 build_dashboard()
 
 print("Step 9b: Building candidate review...")
-score_candidates()
+score_candidates(rebalance=False, build_review=True)
 
 print("Step 10: Building holdings view...")
 build_holdings_view()
