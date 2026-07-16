@@ -12,6 +12,7 @@ HOLDINGS_PATH = DATA_DIR / "holdings.csv"
 CANDIDATE_REVIEW_PATH = DATA_DIR / "candidate_review.csv"
 
 ACTIVE_NON_HELD_LIMIT = 5
+MOMENTUM_SOFT_INCLUDE_SCORE_GAP = 10
 KEEP_SCORE = 50
 
 BASE_COLUMNS = [
@@ -43,15 +44,12 @@ def normalise(df, default_enabled):
 
     df["ticker"] = df["ticker"].astype(str).str.upper().str.strip()
     df = df[df["ticker"] != ""].copy()
-    df["enabled"] = df["enabled"].apply(
-        lambda x: truthy(x) if str(x).strip() else default_enabled
-    )
+    df["enabled"] = df["enabled"].apply(lambda x: truthy(x) if str(x).strip() else default_enabled)
 
     today = str(date.today())
     df["date_added"] = df["date_added"].replace("", today)
     df["last_reviewed"] = df["last_reviewed"].replace("", "")
     df["review_count"] = pd.to_numeric(df["review_count"], errors="coerce").fillna(0).astype(int)
-
     df["candidate_reason"] = df["candidate_reason"].where(
         df["candidate_reason"].astype(str).str.strip() != "",
         df["notes"]
@@ -127,6 +125,40 @@ def tier_rank(tier):
         return 1
     return 0
 
+def select_active_non_held(non_held):
+    ranked = non_held.sort_values(
+        ["_score", "_timing_score", "_tier_rank", "ticker"],
+        ascending=[False, False, False, True]
+    )
+
+    selected = ranked.head(ACTIVE_NON_HELD_LIMIT).copy()
+
+    if selected.empty:
+        return selected, ranked.iloc[0:0].copy()
+
+    has_momentum = (selected["tier"].astype(str).str.upper() == "MOMENTUM").any()
+
+    if not has_momentum:
+        momentum_pool = ranked[ranked["tier"].astype(str).str.upper() == "MOMENTUM"]
+
+        if not momentum_pool.empty:
+            best_momentum = momentum_pool.iloc[0]
+            weakest_selected = selected.sort_values(
+                ["_score", "_timing_score", "_tier_rank", "ticker"],
+                ascending=[True, True, True, False]
+            ).iloc[0]
+
+            score_gap = weakest_selected["_score"] - best_momentum["_score"]
+
+            if score_gap <= MOMENTUM_SOFT_INCLUDE_SCORE_GAP:
+                selected = selected[selected["ticker"] != weakest_selected["ticker"]]
+                selected = pd.concat([selected, best_momentum.to_frame().T], ignore_index=True)
+
+    selected = selected.drop_duplicates("ticker", keep="first")
+    remaining = ranked[~ranked["ticker"].isin(selected["ticker"])].copy()
+
+    return selected, remaining
+
 def score_candidates(rebalance=True, build_review=True):
     watch = normalise(read_csv_safe(WATCHLIST_PATH, BASE_COLUMNS), True)
     candidates = normalise(read_csv_safe(CANDIDATES_PATH, BASE_COLUMNS), False)
@@ -165,16 +197,9 @@ def score_candidates(rebalance=True, build_review=True):
 
     if rebalance:
         held_rows = scored[scored["_is_held"]].copy()
-
         non_held = scored[~scored["_is_held"]].copy()
-        non_held = non_held.sort_values(
-            ["_score", "_timing_score", "_tier_rank", "ticker"],
-            ascending=[False, False, False, True]
-        )
 
-        active_non_held = non_held.head(ACTIVE_NON_HELD_LIMIT).copy()
-        candidate_rows = non_held.iloc[ACTIVE_NON_HELD_LIMIT:].copy()
-
+        active_non_held, candidate_rows = select_active_non_held(non_held)
         active = pd.concat([held_rows, active_non_held], ignore_index=True)
 
         active_out = []
