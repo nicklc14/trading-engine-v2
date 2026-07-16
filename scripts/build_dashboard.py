@@ -13,7 +13,7 @@ DASHBOARD_PATH = DATA_DIR / "dashboard.csv"
 VISIBLE_COLUMNS = [
     "ticker",
     "action_required",
-    "add_more",
+    "position_rule",
     "plan_why",
     "buy_usd",
     "sell_usd",
@@ -26,7 +26,7 @@ VISIBLE_COLUMNS = [
     "stop_loss",
     "trim_target",
     "risk_note",
-    "position_rule",
+    "add_more",
 ]
 
 def clean_text(x):
@@ -70,7 +70,6 @@ def load_data_quality():
 
     severity_rank = {"OK": 0, "LOW": 1, "MEDIUM": 2, "HIGH": 3}
     ticker_status = {}
-
     global_status = "OK"
 
     for _, row in dq.iterrows():
@@ -364,7 +363,7 @@ def build_dashboard():
     out = pd.DataFrame({
         "ticker": signals.get("ticker", ""),
         "action_required": signals["action_required"],
-        "add_more": signals["add_more"],
+        "position_rule": signals.get("position_rule", ""),
         "plan_why": signals["plan_why"],
         "buy_usd": signals["buy_usd"],
         "sell_usd": signals["sell_usd"],
@@ -377,7 +376,7 @@ def build_dashboard():
         "stop_loss": signals.get("stop_loss", np.nan),
         "trim_target": signals.get("trim_price", np.nan),
         "risk_note": signals["risk_note"],
-        "position_rule": signals.get("position_rule", ""),
+        "add_more": signals["add_more"],
         "_dashboard_priority": signals["_dashboard_priority"],
     })
 
