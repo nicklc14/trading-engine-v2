@@ -210,12 +210,16 @@ def add_replacement_notes(signals):
     best_ticker = best["ticker"]
     best_score = best["_score_num"]
     best_tier = clean_text(best.get("tier"))
+    best_timing = timing_note(best)
+    best_reasons = clean_text(best.get("decision_reasons"))
+    best_reason_short = best_reasons.split(";")[0] if best_reasons else "stronger setup"
 
     for idx, row in signals.iterrows():
         is_held = "ALREADY HELD" in clean_text(row.get("position_rule")).upper()
         if not is_held:
             continue
 
+        held_ticker = row.get("ticker")
         held_score = pd.to_numeric(row.get("score"), errors="coerce")
         held_return = pd.to_numeric(row.get("holding_return_pct"), errors="coerce")
         held_tier = clean_text(row.get("tier")).upper()
@@ -231,9 +235,18 @@ def add_replacement_notes(signals):
             and (pd.isna(held_return) or held_return <= 0)
             and not protect_strong_moonshot
         ):
+            held_return_text = (
+                f"down {abs(held_return):.1%}"
+                if pd.notna(held_return) and held_return < 0
+                else "not currently outperforming"
+            )
+            score_gap = best_score - held_score
+
             signals.at[idx, "_replacement_note"] = (
-                f"Replacement review: {best_ticker} ({best_tier}, score {best_score:.0f}) "
-                f"is much stronger than held score {held_score:.0f}."
+                f"Replacement review: consider rotating {held_ticker} into {best_ticker}. "
+                f"{best_ticker} has stronger score {best_score:.0f} vs {held_score:.0f} (+{score_gap:.0f}), "
+                f"{best_tier} tier, {best_timing.lower()}, and {best_reason_short.lower()}. "
+                f"{held_ticker} is {held_return_text}. Manual review only; not an automatic sell."
             )
 
     return signals
