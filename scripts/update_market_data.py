@@ -5,20 +5,19 @@ from pathlib import Path
 from datetime import datetime, timezone
 
 DATA_DIR = Path("data")
-WATCHLIST_PATH = DATA_DIR / "watchlist.csv"
-CANDIDATE_PATH = DATA_DIR / "candidate_watchlist.csv"
+DASHBOARD_WATCHLIST_PATH = DATA_DIR / "dashboard_watchlist.csv"
+CANDIDATE_POOL_PATH = DATA_DIR / "candidate_pool.csv"
 MARKET_PATH = DATA_DIR / "market_data.csv"
 REGIME_PATH = DATA_DIR / "market_regime.csv"
-
 
 def fetch_tickers():
     frames = []
 
-    if WATCHLIST_PATH.exists():
-        frames.append(pd.read_csv(WATCHLIST_PATH))
+    if DASHBOARD_WATCHLIST_PATH.exists():
+        frames.append(pd.read_csv(DASHBOARD_WATCHLIST_PATH))
 
-    if CANDIDATE_PATH.exists():
-        frames.append(pd.read_csv(CANDIDATE_PATH))
+    if CANDIDATE_POOL_PATH.exists():
+        frames.append(pd.read_csv(CANDIDATE_POOL_PATH))
 
     if not frames:
         return []
@@ -28,14 +27,12 @@ def fetch_tickers():
     df = df[df["ticker"] != ""]
     return sorted(df["ticker"].drop_duplicates().tolist())
 
-
 def calc_rsi(close, period=14):
     delta = close.diff()
     gain = delta.clip(lower=0).rolling(period).mean()
     loss = (-delta.clip(upper=0)).rolling(period).mean()
     rs = gain / loss.replace(0, np.nan)
     return 100 - (100 / (1 + rs))
-
 
 def calc_macd(close, fast=12, slow=26, signal=9):
     ema_fast = close.ewm(span=fast, adjust=False).mean()
@@ -45,7 +42,6 @@ def calc_macd(close, fast=12, slow=26, signal=9):
     hist = macd - sig
     return macd, sig, hist
 
-
 def calc_atr(high, low, close, period=14):
     tr = pd.concat([
         high - low,
@@ -53,7 +49,6 @@ def calc_atr(high, low, close, period=14):
         (low - close.shift(1)).abs()
     ], axis=1).max(axis=1)
     return tr.rolling(period).mean()
-
 
 def fetch_one(ticker):
     fetched_at = datetime.now(timezone.utc).isoformat()
@@ -122,7 +117,6 @@ def fetch_one(ticker):
         "fetched_at_utc": fetched_at,
     }
 
-
 def update_market_data():
     DATA_DIR.mkdir(exist_ok=True)
 
@@ -150,7 +144,6 @@ def update_market_data():
     }]).to_csv(REGIME_PATH, index=False)
 
     return market
-
 
 if __name__ == "__main__":
     update_market_data()
