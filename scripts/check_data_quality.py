@@ -6,38 +6,81 @@ from datetime import datetime, timezone
 DATA_DIR = Path("data")
 
 MARKET_PATH = DATA_DIR / "market_data.csv"
-WATCHLIST_PATH = DATA_DIR / "watchlist.csv"
+DASHBOARD_WATCHLIST_PATH = DATA_DIR / "dashboard_watchlist.csv"
+CANDIDATE_POOL_PATH = DATA_DIR / "candidate_pool.csv"
 QUALITY_PATH = DATA_DIR / "data_quality_report.csv"
 
 MAX_DATA_AGE_HOURS = 18
 MAX_MARKET_DATE_LAG_DAYS = 4
 
 REQUIRED_MARKET_COLUMNS = [
-    "ticker",
-    "price",
-    "volume",
-    "avg_volume_50",
-    "volume_trend",
-    "rsi_14",
-    "atr",
-    "atr_pct",
-    "as_of",
-    "market_data_date",
-    "fetched_at_utc",
+    "ticker", "price", "volume", "avg_volume_50", "volume_trend",
+    "rsi_14", "atr", "atr_pct", "as_of", "market_data_date", "fetched_at_utc",
 ]
 
-def truthy(x):
-    return str(x).strip().upper() in ["TRUE", "YES", "1", "Y"]
-
-def issue(ticker, issue_type, severity, text, action):
-    return {
+def issue(ticker, issue_type, severity, text, action, freshness=None):
+    row = {
         "as_of": datetime.now(timezone.utc).isoformat(),
         "ticker": ticker,
         "issue_type": issue_type,
         "severity": severity,
         "issue": text,
         "suggested_action": action,
+        "yfinance_fetched_at_utc": "",
+        "latest_market_data_date": "",
+        "oldest_market_data_date": "",
+        "max_yfinance_age_hours": "",
+        "max_market_date_lag_days": "",
     }
+    if freshness:
+        row.update(freshness)
+    return row
+
+def expected_tickers():
+    frames = []
+    for path in [DASHBOARD_WATCHLIST_PATH, CANDIDATE_POOL_PATH]:
+        if path.exists():
+            frames.append(pd.read_csv(path))
+
+    if not frames:
+        return set()
+
+    df = pd.concat(frames, ignore_index=True)
+    if "ticker" not in df.columns:
+        return set()
+
+    return set(df["ticker"].astype(str).str.upper().str.strip()) - {""}
+
+def freshness_issue(market, now):
+    fetched = pd.to_datetime(market["fetched_at_utc"], errors="coerce", utc=True)
+    market_dates = pd.to_datetime(market["market_data_date"], errors="coerce")
+
+    newest_fetch = fetched.max()
+    oldest_fetch = fetched.min()
+    latest_market_date = market_dates.max()
+    oldest_market_date = market_dates.min()
+
+    max_age_hours = "" if pd.isna(oldest_fetch) else round((now - oldest_fetch.to_pydatetime()).total_seconds() / 3600, 1)
+    max_lag_days = "" if pd.isna(oldest_market_date) else (now.date() - oldest_market_date.date()).days
+
+    freshness = {
+        "yfinance_fetched_at_utc": "" if pd.isna(newest_fetch) else newest_fetch.isoformat(),
+        "latest_market_data_date": "" if pd.isna(latest_market_date) else latest_market_date.date().isoformat(),
+        "oldest_market_data_date": "" if pd.isna(oldest_market_date) else oldest_market_date.date().isoformat(),
+        "max_yfinance_age_hours": max_age_hours,
+        "max_market_date_lag_days": max_lag_days,
+    }
+
+    if max_age_hours == "" or max_lag_days == "":
+        return issue("", "yfinance_freshness", "HIGH", "Yfinance freshness timestamps are missing or invalid", "Rerun GitHub workflow before trading", freshness)
+
+    if max_age_hours > MAX_DATA_AGE_HOURS:
+        return issue("", "yfinance_freshness", "HIGH", f"Oldest yfinance fetch is {max_age_hours} hours old", "Rerun GitHub workflow before trading", freshness)
+
+    if max_lag_days > MAX_MARKET_DATE_LAG_DAYS:
+        return issue("", "yfinance_freshness", "HIGH", f"Oldest latest-market candle is {max_lag_days} days old", "Check yfinance data or ticker validity", freshness)
+
+    return issue("", "yfinance_freshness", "OK", "Yfinance market data freshness looks OK", "Proceed with normal review", freshness)
 
 def check_data_quality():
     issues = []
@@ -62,21 +105,12 @@ def check_data_quality():
 
     market["ticker"] = market["ticker"].astype(str).str.upper().str.strip()
 
-    if WATCHLIST_PATH.exists():
-        watch = pd.read_csv(WATCHLIST_PATH)
-        watch["enabled"] = watch["enabled"].apply(truthy)
-        enabled_tickers = set(watch.loc[watch["enabled"], "ticker"].astype(str).str.upper().str.strip())
-        fetched_tickers = set(market["ticker"])
-        missing_tickers = sorted(enabled_tickers - fetched_tickers)
+    if "fetched_at_utc" in market.columns and "market_data_date" in market.columns:
+        issues.append(freshness_issue(market, now))
 
-        for ticker in missing_tickers:
-            issues.append(issue(
-                ticker,
-                "missing_ticker_data",
-                "HIGH",
-                "Enabled watchlist ticker is missing from market_data.csv",
-                "Do not trade this ticker until yfinance fetch succeeds"
-            ))
+    missing_tickers = sorted(expected_tickers() - set(market["ticker"]))
+    for ticker in missing_tickers:
+        issues.append(issue(ticker, "missing_ticker_data", "HIGH", "Expected ticker is missing from market_data.csv", "Do not trade this ticker until yfinance fetch succeeds"))
 
     for _, row in market.iterrows():
         ticker = str(row.get("ticker", "")).upper().strip()
@@ -92,18 +126,10 @@ def check_data_quality():
         fetched = pd.to_datetime(row.get("fetched_at_utc", ""), errors="coerce", utc=True)
         if pd.isna(fetched):
             issues.append(issue(ticker, "missing_fetch_time", "HIGH", "Missing fetched_at_utc timestamp", "Rerun GitHub workflow before trading"))
-        else:
-            age_hours = (now - fetched.to_pydatetime()).total_seconds() / 3600
-            if age_hours > MAX_DATA_AGE_HOURS:
-                issues.append(issue(ticker, "stale_fetch", "HIGH", f"Market data was fetched {age_hours:.1f} hours ago", "Rerun GitHub workflow before trading"))
 
         market_date = pd.to_datetime(row.get("market_data_date", ""), errors="coerce")
         if pd.isna(market_date):
             issues.append(issue(ticker, "missing_market_date", "HIGH", "Missing market_data_date", "Do not trade until latest market date is known"))
-        else:
-            lag_days = (now.date() - market_date.date()).days
-            if lag_days > MAX_MARKET_DATE_LAG_DAYS:
-                issues.append(issue(ticker, "old_market_date", "HIGH", f"Latest market candle is {lag_days} days old", "Check yfinance data or ticker validity"))
 
         if pd.isna(price) or price <= 0:
             issues.append(issue(ticker, "bad_price", "HIGH", "Missing or invalid price", "Do not trade this ticker"))
@@ -119,9 +145,6 @@ def check_data_quality():
             issues.append(issue(ticker, "missing_atr", "HIGH", "Missing or invalid ATR", "Stop loss and sizing may be unreliable"))
         if pd.notna(atr_pct) and atr_pct > 0.20:
             issues.append(issue(ticker, "extreme_volatility", "MEDIUM", "ATR is over 20 percent of price", "Use smaller size unless intentional moonshot"))
-
-    if not issues:
-        issues.append(issue("", "ok", "OK", "No major data quality issues found", "Proceed with normal review"))
 
     out = pd.DataFrame(issues)
     out.to_csv(QUALITY_PATH, index=False)
