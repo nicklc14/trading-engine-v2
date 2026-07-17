@@ -202,7 +202,7 @@ def style_dashboard(ws, raw_headers):
     preferred = {
         "ticker": 12,
         "action_required": 14,
-        "add_more": 12,
+        "position_rule": 28,
         "plan_why": 48,
         "buy_usd": 12,
         "sell_usd": 12,
@@ -215,7 +215,7 @@ def style_dashboard(ws, raw_headers):
         "stop_loss": 12,
         "trim_target": 12,
         "risk_note": 44,
-        "position_rule": 28,
+        "add_more": 12,
     }
 
     for idx, header in enumerate(raw_headers, start=1):
@@ -258,17 +258,18 @@ def build_excel_workbook():
             df.to_excel(writer, sheet_name=safe_name, index=False)
 
         instructions = pd.DataFrame([
-            {"Step": 1, "Action": "Open Dashboard first. Review from top to bottom."},
+            {"Step": 1, "Action": "Open Dashboard first. Review held positions and the active Dashboard watchlist."},
             {"Step": 2, "Action": "Review SELL / TRIM rows before any buys."},
-            {"Step": 3, "Action": "Check add_more to see whether current winners are strong enough to add to."},
-            {"Step": 4, "Action": "Check Candidate Review for new tickers to promote or remove."},
-            {"Step": 5, "Action": "Check Holdings and Performance Summary before trading."},
-            {"Step": 6, "Action": "Use BUY / BUY SMALL as candidates, not automatic trades."},
-            {"Step": 7, "Action": "Check Market Timing to confirm whether entry timing looks supportive."},
-            {"Step": 8, "Action": "Check Weekly Review, Closed Trades Learning, and Performance Learning."},
-            {"Step": 9, "Action": "Check Data Quality if a signal looks strange."},
-            {"Step": 10, "Action": "For full sells in trades.csv, use shares=ALL."},
-            {"Step": 11, "Action": "Run GitHub workflow, then open the generated workbook."},
+            {"Step": 3, "Action": "Check position_rule and plan_why together before trading."},
+            {"Step": 4, "Action": "Dashboard watchlist source: data/dashboard_watchlist.csv."},
+            {"Step": 5, "Action": "Candidate pool source: data/candidate_pool.csv. Candidate Review shows names not currently active on Dashboard."},
+            {"Step": 6, "Action": "Check Holdings and Performance Summary before trading."},
+            {"Step": 7, "Action": "Use BUY / BUY SMALL as candidates, not automatic trades."},
+            {"Step": 8, "Action": "Check Market Timing to confirm whether entry timing looks supportive."},
+            {"Step": 9, "Action": "Check Weekly Review, Closed Trades Learning, and Performance Learning."},
+            {"Step": 10, "Action": "Check Data Quality if a signal looks strange."},
+            {"Step": 11, "Action": "For full sells in trades.csv, use shares=ALL."},
+            {"Step": 12, "Action": "Run GitHub workflow, then open the generated workbook."},
         ])
 
         raw_headers_by_sheet["How To Use"] = list(instructions.columns)
