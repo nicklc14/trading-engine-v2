@@ -81,6 +81,9 @@ def load_data_quality():
 
     return ticker_status, global_status
 
+def is_reentry(row):
+    return "RE-ENTRY" in clean_text(row.get("position_rule")).upper()
+
 def base_action_required(row):
     exit_action = clean_text(row.get("exit_action")).upper()
     action = clean_text(row.get("action")).upper()
@@ -131,6 +134,7 @@ def dashboard_priority(row):
     replacement = clean_text(row.get("_replacement_note"))
     exit_priority = clean_text(row.get("exit_priority")).upper()
     score = pd.to_numeric(row.get("score", 0), errors="coerce")
+    reentry = is_reentry(row)
 
     if action == "SELL" and exit_priority == "HIGH":
         return 1
@@ -144,13 +148,19 @@ def dashboard_priority(row):
         return 5
     if action == "HOLD" and replacement:
         return 6
-    if action == "BUY":
+    if reentry and action == "BUY":
         return 7
-    if action == "BUY SMALL":
+    if action == "BUY":
         return 8
-    if action == "WATCH" and pd.notna(score) and score >= 80:
+    if reentry and action == "BUY SMALL":
         return 9
-    return 10
+    if action == "BUY SMALL":
+        return 10
+    if reentry and action == "WATCH":
+        return 11
+    if action == "WATCH" and pd.notna(score) and score >= 80:
+        return 12
+    return 13
 
 def timing_note(row):
     timing = clean_text(row.get("timing_action")).upper()
@@ -182,6 +192,8 @@ def watchlist_review_note(row):
 
     if action != "WATCH":
         return ""
+    if is_reentry(row):
+        return "Re-entry watch"
     if pd.notna(score) and score < 40:
         return "Review watchlist — low score and weak setup"
     if tier == "QUALITY" and (pd.isna(score) or score < 60):
@@ -265,6 +277,7 @@ def build_plan_why(row):
     timing = timing_note(row)
     quality = quality_note(row)
     review_note = watchlist_review_note(row)
+    reentry = is_reentry(row)
 
     suffix = f". {replacement}" if replacement else ""
 
@@ -275,12 +288,16 @@ def build_plan_why(row):
     if add_signal == "ADD SMALL":
         return f"Add small ${buy_usd:.2f}: {add_reason}. {timing}. {quality}. {reasons}{suffix}"
     if action in ["BUY", "BUY SMALL"]:
+        if reentry:
+            return f"{action} re-entry ${buy_usd:.2f}: {tier}. {timing}. {quality}. {reasons}{suffix}"
         return f"{action} ${buy_usd:.2f}: {tier}. {timing}. {quality}. {reasons}{suffix}"
     if action == "HOLD":
         if add_reason:
             return f"Hold. {add_reason}. {timing}. {quality}. {warnings or reasons}{suffix}"
         return f"Hold. {timing}. {quality}. {warnings or reasons}{suffix}"
     if base_action in ["BUY", "BUY SMALL"] and action == "WATCH":
+        if reentry:
+            return f"Re-entry watch — signal was {base_action}, but not trade-ready. {timing}. {quality}. {warnings or reasons}{suffix}"
         return f"Wait — signal was {base_action}, but not trade-ready. {timing}. {quality}. {warnings or reasons}{suffix}"
     if review_note:
         return f"{review_note}. {timing}. {quality}. {warnings or reasons}{suffix}"
