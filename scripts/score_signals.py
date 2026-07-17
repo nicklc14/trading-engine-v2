@@ -48,6 +48,10 @@ def load_config():
         "aggressive_risk_on_position_size_factor": 1.25,
         "aggressive_risk_on_buy_threshold": 78,
         "aggressive_risk_on_buy_small_threshold": 73,
+        "reentry_lookback_days": 60,
+        "reentry_min_score": 70,
+        "reentry_min_momentum_score": 70,
+        "reentry_block_stop_loss_sells": "TRUE",
     }
 
     if CONFIG_PATH.exists():
@@ -80,6 +84,57 @@ def get_cash_available():
     cash = pd.read_csv(CASH_PATH)
     return float(cash["cash_available_usd"].iloc[0]) if not cash.empty else 0.0
 
+def load_recent_sells(lookback_days):
+    if not TRADES_PATH.exists():
+        return {}
+
+    trades = pd.read_csv(TRADES_PATH)
+    if trades.empty:
+        return {}
+
+    trades["date"] = pd.to_datetime(trades["date"], errors="coerce")
+    trades["ticker"] = trades["ticker"].astype(str).str.upper().str.strip()
+    trades["type_upper"] = trades["type"].astype(str).str.upper().str.strip()
+    trades["price"] = pd.to_numeric(trades.get("price", np.nan), errors="coerce")
+
+    today = pd.Timestamp(datetime.utcnow().date())
+    cutoff = today - pd.Timedelta(days=lookback_days)
+
+    sells = trades[
+        (trades["type_upper"] == "SELL")
+        & (trades["date"].notna())
+        & (trades["date"] >= cutoff)
+        & (trades["ticker"] != "")
+    ].copy()
+
+    if sells.empty:
+        return {}
+
+    sells = sells.sort_values(["ticker", "date"])
+    latest = sells.groupby("ticker").tail(1)
+
+    out = {}
+    for _, row in latest.iterrows():
+        out[row["ticker"]] = {
+            "sell_date": row.get("date"),
+            "sell_price": row.get("price", np.nan),
+            "sell_note": str(row.get("notes", "")),
+        }
+
+    return out
+
+def prior_sell_blocks_reentry(sell_note):
+    note = str(sell_note).lower()
+    block_terms = [
+        "stop loss",
+        "broken trend",
+        "trend weakened",
+        "score weakened",
+        "holding down",
+        "down 15",
+    ]
+    return any(term in note for term in block_terms)
+
 def get_weekly_realized_pnl():
     if not TRADES_PATH.exists():
         return 0.0
@@ -93,7 +148,6 @@ def get_weekly_realized_pnl():
 
     today = pd.Timestamp(datetime.utcnow().date())
     week_start = today.to_period("W").start_time
-
     sells = trades[(trades["type_upper"] == "SELL") & (trades["date"] >= week_start)]
 
     realized_pnl = 0.0
@@ -115,19 +169,25 @@ def get_weekly_realized_pnl():
     return float(realized_pnl)
 
 def review_priority(action, exit_action="", exit_priority="", position_rule=""):
+    rule = str(position_rule).upper()
+
     if exit_action == "SELL" and exit_priority == "HIGH":
         return 1
     if exit_action == "SELL":
         return 2
-    if "ALREADY HELD" in str(position_rule).upper():
+    if "ALREADY HELD" in rule:
         return 3
+    if "RE-ENTRY" in rule and action == "BUY":
+        return 4
     if action == "BUY":
         return 5
-    if action == "BUY SMALL":
+    if "RE-ENTRY" in rule and action == "BUY SMALL":
         return 6
-    if action == "WATCH":
+    if action == "BUY SMALL":
         return 7
-    return 8
+    if action == "WATCH":
+        return 8
+    return 9
 
 def score_signals():
     cfg = load_config()
@@ -164,6 +224,12 @@ def score_signals():
     aggressive_size_factor = cfg_float(cfg, "aggressive_risk_on_position_size_factor")
     aggressive_buy_threshold = cfg_float(cfg, "aggressive_risk_on_buy_threshold")
     aggressive_buy_small_threshold = cfg_float(cfg, "aggressive_risk_on_buy_small_threshold")
+
+    reentry_lookback_days = cfg_int(cfg, "reentry_lookback_days")
+    reentry_min_score = cfg_float(cfg, "reentry_min_score")
+    reentry_min_momentum_score = cfg_float(cfg, "reentry_min_momentum_score")
+    reentry_block_stop_loss_sells = cfg_bool(cfg, "reentry_block_stop_loss_sells")
+    recent_sells = load_recent_sells(reentry_lookback_days)
 
     buy_threshold = 80
     buy_small_threshold = 75
@@ -242,6 +308,7 @@ def score_signals():
         shares_held = row.get("shares", 0)
         holding_return_pct = row.get("holding_return_pct", np.nan)
         already_held = pd.notna(shares_held) and shares_held > 0
+        recently_sold = ticker in recent_sells and not already_held
 
         trend_score = 0
         if pd.notna(price) and pd.notna(row.get("sma_50")) and price > row["sma_50"]:
@@ -302,14 +369,37 @@ def score_signals():
         if is_risk_off and tier == "MOONSHOT" and not already_held and risk_off_block_new_moonshots:
             action = "WATCH"
 
+        reentry_setup = False
+        reentry_blocked = False
+
+        if recently_sold:
+            sell_info = recent_sells.get(ticker, {})
+            reentry_blocked = reentry_block_stop_loss_sells and prior_sell_blocks_reentry(sell_info.get("sell_note", ""))
+            reentry_setup = (
+                final_score >= reentry_min_score
+                and (
+                    momentum_score >= reentry_min_momentum_score
+                    or trend_score >= 70
+                    or accelerator_score >= 75
+                )
+                and not reentry_blocked
+            )
+
+        if recently_sold and reentry_blocked:
+            action = "WATCH"
+
         if already_held:
             position_rule = "Already held"
         elif open_slots <= 0:
-            position_rule = f"Max {max_positions} positions reached"
+            position_rule = f"Re-entry watch; Max {max_positions} positions reached" if reentry_setup else f"Max {max_positions} positions reached"
             action = "WATCH"
         elif tier == "MOONSHOT" and moonshot_open_slots <= 0:
-            position_rule = f"Max {max_moonshot_positions} MOONSHOT positions reached"
+            position_rule = f"Re-entry watch; Max {max_moonshot_positions} MOONSHOT positions reached" if reentry_setup else f"Max {max_moonshot_positions} MOONSHOT positions reached"
             action = "WATCH"
+        elif reentry_setup and action in ["BUY", "BUY SMALL"]:
+            position_rule = f"Re-entry candidate; {open_slots} open slot(s)"
+        elif recently_sold:
+            position_rule = f"Re-entry watch; {open_slots} open slot(s)"
         else:
             position_rule = f"{open_slots} open slot(s); {moonshot_open_slots} MOONSHOT slot(s)" if tier == "MOONSHOT" else f"{open_slots} open slot(s)"
 
@@ -381,6 +471,12 @@ def score_signals():
             reasons.append("Positive momentum")
         if accelerator_score >= 75:
             reasons.append("MACD/volume acceleration")
+        if reentry_setup:
+            reasons.append("Re-entry setup")
+        if recently_sold and reentry_blocked:
+            warnings.append("Re-entry blocked by prior sell reason")
+        elif recently_sold and not reentry_setup:
+            warnings.append("Re-entry watch")
         if tier == "MOMENTUM":
             reasons.append("Momentum tier boost")
         if tier == "MOONSHOT":
