@@ -24,6 +24,7 @@ BASE_WATCHLIST_COLUMNS = [
     "ticker", "sector", "tier", "enabled", "notes",
     "date_added", "candidate_reason",
     "last_reviewed", "review_count", "status_reason",
+    "low_score_count",
 ]
 
 REQUIRED_COLUMNS = {
@@ -36,9 +37,13 @@ REQUIRED_COLUMNS = {
         "stop_loss", "trim_target", "risk_note", "add_more",
     ],
     "candidate_review": [
-        "ticker", "source_list", "sector", "tier", "price", "score",
-        "trend_score", "momentum_score", "accelerator_score",
-        "timing_action", "timing_score", "recommendation", "why",
+        "ticker", "recommendation", "next_up_rank", "promotion_fit",
+        "promotion_reason", "tier", "score", "timing_score",
+        "timing_action", "sector", "price", "trend_score",
+        "momentum_score", "accelerator_score", "notes",
+        "candidate_reason", "date_added", "days_in_pool",
+        "last_reviewed", "review_count", "low_score_count",
+        "stale_flag", "removal_reason", "status_reason",
     ],
     "weekly_review": [
         "week_start", "closed_trades", "wins", "losses", "win_rate",
@@ -89,13 +94,12 @@ VALID_DASHBOARD_ACTIONS = {"SELL", "TRIM", "HOLD", "BUY", "BUY SMALL", "WATCH"}
 VALID_TIMING_ACTIONS = {"TIMING CONFIRMED", "TIMING WATCH", "WAIT", ""}
 VALID_QUALITY_SEVERITIES = {"OK", "LOW", "MEDIUM", "HIGH"}
 VALID_CANDIDATE_RECOMMENDATIONS = {
-    "PROMOTE",
     "KEEP CANDIDATE",
+    "MONITOR LOW",
     "REMOVE",
     "DISABLED",
     "NO CANDIDATES",
 }
-VALID_SOURCE_LISTS = {"CANDIDATE"}
 VALID_TIERS = {"QUALITY", "MOMENTUM", "MOONSHOT", ""}
 
 def read_csv(name):
@@ -172,14 +176,6 @@ def validate_signals(df):
         raise ValueError("signals.csv has score values outside 0–100")
 
 def validate_candidate_review(df):
-    bad_sources = (
-        set(df["source_list"].dropna().astype(str).str.upper())
-        - VALID_SOURCE_LISTS
-    )
-
-    if bad_sources:
-        raise ValueError(f"candidate_review.csv has invalid source_list values: {sorted(bad_sources)}")
-
     bad_recommendations = (
         set(df["recommendation"].dropna().astype(str).str.upper())
         - VALID_CANDIDATE_RECOMMENDATIONS
