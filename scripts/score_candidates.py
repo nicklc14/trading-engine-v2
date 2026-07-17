@@ -5,8 +5,8 @@ from datetime import date
 
 DATA_DIR = Path("data")
 
-WATCHLIST_PATH = DATA_DIR / "watchlist.csv"
-CANDIDATES_PATH = DATA_DIR / "candidate_watchlist.csv"
+DASHBOARD_WATCHLIST_PATH = DATA_DIR / "dashboard_watchlist.csv"
+CANDIDATE_POOL_PATH = DATA_DIR / "candidate_pool.csv"
 MARKET_PATH = DATA_DIR / "market_data.csv"
 HOLDINGS_PATH = DATA_DIR / "holdings.csv"
 CANDIDATE_REVIEW_PATH = DATA_DIR / "candidate_review.csv"
@@ -160,8 +160,8 @@ def select_active_non_held(non_held):
     return selected, remaining
 
 def score_candidates(rebalance=True, build_review=True):
-    watch = normalise(read_csv_safe(WATCHLIST_PATH, BASE_COLUMNS), True)
-    candidates = normalise(read_csv_safe(CANDIDATES_PATH, BASE_COLUMNS), False)
+    dashboard_watchlist = normalise(read_csv_safe(DASHBOARD_WATCHLIST_PATH, BASE_COLUMNS), True)
+    candidate_pool = normalise(read_csv_safe(CANDIDATE_POOL_PATH, BASE_COLUMNS), False)
 
     market = read_csv_safe(MARKET_PATH)
     if not market.empty and "ticker" in market.columns:
@@ -172,7 +172,7 @@ def score_candidates(rebalance=True, build_review=True):
     if not holdings.empty and "ticker" in holdings.columns:
         held = set(holdings["ticker"].astype(str).str.upper().str.strip())
 
-    combined = pd.concat([watch, candidates], ignore_index=True)
+    combined = pd.concat([dashboard_watchlist, candidate_pool], ignore_index=True)
     combined = combined.drop_duplicates("ticker", keep="first")
 
     scored_rows = []
@@ -224,20 +224,20 @@ def score_candidates(rebalance=True, build_review=True):
                 row["candidate_reason"] = "Not currently in Dashboard active watchlist"
             candidate_out.append(row[BASE_COLUMNS])
 
-        watch = pd.DataFrame(active_out, columns=BASE_COLUMNS)
-        candidates = pd.DataFrame(candidate_out, columns=BASE_COLUMNS)
+        dashboard_watchlist = pd.DataFrame(active_out, columns=BASE_COLUMNS)
+        candidate_pool = pd.DataFrame(candidate_out, columns=BASE_COLUMNS)
 
-        watch.to_csv(WATCHLIST_PATH, index=False)
-        candidates.to_csv(CANDIDATES_PATH, index=False)
+        dashboard_watchlist.to_csv(DASHBOARD_WATCHLIST_PATH, index=False)
+        candidate_pool.to_csv(CANDIDATE_POOL_PATH, index=False)
     else:
-        candidates = normalise(read_csv_safe(CANDIDATES_PATH, BASE_COLUMNS), False)
+        candidate_pool = normalise(read_csv_safe(CANDIDATE_POOL_PATH, BASE_COLUMNS), False)
 
     if not build_review:
         return pd.DataFrame(columns=REVIEW_COLUMNS)
 
     rows = []
 
-    for _, row in candidates.iterrows():
+    for _, row in candidate_pool.iterrows():
         price, score, trend, momentum, accel, timing_action, timing_score = score_one(row, market)
 
         recommendation = "KEEP CANDIDATE" if score >= KEEP_SCORE else "DISABLED"
