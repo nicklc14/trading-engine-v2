@@ -9,6 +9,7 @@ DASHBOARD_WATCHLIST_PATH = DATA_DIR / "dashboard_watchlist.csv"
 CANDIDATE_POOL_PATH = DATA_DIR / "candidate_pool.csv"
 MARKET_PATH = DATA_DIR / "market_data.csv"
 HOLDINGS_PATH = DATA_DIR / "holdings.csv"
+TRADES_PATH = DATA_DIR / "trades.csv"
 CANDIDATE_REVIEW_PATH = DATA_DIR / "candidate_review.csv"
 
 ACTIVE_NON_HELD_LIMIT = 5
@@ -17,6 +18,9 @@ KEEP_SCORE = 50
 REMOVE_SCORE = 40
 LOW_SCORE_REVIEW_LIMIT = 3
 STALE_DAYS = 14
+
+REENTRY_LOOKBACK_DAYS = 60
+REENTRY_MIN_SCORE = 70
 
 BASE_COLUMNS = [
     "ticker", "sector", "tier", "enabled", "notes",
@@ -72,6 +76,56 @@ def normalise(df, default_enabled):
     )
 
     return df[BASE_COLUMNS]
+
+def load_recent_sells():
+    if not TRADES_PATH.exists():
+        return {}
+
+    trades = read_csv_safe(TRADES_PATH)
+    if trades.empty:
+        return {}
+
+    trades["date"] = pd.to_datetime(trades["date"], errors="coerce")
+    trades["ticker"] = trades["ticker"].astype(str).str.upper().str.strip()
+    trades["type_upper"] = trades["type"].astype(str).str.upper().str.strip()
+    trades["price"] = pd.to_numeric(trades.get("price", np.nan), errors="coerce")
+
+    cutoff = pd.Timestamp(date.today()) - pd.Timedelta(days=REENTRY_LOOKBACK_DAYS)
+
+    sells = trades[
+        (trades["type_upper"] == "SELL")
+        & (trades["date"].notna())
+        & (trades["date"] >= cutoff)
+        & (trades["ticker"] != "")
+    ].copy()
+
+    if sells.empty:
+        return {}
+
+    sells = sells.sort_values(["ticker", "date"])
+    latest = sells.groupby("ticker").tail(1)
+
+    recent = {}
+    for _, row in latest.iterrows():
+        recent[row["ticker"]] = {
+            "sell_date": row.get("date"),
+            "sell_price": row.get("price", np.nan),
+            "sell_note": str(row.get("notes", "")),
+        }
+
+    return recent
+
+def prior_sell_blocks_reentry(note):
+    note = str(note).lower()
+    block_terms = [
+        "stop loss",
+        "broken trend",
+        "trend weakened",
+        "score weakened",
+        "holding down",
+        "down 15",
+    ]
+    return any(term in note for term in block_terms)
 
 def score_one(row, market):
     ticker = row["ticker"]
@@ -147,6 +201,32 @@ def tier_rank(tier):
         return 1
     return 0
 
+def is_reentry_candidate(row, recent_sells):
+    ticker = row["ticker"]
+    if ticker not in recent_sells:
+        return False
+
+    sell_info = recent_sells[ticker]
+    if prior_sell_blocks_reentry(sell_info.get("sell_note", "")):
+        return False
+
+    score = pd.to_numeric(row.get("_score", 0), errors="coerce")
+    timing_score = pd.to_numeric(row.get("_timing_score", 0), errors="coerce")
+    accel = pd.to_numeric(row.get("_accelerator_score", 0), errors="coerce")
+    momentum = pd.to_numeric(row.get("_momentum_score", 0), errors="coerce")
+    trend = pd.to_numeric(row.get("_trend_score", 0), errors="coerce")
+
+    return (
+        pd.notna(score)
+        and score >= REENTRY_MIN_SCORE
+        and (
+            timing_score >= 60
+            or accel >= 70
+            or momentum > 0
+            or trend > 0
+        )
+    )
+
 def touch_review(row, reason, score):
     row = row.copy()
     today = str(date.today())
@@ -161,8 +241,8 @@ def touch_review(row, reason, score):
 
 def select_active_non_held(non_held):
     ranked = non_held.sort_values(
-        ["_score", "_timing_score", "_tier_rank", "ticker"],
-        ascending=[False, False, False, True]
+        ["_reentry_sort", "_score", "_timing_score", "_tier_rank", "ticker"],
+        ascending=[False, False, False, False, True]
     )
 
     selected = ranked.head(ACTIVE_NON_HELD_LIMIT).copy()
@@ -178,8 +258,8 @@ def select_active_non_held(non_held):
         if not momentum_pool.empty:
             best_momentum = momentum_pool.iloc[0]
             weakest_selected = selected.sort_values(
-                ["_score", "_timing_score", "_tier_rank", "ticker"],
-                ascending=[True, True, True, False]
+                ["_reentry_sort", "_score", "_timing_score", "_tier_rank", "ticker"],
+                ascending=[True, True, True, True, False]
             ).iloc[0]
 
             score_gap = weakest_selected["_score"] - best_momentum["_score"]
@@ -193,7 +273,9 @@ def select_active_non_held(non_held):
 
     return selected, remaining
 
-def recommendation_for(score, low_score_count):
+def recommendation_for(score, low_score_count, reentry_candidate):
+    if reentry_candidate:
+        return "RE-ENTRY CANDIDATE"
     if score < REMOVE_SCORE:
         return "REMOVE"
     if score < KEEP_SCORE and low_score_count >= LOW_SCORE_REVIEW_LIMIT:
@@ -202,9 +284,13 @@ def recommendation_for(score, low_score_count):
         return "MONITOR LOW"
     return "KEEP CANDIDATE"
 
-def promotion_fit_for(score, timing_score, timing_action, rank):
+def promotion_fit_for(score, timing_score, timing_action, rank, reentry_candidate):
     timing_action = str(timing_action).upper()
 
+    if reentry_candidate and rank <= ACTIVE_NON_HELD_LIMIT:
+        return "NEXT UP"
+    if reentry_candidate:
+        return "STRONG CANDIDATE"
     if rank <= 3:
         return "NEXT UP"
     if score >= 70 and timing_score >= 60:
@@ -225,6 +311,8 @@ def removal_reason_for(score, low_score_count):
     return ""
 
 def score_candidates(rebalance=True, build_review=True):
+    recent_sells = load_recent_sells()
+
     dashboard_watchlist = normalise(read_csv_safe(DASHBOARD_WATCHLIST_PATH, BASE_COLUMNS), True)
     candidate_pool = normalise(read_csv_safe(CANDIDATE_POOL_PATH, BASE_COLUMNS), False)
 
@@ -255,6 +343,8 @@ def score_candidates(rebalance=True, build_review=True):
         row["_timing_score"] = timing_score
         row["_tier_rank"] = tier_rank(row.get("tier", ""))
         row["_is_held"] = row["ticker"] in held
+        row["_reentry_candidate"] = is_reentry_candidate(row, recent_sells)
+        row["_reentry_sort"] = 1 if row["_reentry_candidate"] else 0
 
         scored_rows.append(row)
 
@@ -271,6 +361,8 @@ def score_candidates(rebalance=True, build_review=True):
         for _, row in active.iterrows():
             if row["_is_held"]:
                 reason = f"Kept active because currently held: score {row['_score']}, timing {row['_timing_score']}"
+            elif row["_reentry_candidate"]:
+                reason = f"Promoted re-entry candidate: score {row['_score']}, timing {row['_timing_score']}"
             else:
                 reason = f"Kept active top {ACTIVE_NON_HELD_LIMIT}: score {row['_score']}, timing {row['_timing_score']}"
 
@@ -280,11 +372,12 @@ def score_candidates(rebalance=True, build_review=True):
 
         candidate_out = []
         for _, row in candidate_rows.iterrows():
-            row = touch_review(
-                row,
-                f"Kept candidate: outside top {ACTIVE_NON_HELD_LIMIT}; score {row['_score']}, timing {row['_timing_score']}",
-                row["_score"],
-            )
+            if row["_reentry_candidate"]:
+                reason = f"Kept re-entry candidate outside active list: score {row['_score']}, timing {row['_timing_score']}"
+            else:
+                reason = f"Kept candidate: outside top {ACTIVE_NON_HELD_LIMIT}; score {row['_score']}, timing {row['_timing_score']}"
+
+            row = touch_review(row, reason, row["_score"])
             row["enabled"] = False
             if not str(row.get("candidate_reason", "")).strip():
                 row["candidate_reason"] = "Not currently in Dashboard active watchlist"
@@ -315,6 +408,8 @@ def score_candidates(rebalance=True, build_review=True):
         row["_timing_action"] = timing_action
         row["_timing_score"] = timing_score
         row["_tier_rank"] = tier_rank(row.get("tier", ""))
+        row["_reentry_candidate"] = is_reentry_candidate(row, recent_sells)
+        row["_reentry_sort"] = 1 if row["_reentry_candidate"] else 0
         scored_candidates.append(row)
 
     scored_candidates = pd.DataFrame(scored_candidates)
@@ -322,10 +417,9 @@ def score_candidates(rebalance=True, build_review=True):
     review_rows = []
 
     if not scored_candidates.empty:
-        # Initial rank uses raw promotion ranking so next_up_rank still means closest to active list.
         scored_candidates = scored_candidates.sort_values(
-            ["_score", "_timing_score", "_tier_rank", "ticker"],
-            ascending=[False, False, False, True]
+            ["_reentry_sort", "_score", "_timing_score", "_tier_rank", "ticker"],
+            ascending=[False, False, False, False, True]
         ).reset_index(drop=True)
 
         for idx, row in scored_candidates.iterrows():
@@ -335,16 +429,23 @@ def score_candidates(rebalance=True, build_review=True):
             low_score_count = int(pd.to_numeric(row.get("low_score_count", 0), errors="coerce") or 0)
             days_in_pool = days_since(row.get("date_added"))
             days_since_review = days_since(row.get("last_reviewed"))
+            reentry_candidate = bool(row["_reentry_candidate"])
 
-            rec = recommendation_for(score, low_score_count)
-            fit = promotion_fit_for(score, timing_score, row["_timing_action"], rank)
+            rec = recommendation_for(score, low_score_count, reentry_candidate)
+            fit = promotion_fit_for(score, timing_score, row["_timing_action"], rank, reentry_candidate)
             removal_reason = removal_reason_for(score, low_score_count)
             stale_flag = "STALE REVIEW" if pd.notna(days_since_review) and days_since_review > STALE_DAYS else ""
 
-            promotion_reason = (
-                f"Rank {rank}; score {score}; timing {timing_score}; "
-                f"tier {row.get('tier', '')}; active list limited to top {ACTIVE_NON_HELD_LIMIT}"
-            )
+            if reentry_candidate:
+                promotion_reason = (
+                    f"Re-entry candidate; rank {rank}; score {score}; timing {timing_score}; "
+                    f"tier {row.get('tier', '')}; recently sold but setup still looks strong"
+                )
+            else:
+                promotion_reason = (
+                    f"Rank {rank}; score {score}; timing {timing_score}; "
+                    f"tier {row.get('tier', '')}; active list limited to top {ACTIVE_NON_HELD_LIMIT}"
+                )
 
             review_rows.append({
                 "ticker": row["ticker"],
