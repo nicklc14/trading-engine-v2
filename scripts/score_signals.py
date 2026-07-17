@@ -6,7 +6,7 @@ from datetime import datetime
 DATA_DIR = Path("data")
 SIGNALS_PATH = DATA_DIR / "signals.csv"
 MARKET_PATH = DATA_DIR / "market_data.csv"
-WATCHLIST_PATH = DATA_DIR / "watchlist.csv"
+DASHBOARD_WATCHLIST_PATH = DATA_DIR / "dashboard_watchlist.csv"
 CASH_PATH = DATA_DIR / "cash.csv"
 HOLDINGS_PATH = DATA_DIR / "holdings.csv"
 CONFIG_PATH = DATA_DIR / "config.csv"
@@ -175,7 +175,7 @@ def score_signals():
         buy_threshold = aggressive_buy_threshold
         buy_small_threshold = aggressive_buy_small_threshold
 
-    watch = pd.read_csv(WATCHLIST_PATH)
+    watch = pd.read_csv(DASHBOARD_WATCHLIST_PATH)
     watch["enabled"] = watch["enabled"].astype(str).str.upper().isin(["TRUE", "YES", "1", "Y"])
     watch["ticker"] = watch["ticker"].astype(str).str.upper().str.strip()
     watch = watch[watch["enabled"]]
