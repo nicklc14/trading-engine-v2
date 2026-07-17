@@ -4,6 +4,8 @@ from pathlib import Path
 DATA_DIR = Path("data")
 
 REQUIRED_FILES = {
+    "dashboard_watchlist": DATA_DIR / "dashboard_watchlist.csv",
+    "candidate_pool": DATA_DIR / "candidate_pool.csv",
     "dashboard": DATA_DIR / "dashboard.csv",
     "candidate_review": DATA_DIR / "candidate_review.csv",
     "holdings_view": DATA_DIR / "holdings_view.csv",
@@ -18,12 +20,20 @@ REQUIRED_FILES = {
     "closed_trades_learning": DATA_DIR / "closed_trades_learning.csv",
 }
 
+BASE_WATCHLIST_COLUMNS = [
+    "ticker", "sector", "tier", "enabled", "notes",
+    "date_added", "candidate_reason",
+    "last_reviewed", "review_count", "status_reason",
+]
+
 REQUIRED_COLUMNS = {
+    "dashboard_watchlist": BASE_WATCHLIST_COLUMNS,
+    "candidate_pool": BASE_WATCHLIST_COLUMNS,
     "dashboard": [
-        "ticker", "action_required", "add_more", "plan_why",
+        "ticker", "action_required", "position_rule", "plan_why",
         "buy_usd", "sell_usd", "shares_to_buy", "shares_to_sell",
         "price", "score", "tier", "holding_return_pct",
-        "stop_loss", "trim_target", "risk_note", "position_rule",
+        "stop_loss", "trim_target", "risk_note", "add_more",
     ],
     "candidate_review": [
         "ticker", "source_list", "sector", "tier", "price", "score",
@@ -63,6 +73,7 @@ REQUIRED_COLUMNS = {
 }
 
 NON_EMPTY_FILES = [
+    "dashboard_watchlist",
     "dashboard",
     "candidate_review",
     "performance_summary",
@@ -85,6 +96,7 @@ VALID_CANDIDATE_RECOMMENDATIONS = {
     "NO CANDIDATES",
 }
 VALID_SOURCE_LISTS = {"CANDIDATE"}
+VALID_TIERS = {"QUALITY", "MOMENTUM", "MOONSHOT", ""}
 
 def read_csv(name):
     path = REQUIRED_FILES[name]
@@ -106,6 +118,18 @@ def require_columns(name, df):
 def require_non_empty(name, df):
     if name in NON_EMPTY_FILES and df.empty:
         raise ValueError(f"{name}.csv has no rows")
+
+def validate_watchlist_like(name, df):
+    if df["ticker"].isna().any():
+        raise ValueError(f"{name}.csv has blank ticker values")
+
+    bad_tiers = (
+        set(df["tier"].fillna("").astype(str).str.upper())
+        - VALID_TIERS
+    )
+
+    if bad_tiers:
+        raise ValueError(f"{name}.csv has invalid tier values: {sorted(bad_tiers)}")
 
 def validate_dashboard(df):
     bad_actions = (
@@ -174,6 +198,8 @@ def validate_outputs():
         require_non_empty(name, df)
         loaded[name] = df
 
+    validate_watchlist_like("dashboard_watchlist", loaded["dashboard_watchlist"])
+    validate_watchlist_like("candidate_pool", loaded["candidate_pool"])
     validate_dashboard(loaded["dashboard"])
     validate_candidate_review(loaded["candidate_review"])
     validate_market_timing(loaded["market_timing"])
