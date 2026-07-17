@@ -253,7 +253,7 @@ def build_plan_why(row):
     quality = quality_note(row)
     review_note = watchlist_review_note(row)
 
-    suffix = f" {replacement}" if replacement else ""
+    suffix = f". {replacement}" if replacement else ""
 
     if action == "SELL":
         return f"Sell: {exit_reason or warnings}. {quality}{suffix}"
