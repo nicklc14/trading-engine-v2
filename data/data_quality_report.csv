@@ -1,2 +1,2 @@
 as_of,ticker,issue_type,severity,issue,suggested_action,yfinance_fetched_at_utc,latest_market_data_date,oldest_market_data_date,max_yfinance_age_hours,max_market_date_lag_days
-2026-07-17T20:28:51.689176+00:00,,yfinance_freshness,OK,Yfinance market data freshness looks OK,Proceed with normal review,2026-07-17T20:28:46.669890+00:00,2026-07-17,2026-07-17,0.0,0
+2026-07-17T21:13:13.513163+00:00,,yfinance_freshness,OK,Yfinance market data freshness looks OK,Proceed with normal review,2026-07-17T21:13:08.173389+00:00,2026-07-17,2026-07-17,0.0,0
