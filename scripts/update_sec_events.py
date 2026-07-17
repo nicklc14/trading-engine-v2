@@ -6,7 +6,7 @@ from datetime import datetime, timezone, timedelta
 
 DATA_DIR = Path("data")
 
-WATCHLIST_PATH = DATA_DIR / "watchlist.csv"
+DASHBOARD_WATCHLIST_PATH = DATA_DIR / "dashboard_watchlist.csv"
 SEC_EVENTS_PATH = DATA_DIR / "sec_events.csv"
 
 SEC_TICKERS_URL = "https://www.sec.gov/files/company_tickers.json"
@@ -51,7 +51,7 @@ def classify_form(form):
     return "OTHER_FILING", "LOW", 0, f"Recent {form} filing"
 
 def update_sec_events():
-    watch = pd.read_csv(WATCHLIST_PATH)
+    watch = pd.read_csv(DASHBOARD_WATCHLIST_PATH)
     watch["ticker"] = watch["ticker"].astype(str).str.upper().str.strip()
     watch["enabled"] = watch["enabled"].astype(str).str.upper().isin(["TRUE", "YES", "1", "Y"])
     watch = watch[watch["enabled"]]
