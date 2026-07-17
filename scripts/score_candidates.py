@@ -14,19 +14,24 @@ CANDIDATE_REVIEW_PATH = DATA_DIR / "candidate_review.csv"
 ACTIVE_NON_HELD_LIMIT = 5
 MOMENTUM_SOFT_INCLUDE_SCORE_GAP = 10
 KEEP_SCORE = 50
+REMOVE_SCORE = 40
+LOW_SCORE_REVIEW_LIMIT = 3
+STALE_DAYS = 14
 
 BASE_COLUMNS = [
     "ticker", "sector", "tier", "enabled", "notes",
     "date_added", "candidate_reason",
     "last_reviewed", "review_count", "status_reason",
+    "low_score_count",
 ]
 
 REVIEW_COLUMNS = [
-    "ticker", "source_list", "sector", "tier", "price", "score",
+    "ticker", "recommendation", "next_up_rank", "promotion_fit", "promotion_reason",
+    "tier", "score", "timing_score", "timing_action", "sector", "price",
     "trend_score", "momentum_score", "accelerator_score",
-    "timing_action", "timing_score", "recommendation", "why",
-    "notes", "date_added", "candidate_reason",
-    "last_reviewed", "review_count", "status_reason",
+    "notes", "candidate_reason", "date_added", "days_in_pool",
+    "last_reviewed", "review_count", "low_score_count",
+    "stale_flag", "removal_reason", "status_reason",
 ]
 
 def truthy(x):
@@ -50,6 +55,8 @@ def normalise(df, default_enabled):
     df["date_added"] = df["date_added"].replace("", today)
     df["last_reviewed"] = df["last_reviewed"].replace("", "")
     df["review_count"] = pd.to_numeric(df["review_count"], errors="coerce").fillna(0).astype(int)
+    df["low_score_count"] = pd.to_numeric(df["low_score_count"], errors="coerce").fillna(0).astype(int)
+
     df["candidate_reason"] = df["candidate_reason"].where(
         df["candidate_reason"].astype(str).str.strip() != "",
         df["notes"]
@@ -107,13 +114,19 @@ def score_one(row, market):
 
     return price, score, trend_score, momentum_score, accelerator_score, timing_action, timing_score
 
-def touch_review(row, reason):
-    row = row.copy()
-    today = str(date.today())
-    row["last_reviewed"] = today
-    row["review_count"] = int(pd.to_numeric(row.get("review_count", 0), errors="coerce") or 0) + 1
-    row["status_reason"] = reason
-    return row
+def parse_date_safe(x):
+    try:
+        if pd.isna(x) or str(x).strip() == "":
+            return None
+        return pd.to_datetime(x).date()
+    except Exception:
+        return None
+
+def days_since(x):
+    d = parse_date_safe(x)
+    if not d:
+        return np.nan
+    return (date.today() - d).days
 
 def tier_rank(tier):
     tier = str(tier).upper()
@@ -124,6 +137,18 @@ def tier_rank(tier):
     if tier == "QUALITY":
         return 1
     return 0
+
+def touch_review(row, reason, score):
+    row = row.copy()
+    today = str(date.today())
+    row["last_reviewed"] = today
+    row["review_count"] = int(pd.to_numeric(row.get("review_count", 0), errors="coerce") or 0) + 1
+    row["status_reason"] = reason
+
+    low_count = int(pd.to_numeric(row.get("low_score_count", 0), errors="coerce") or 0)
+    row["low_score_count"] = low_count + 1 if score < KEEP_SCORE else 0
+
+    return row
 
 def select_active_non_held(non_held):
     ranked = non_held.sort_values(
@@ -158,6 +183,31 @@ def select_active_non_held(non_held):
     remaining = ranked[~ranked["ticker"].isin(selected["ticker"])].copy()
 
     return selected, remaining
+
+def promotion_fit(score, timing_score, rank):
+    if rank <= 3:
+        return "NEXT UP"
+    if score >= 70 and timing_score >= 60:
+        return "STRONG CANDIDATE"
+    if score >= KEEP_SCORE:
+        return "MONITOR"
+    return "WEAK"
+
+def recommendation_for(score, low_score_count):
+    if score < REMOVE_SCORE:
+        return "REMOVE"
+    if score < KEEP_SCORE and low_score_count >= LOW_SCORE_REVIEW_LIMIT:
+        return "REMOVE"
+    if score < KEEP_SCORE:
+        return "MONITOR LOW"
+    return "KEEP CANDIDATE"
+
+def removal_reason_for(score, low_score_count):
+    if score < REMOVE_SCORE:
+        return f"Score below remove threshold {REMOVE_SCORE}"
+    if score < KEEP_SCORE and low_score_count >= LOW_SCORE_REVIEW_LIMIT:
+        return f"Score below {KEEP_SCORE} for {low_score_count} reviews"
+    return ""
 
 def score_candidates(rebalance=True, build_review=True):
     dashboard_watchlist = normalise(read_csv_safe(DASHBOARD_WATCHLIST_PATH, BASE_COLUMNS), True)
@@ -209,7 +259,7 @@ def score_candidates(rebalance=True, build_review=True):
             else:
                 reason = f"Kept active top {ACTIVE_NON_HELD_LIMIT}: score {row['_score']}, timing {row['_timing_score']}"
 
-            row = touch_review(row, reason)
+            row = touch_review(row, reason, row["_score"])
             row["enabled"] = True
             active_out.append(row[BASE_COLUMNS])
 
@@ -217,7 +267,8 @@ def score_candidates(rebalance=True, build_review=True):
         for _, row in candidate_rows.iterrows():
             row = touch_review(
                 row,
-                f"Kept candidate: outside top {ACTIVE_NON_HELD_LIMIT}; score {row['_score']}, timing {row['_timing_score']}"
+                f"Kept candidate: outside top {ACTIVE_NON_HELD_LIMIT}; score {row['_score']}, timing {row['_timing_score']}",
+                row["_score"],
             )
             row["enabled"] = False
             if not str(row.get("candidate_reason", "")).strip():
@@ -235,49 +286,76 @@ def score_candidates(rebalance=True, build_review=True):
     if not build_review:
         return pd.DataFrame(columns=REVIEW_COLUMNS)
 
-    rows = []
+    review_rows = []
 
+    scored_candidates = []
     for _, row in candidate_pool.iterrows():
         price, score, trend, momentum, accel, timing_action, timing_score = score_one(row, market)
+        row = row.copy()
+        row["_price"] = price
+        row["_score"] = score
+        row["_trend_score"] = trend
+        row["_momentum_score"] = momentum
+        row["_accelerator_score"] = accel
+        row["_timing_action"] = timing_action
+        row["_timing_score"] = timing_score
+        row["_tier_rank"] = tier_rank(row.get("tier", ""))
+        scored_candidates.append(row)
 
-        recommendation = "KEEP CANDIDATE" if score >= KEEP_SCORE else "DISABLED"
-        why = "Monitor for improvement" if score >= KEEP_SCORE else "Candidate disabled"
+    scored_candidates = pd.DataFrame(scored_candidates)
 
-        rows.append({
+    if not scored_candidates.empty:
+        scored_candidates = scored_candidates.sort_values(
+            ["_score", "_timing_score", "_tier_rank", "ticker"],
+            ascending=[False, False, False, True]
+        ).reset_index(drop=True)
+
+    for idx, row in scored_candidates.iterrows():
+        rank = idx + 1
+        score = row["_score"]
+        timing_score = row["_timing_score"]
+        low_score_count = int(pd.to_numeric(row.get("low_score_count", 0), errors="coerce") or 0)
+        days_in_pool = days_since(row.get("date_added"))
+        days_since_review = days_since(row.get("last_reviewed"))
+
+        rec = recommendation_for(score, low_score_count)
+        fit = promotion_fit(score, timing_score, rank)
+        removal_reason = removal_reason_for(score, low_score_count)
+        stale_flag = "STALE REVIEW" if pd.notna(days_since_review) and days_since_review > STALE_DAYS else ""
+
+        promotion_reason = (
+            f"Rank {rank}; score {score}; timing {timing_score}; "
+            f"tier {row.get('tier', '')}; active list limited to top {ACTIVE_NON_HELD_LIMIT}"
+        )
+
+        review_rows.append({
             "ticker": row["ticker"],
-            "source_list": "CANDIDATE",
-            "sector": row.get("sector", ""),
+            "recommendation": rec,
+            "next_up_rank": rank,
+            "promotion_fit": fit,
+            "promotion_reason": promotion_reason,
             "tier": row.get("tier", ""),
-            "price": price,
             "score": score,
-            "trend_score": trend,
-            "momentum_score": momentum,
-            "accelerator_score": accel,
-            "timing_action": timing_action,
             "timing_score": timing_score,
-            "recommendation": recommendation,
-            "why": why,
+            "timing_action": row["_timing_action"],
+            "sector": row.get("sector", ""),
+            "price": row["_price"],
+            "trend_score": row["_trend_score"],
+            "momentum_score": row["_momentum_score"],
+            "accelerator_score": row["_accelerator_score"],
             "notes": row.get("notes", ""),
-            "date_added": row.get("date_added", str(date.today())),
             "candidate_reason": row.get("candidate_reason", row.get("notes", "")),
+            "date_added": row.get("date_added", str(date.today())),
+            "days_in_pool": days_in_pool,
             "last_reviewed": row.get("last_reviewed", ""),
             "review_count": row.get("review_count", 0),
+            "low_score_count": low_score_count,
+            "stale_flag": stale_flag,
+            "removal_reason": removal_reason,
             "status_reason": row.get("status_reason", ""),
         })
 
-    review = pd.DataFrame(rows, columns=REVIEW_COLUMNS)
-
-    if not review.empty:
-        review["priority_rank"] = review["recommendation"].map({
-            "KEEP CANDIDATE": 1,
-            "DISABLED": 4,
-        }).fillna(9)
-
-        review = review.sort_values(
-            ["priority_rank", "score", "timing_score", "ticker"],
-            ascending=[True, False, False, True]
-        ).drop(columns=["priority_rank"])
-
+    review = pd.DataFrame(review_rows, columns=REVIEW_COLUMNS)
     review.to_csv(CANDIDATE_REVIEW_PATH, index=False)
     return review
 
