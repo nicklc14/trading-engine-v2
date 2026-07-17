@@ -366,8 +366,8 @@ def build_dashboard():
     signals["action_required"] = signals.apply(validate_action, axis=1)
     signals["add_more"] = signals.apply(add_more, axis=1)
 
-    signals = allocate_cash(signals)
     signals = add_replacement_notes(signals)
+    signals = allocate_cash(signals)
 
     signals["sell_usd"] = np.where(
         signals["action_required"] == "SELL",
