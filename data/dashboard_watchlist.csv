@@ -1,13 +1,13 @@
 ticker,sector,tier,enabled,notes,date_added,candidate_reason,last_reviewed,review_count,status_reason,low_score_count
-ANET,Networking,MOMENTUM,True,Strong trend momentum,2026-07-16,Strong trend momentum,2026-07-17,22,"Kept active because currently held: score 75, timing 60",0
-BFLY,Medical Devices,MOONSHOT,True,Speculative medical device,2026-07-16,Speculative medical device,2026-07-17,22,"Kept active because currently held: score 50, timing 50",0
-BLZE,Gaming/Digital Media,MOONSHOT,True,High-risk momentum/moonshot,2026-07-16,High-risk momentum/moonshot,2026-07-17,22,"Kept active because currently held: score 50, timing 60",0
-GOOGL,Internet/Software,QUALITY,True,Large-cap quality,2026-07-16,Large-cap quality,2026-07-17,22,"Kept active because currently held: score 75, timing 60",0
-NVDA,Semiconductors,QUALITY,True,Large-cap AI leader,2026-07-16,Large-cap AI leader,2026-07-17,22,"Kept active because currently held: score 100, timing 70",0
-SOFI,Fintech,MOMENTUM,True,Fintech momentum,2026-07-16,Fintech momentum,2026-07-17,22,"Kept active because currently held: score 50, timing 60",0
-STTK,Industrials,MOONSHOT,True,Speculative small-cap,2026-07-16,Speculative small-cap,2026-07-17,22,"Kept active because currently held: score 120, timing 85",0
-TSLA,Electric Vehicles,QUALITY,True,Large-cap volatile quality,2026-07-16,Large-cap volatile quality,2026-07-17,22,"Promoted re-entry candidate: score 75, timing 60",0
-SOUN,AI Software,MOONSHOT,True,Speculative AI software,2026-07-16,Speculative AI software,2026-07-17,22,"Kept active top 5: score 120, timing 85",0
-SYM,Robotics Automation,MOONSHOT,True,Warehouse automation/robotics,2026-07-16,Robotics automation upside,2026-07-17,22,"Kept active top 5: score 100, timing 70",0
-AMZN,Internet/E-Commerce,QUALITY,True,Large-cap quality,2026-07-16,Large-cap quality,2026-07-17,22,"Kept active top 5: score 100, timing 70",0
-AVGO,Semiconductors,QUALITY,True,Large-cap semiconductor,2026-07-16,Large-cap semiconductor,2026-07-17,22,"Kept active top 5: score 100, timing 70",0
+ANET,Networking,MOMENTUM,True,Strong trend momentum,2026-07-16,Strong trend momentum,2026-07-18,23,"Kept active because currently held: score 75, timing 60",0
+BFLY,Medical Devices,MOONSHOT,True,Speculative medical device,2026-07-16,Speculative medical device,2026-07-18,23,"Kept active because currently held: score 50, timing 50",0
+BLZE,Gaming/Digital Media,MOONSHOT,True,High-risk momentum/moonshot,2026-07-16,High-risk momentum/moonshot,2026-07-18,23,"Kept active because currently held: score 50, timing 60",0
+GOOGL,Internet/Software,QUALITY,True,Large-cap quality,2026-07-16,Large-cap quality,2026-07-18,23,"Kept active because currently held: score 75, timing 60",0
+NVDA,Semiconductors,QUALITY,True,Large-cap AI leader,2026-07-16,Large-cap AI leader,2026-07-18,23,"Kept active because currently held: score 100, timing 70",0
+SOFI,Fintech,MOMENTUM,True,Fintech momentum,2026-07-16,Fintech momentum,2026-07-18,23,"Kept active because currently held: score 50, timing 60",0
+STTK,Industrials,MOONSHOT,True,Speculative small-cap,2026-07-16,Speculative small-cap,2026-07-18,23,"Kept active because currently held: score 120, timing 85",0
+TSLA,Electric Vehicles,QUALITY,True,Large-cap volatile quality,2026-07-16,Large-cap volatile quality,2026-07-18,23,"Promoted re-entry candidate: score 75, timing 60",0
+SOUN,AI Software,MOONSHOT,True,Speculative AI software,2026-07-16,Speculative AI software,2026-07-18,23,"Kept active top 5: score 120, timing 85",0
+SYM,Robotics Automation,MOONSHOT,True,Warehouse automation/robotics,2026-07-16,Robotics automation upside,2026-07-18,23,"Kept active top 5: score 100, timing 70",0
+AMZN,Internet/E-Commerce,QUALITY,True,Large-cap quality,2026-07-16,Large-cap quality,2026-07-18,23,"Kept active top 5: score 100, timing 70",0
+AVGO,Semiconductors,QUALITY,True,Large-cap semiconductor,2026-07-16,Large-cap semiconductor,2026-07-18,23,"Kept active top 5: score 100, timing 70",0
