@@ -1,4 +1,4 @@
 week_start,sell_date,ticker,tier,holding_key,first_buy_date,holding_days,buy_cost_usd,buy_fees_usd,sell_proceeds_usd,sell_fee_usd,realized_pnl_usd,realized_return_pct,result,latest_score,latest_action,latest_reasons,latest_warnings,market_regime,aggressive_mode_active,add_more_signal,exit_action,exit_reason,notes
-2026-07-06,2026-07-08,IONQ,,5,2026-07-02,6,11.28,0.21,9.65,0.18,-1.63,-0.1445035460992907,LOSS,,,,,,,,,,Imported current workbook sell
+2026-07-06,2026-07-08,IONQ,,5,2026-07-02,6,11.28,0.21,9.65,0.18,-1.63,-0.1445035460992907,LOSS,33.0,WATCH,Market regime: Risk On; Aggressive mode active; Moonshot tier boost,Re-entry watch; Moonshot: high risk / small size,Risk On,True,,,,Imported current workbook sell
 2026-07-06,2026-07-09,ASTS,,2,2026-06-30,9,11.26,0.21,9.74,0.19,-1.52,-0.13499111900532856,LOSS,,,,,,,,,,Imported current workbook sell
 2026-07-13,2026-07-16,TSLA,,1,2026-06-30,16,11.26,0.2,10.67,0.29,-0.59,-0.05239786856127885,LOSS,,,,,,,,,,First Sell on engine v2 advice

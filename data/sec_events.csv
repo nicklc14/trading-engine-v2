@@ -2,12 +2,12 @@ ticker,sec_event_flag,sec_event_type,sec_event_date,sec_form,sec_severity,sec_sc
 ANET,YES,OWNERSHIP_FILING,2026-07-16,4,LOW,0,Recent insider/ownership filing
 BFLY,YES,MATERIAL_EVENT,2026-06-22,8-K,MEDIUM,0,Recent 8-K material event filing
 BLZE,YES,MATERIAL_EVENT,2026-07-02,8-K,MEDIUM,0,Recent 8-K material event filing
-GOOGL,YES,OWNERSHIP_FILING,2026-07-17,4,LOW,0,Recent insider/ownership filing
+GOOGL,YES,OWNERSHIP_FILING,2026-07-21,4,LOW,0,Recent insider/ownership filing
 NVDA,YES,MATERIAL_EVENT,2026-07-02,8-K,MEDIUM,0,Recent 8-K material event filing
 SOFI,YES,OWNERSHIP_FILING,2026-06-29,4,LOW,0,Recent insider/ownership filing
 STTK,YES,OWNERSHIP_FILING,2026-07-07,4,LOW,0,Recent insider/ownership filing
-TSLA,YES,MATERIAL_EVENT,2026-07-02,8-K,MEDIUM,0,Recent 8-K material event filing
 SOUN,YES,DILUTION_RISK,2026-07-09,424B3,HIGH,-5,Recent offering/registration filing risk
 SYM,YES,OWNERSHIP_FILING,2026-07-08,4,LOW,0,Recent insider/ownership filing
 AMZN,YES,DILUTION_RISK,2026-07-08,424B5,HIGH,-5,Recent offering/registration filing risk
 AVGO,YES,MATERIAL_EVENT,2026-07-06,8-K,MEDIUM,0,Recent 8-K material event filing
+PLTR,YES,OWNERSHIP_FILING,2026-07-17,4,LOW,0,Recent insider/ownership filing
