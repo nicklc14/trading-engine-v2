@@ -1,12 +1,12 @@
 metric,value,format_hint
 Total Deposits USD,113.89,currency
 Cash Available USD,4.94,currency
-Holdings Value USD,94.24,currency
-Account Equity USD,99.18,currency
-Account P&L USD,-14.71,currency
-Account Return %,-0.129141395500552,percent
+Holdings Value USD,93.0,currency
+Account Equity USD,97.94,currency
+Account P&L USD,-15.95,currency
+Account Return %,-0.1400693113549253,percent
 Realised P&L USD,-3.83,currency
-Unrealised P&L USD,-10.97,currency
+Unrealised P&L USD,-12.21,currency
 Closed Wins,0.0,number
 Closed Losses,3.0,number
 Win Rate,0.0,percent
